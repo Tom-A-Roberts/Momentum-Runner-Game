@@ -110,8 +110,6 @@ public class PlayerController : MonoBehaviour
 
             bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
 
-            print(forwardsSpeed.ToString() + "  " + requiredAcc.ToString());
-
 
             //if (isOnFloor)
             //{
