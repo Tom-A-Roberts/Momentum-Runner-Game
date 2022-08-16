@@ -10,18 +10,20 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Settings")]
     [Tooltip("The maximum speed the player will accelerate to when on the ground as a result of key-presses.")]
-    public float WalkingSpeed = 5f;
+    public float WalkingSpeed = 8f;
 
     [Tooltip("The power of the acceleration. 1 means instant acceleration to full walking speed. 0 means something slow.")]
     [Range(0f, 1f)]
-    public float Acceleration = 0.9f;
+    public float Acceleration = 0.8f;
 
-    [Tooltip("The power of the deceleration when the player is actively cancelling .")]
-    public float CancellationPower = 20f;
+    [Tooltip("The power of the deceleration when the player is actively cancelling motion.")]
+    public float CancellationPower = 50f;
     [Tooltip("The power of the deceleration that stops the player sliding sideways")]
     public float SidewaysDeceleration = 10f;
     [Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
     public float AirAcceleration = 15f;
+    [Tooltip("How much drag the character should have when no keys are pressed (how quick they slow down).")]
+    public float DragWhenNoKeysPressed = 19f;
 
     Vector2 keyboardInputs;
     bool JumpKeyPressed = false;
@@ -58,7 +60,7 @@ public class PlayerController : MonoBehaviour
 
         if (xInput == 0 && yInput == 0 && isOnFloor)
         {
-            bodyRigidBody.drag = 4;
+            bodyRigidBody.drag = DragWhenNoKeysPressed;
         }
         else
         {
@@ -88,9 +90,6 @@ public class PlayerController : MonoBehaviour
             // Unwanted velocity that is sideways to the wish direction
             Vector3 sidewaysVelocity = Vector3.Project(currentPlanarVelocity, wishVelocitySideways);
 
-            // velocity that is in-line with the wish direction
-            //Vector3 forwardsVelocity = Vector3.Project(wishVelocity, currentPlanarVelocity);
-
             float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
 
             float requiredAcc = 0;
@@ -102,52 +101,16 @@ public class PlayerController : MonoBehaviour
             }
             else if (forwardsSpeed < WalkingSpeed)
             {
+                // How much required acceleration there is to reach the intended speed (walkingspeed).
                 requiredAcc = (WalkingSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration)*25 + 1));
-                //if (requiredAcc < WalkingSpeed)
-                //{
-                //    bodyRigidBody.AddForce(wishDirection * -requiredAcc, ForceMode.Acceleration);
-                //}
-                //else* Acceleration
-                //{
+
                 bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
-                //}
-                
 
             }
 
             bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
 
             print(forwardsSpeed.ToString() + "  " + requiredAcc.ToString());
-
-            //float MultiplierV = 1;
-            //float MultiplierH = 1;
-
-            //float DotV = Vector3.Dot(targetForwardVector, currentPlanarVelocity.normalized);
-            //float DotH = Vector3.Dot(targetHorizontalVector, currentPlanarVelocity.normalized);
-
-
-            //if (DotV < 0)
-            //{
-            //    DotV = 0;
-            //}
-            //if (DotH < 0)
-            //{
-            //    DotH = 0;
-            //}
-            //MultiplierV = 0.5f - DotV;
-            //MultiplierH = 0.5f - DotH;
-
-            //if (MultiplierV < 0)
-            //{
-            //    MultiplierV = 0;
-            //}
-            //if (MultiplierH < 0)
-            //{
-            //    MultiplierH = 0;
-            //}
-
-            //MultiplierV *= 2;
-            //MultiplierH *= 2;
 
 
             //if (isOnFloor)
