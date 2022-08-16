@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,10 +25,13 @@ public class PlayerController : MonoBehaviour
     public float AirAcceleration = 15f;
     [Tooltip("How much drag the character should have when no keys are pressed (how quick they slow down).")]
     public float DragWhenNoKeysPressed = 19f;
+    [Tooltip("Force applied to player when jump button is pressed.")]
+    public float jumpHeight = 10000f;
 
     Vector2 keyboardInputs;
     bool JumpKeyPressed = false;
     bool isOnFloor = true;
+    int jumpNumber = 2;
 
     void Start()
     {
@@ -37,9 +41,17 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (isOnFloor)
+        {
+            jumpNumber = 2;
+        }
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
-
+        if(Input.GetKey(KeyCode.Space) && jumpNumber > 0)
+        {
+            jumpNumber--;
+            Jump();
+        }
 
     }
 
@@ -53,6 +65,10 @@ public class PlayerController : MonoBehaviour
 
         processMotion(xInput, yInput);
 
+    }
+    void Jump()
+    {
+        bodyRigidBody.AddForce(new Vector3 (0,jumpHeight,0));
     }
 
     void processMotion(float xInput, float yInput)
