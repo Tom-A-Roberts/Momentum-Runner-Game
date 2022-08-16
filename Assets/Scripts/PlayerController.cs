@@ -6,18 +6,20 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Known Objects")]
     public Transform mainCamera;
-    //[Tooltip("The acceleration felt when moving forwards on the ground at higher speeds.")]
     private Rigidbody bodyRigidBody;
 
     [Header("Movement Settings")]
     [Tooltip("The maximum speed the player will accelerate to when on the ground as a result of key-presses.")]
-    public float WalkingSpeed = 80f;
-    [Tooltip("The power of the acceleration in-line with the player's desired direction.")]
-    public float Acceleration = 10f;
+    public float WalkingSpeed = 5f;
+
+    [Tooltip("The power of the acceleration. 1 means instant acceleration to full walking speed. 0 means something slow.")]
+    [Range(0f, 1f)]
+    public float Acceleration = 0.9f;
+
     [Tooltip("The power of the deceleration when the player is actively cancelling .")]
-    public float CancellationDeceleration = 15f;
+    public float CancellationPower = 20f;
     [Tooltip("The power of the deceleration that stops the player sliding sideways")]
-    public float SidewaysDeceleration = 15f;
+    public float SidewaysDeceleration = 10f;
     [Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
     public float AirAcceleration = 15f;
 
@@ -50,7 +52,6 @@ public class PlayerController : MonoBehaviour
         processMotion(xInput, yInput);
 
     }
-
 
     void processMotion(float xInput, float yInput)
     {
@@ -92,21 +93,31 @@ public class PlayerController : MonoBehaviour
 
             float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
 
-            print(forwardsSpeed.ToString() + "  " + sidewaysVelocity.magnitude.ToString());
+            float requiredAcc = 0;
 
             // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
             if (forwardsSpeed < 0)
             {
-                bodyRigidBody.AddForce(wishDirection * CancellationDeceleration, ForceMode.Acceleration);
+                bodyRigidBody.AddForce(wishDirection * CancellationPower, ForceMode.Acceleration);
             }
             else if (forwardsSpeed < WalkingSpeed)
             {
-                // We are accelerating towards the target speed
-                bodyRigidBody.AddForce(wishDirection * Acceleration, ForceMode.Acceleration);
+                requiredAcc = (WalkingSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration)*25 + 1));
+                //if (requiredAcc < WalkingSpeed)
+                //{
+                //    bodyRigidBody.AddForce(wishDirection * -requiredAcc, ForceMode.Acceleration);
+                //}
+                //else* Acceleration
+                //{
+                bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
+                //}
+                
+
             }
 
             bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
 
+            print(forwardsSpeed.ToString() + "  " + requiredAcc.ToString());
 
             //float MultiplierV = 1;
             //float MultiplierH = 1;
