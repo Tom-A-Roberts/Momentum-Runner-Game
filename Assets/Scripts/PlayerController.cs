@@ -60,7 +60,12 @@ public class PlayerController : MonoBehaviour
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
 
-        if (GroundDetector.IsOnGround)
+        if (remainingJumps != JumpCount)
+        {
+            if (GroundDetector.IsOnGround)
+                remainingJumps = JumpCount;
+        }
+        else
         {
             remainingJumps = JumpCount - 1;
         }
