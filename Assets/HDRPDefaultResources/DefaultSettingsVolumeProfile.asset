@@ -134,7 +134,7 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0
   skyIntensityMode:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   exposure:
     m_OverrideState: 1
@@ -261,7 +261,7 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0.2
   scatter:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.7
   tint:
     m_OverrideState: 0
@@ -302,7 +302,7 @@ MonoBehaviour:
     m_Value: 1
   cloudType:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 1
   skyAmbientMode:
     m_OverrideState: 0
     m_Value: 0
@@ -338,8 +338,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 1
   fixedExposure:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 13.935136
   compensation:
     m_OverrideState: 0
     m_Value: 0
@@ -580,7 +580,7 @@ MonoBehaviour:
     m_Value: 0
   gamma:
     m_OverrideState: 0
-    m_Value: 1
+    m_Value: 1.58
   lutTexture:
     m_OverrideState: 0
     m_Value: {fileID: 0}
