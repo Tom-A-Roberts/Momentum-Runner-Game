@@ -39,6 +39,8 @@ public class PlayerController : MonoBehaviour
     public float AirJumpMultiplier = 2;
     [Tooltip("How much sprinting increases your speed by")]
     public float SprintMultiplier = 1.5f;
+    [Tooltip("How much force is applied when air dashing")]
+    public float DashForce = 10f;
 
     public float JumpLerpStart = 10f;
 
@@ -47,6 +49,7 @@ public class PlayerController : MonoBehaviour
     private float movementSpeed;
     private float currentJumpForce;
     private float yVelocity;
+    private bool canDash;
 
     void Start()
     {
@@ -60,6 +63,8 @@ public class PlayerController : MonoBehaviour
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
 
+        if (GroundDetector.IsOnGround) canDash = true;
+
         if (remainingJumps != JumpCount)
         {
             if (GroundDetector.IsOnGround)
@@ -72,6 +77,12 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftShift)) movementSpeed = WalkingSpeed * SprintMultiplier;
         else movementSpeed = WalkingSpeed;
+
+        if(Input.GetKeyDown(KeyCode.Q) && canDash == true && !GroundDetector.IsOnGround) //if the player is in the air, hasnt already dashed, and presses q
+        {
+            canDash = false;
+            bodyRigidBody.AddForce(transform.forward * DashForce, ForceMode.Impulse); //add a forward horizontal force
+        }
 
         if (remainingJumps > 0 && Input.GetKeyDown(KeyCode.Space))
         {

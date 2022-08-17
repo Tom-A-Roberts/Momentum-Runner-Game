@@ -37633,6 +37633,10 @@ PrefabInstance:
       value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: DashForce
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: AirForceMax
       value: 10
       objectReference: {fileID: 0}
@@ -40945,7 +40949,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh29534
+  m_Name: pb_Mesh23734
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -46427,7 +46431,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh29752
+  m_Name: pb_Mesh23952
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
