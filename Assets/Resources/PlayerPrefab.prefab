@@ -613,10 +613,10 @@ MonoBehaviour:
   SidewaysDeceleration: 10
   DragWhenNoKeysPressed: 10
   CharacterFallingWeight: 5
-  JumpForce: 10
-  MinJumpForce: 0
+  JumpForce: 12
+  MinJumpForce: 2
   JumpCount: 2
-  AirJumpMultiplier: 2
+  AirJumpMultiplier: 1.5
   SprintMultiplier: 1.5
   JumpLerpStart: 10
 --- !u!1 &4316027074863493586
@@ -879,3 +879,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d57d33ef101f74d80fc7146a7a326f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  positionVector: {x: 0, y: 0, z: 0}
