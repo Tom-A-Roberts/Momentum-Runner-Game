@@ -37633,6 +37633,30 @@ PrefabInstance:
       value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: JumpCount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: JumpForce
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: AirForceMax
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: MinJumpForce
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: JumpLerpStart
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: AirJumpMultiplier
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: airJumpMultiplier
       value: 1.5
       objectReference: {fileID: 0}
@@ -40933,7 +40957,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh23650
+  m_Name: pb_Mesh26390
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -46415,7 +46439,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh23868
+  m_Name: pb_Mesh26608
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
