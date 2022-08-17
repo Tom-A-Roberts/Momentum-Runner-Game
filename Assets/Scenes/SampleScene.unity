@@ -37696,21 +37696,9 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2020538239, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: lineColor.a
-      value: 0.8156863
-      objectReference: {fileID: 0}
-    - target: {fileID: 2020538239, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: lineColor.b
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2020538239, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: lineColor.g
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2020538239, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: lineColor.r
-      value: 0.5
-      objectReference: {fileID: 0}
+      propertyPath: muzzleFlashParticlePrefab
+      value: 
+      objectReference: {fileID: 1548731787465841113, guid: 14a375f0b95638a479fd733831292beb, type: 3}
     - target: {fileID: 4316027075412832466, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab

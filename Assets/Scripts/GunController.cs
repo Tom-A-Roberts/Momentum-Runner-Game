@@ -27,6 +27,7 @@ public class GunController : MonoBehaviour
     public Color lineColor;
     public Shader lineShader;
     public GameObject groundHitParticlePrefab;
+    public GameObject muzzleFlashParticlePrefab;
 
     private float animationProgress = 1;
     private bool animationActive = false;
@@ -124,13 +125,13 @@ public class GunController : MonoBehaviour
 
 
             GameObject ground_particle = Instantiate(groundHitParticlePrefab, hitObj.point, Quaternion.FromToRotation(Vector3.forward, hitObj.normal));
+            
         }
         else
         {
             lr.SetPosition(1, shootDirection * 100f);
         }
-
-
-
+        GameObject muzzle_particle = Instantiate(muzzleFlashParticlePrefab, muzzlePoint.position, muzzlePoint.rotation);//
+        muzzle_particle.transform.parent = muzzlePoint.transform;
     }
 }
