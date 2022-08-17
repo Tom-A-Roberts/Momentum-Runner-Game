@@ -6,11 +6,19 @@ public class CameraController : MonoBehaviour
 {
     public GameObject body;
 
+	[Header("Dynamic FOV Settings")]
+	//[Tooltip("The power of the deceleration that stops the player sliding sideways")]
+	public float FOVMultiperWhenSprinting = 1.2f;
+
+
 	private Vector3 cameraOffsetFromBody;
+	private float originalFOV;
+	private Camera myCamera;
     private void Start()
     {
 		cameraOffsetFromBody = transform.position - body.transform.position;
-
+		myCamera = GetComponent<Camera>();
+		originalFOV = myCamera.fieldOfView;
 		Cursor.lockState = CursorLockMode.Locked; //Lock mouse cursor to screen
 	}
 
@@ -40,4 +48,10 @@ public class CameraController : MonoBehaviour
 
 		transform.position = body.transform.position + cameraOffsetFromBody;
 	}
+
+	void UpdateCameraFOV()
+    {
+
+    }
+
 }
