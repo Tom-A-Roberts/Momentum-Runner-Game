@@ -114,6 +114,7 @@ GameObject:
   - component: {fileID: 4316027073947639283}
   - component: {fileID: 4316027073947639282}
   - component: {fileID: 1371572323}
+  - component: {fileID: 7414070647618193404}
   m_Layer: 0
   m_Name: Feet
   m_TagString: Untagged
@@ -214,8 +215,20 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &1371572323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4316027073947639292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0047c36ee6ab65408f1d8b10985087e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7414070647618193404
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -454,7 +467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 4316027073834798315}
-  GroundDetector: {fileID: 1371572323}
+  GroundDetector: {fileID: 7414070647618193404}
   WalkingSpeed: 8
   Acceleration: 0.8
   CancellationPower: 50
@@ -462,6 +475,8 @@ MonoBehaviour:
   DragWhenNoKeysPressed: 10
   CharacterFallingWeight: 5
   JumpForce: 10
+  JumpCount: 2
+  airJumpMultiplier: 2
 --- !u!1 &4316027074863493586
 GameObject:
   m_ObjectHideFlags: 0

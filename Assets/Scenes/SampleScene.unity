@@ -37629,16 +37629,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: GroundDetector
-      value: 
-      objectReference: {fileID: 1371572323}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: CharacterFallingWeight
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905780, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: m_MassScale
-      value: 10
+      propertyPath: airJumpMultiplier
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 4316027075412832466, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: m_Name
@@ -40281,23 +40273,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &1371572317 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4316027073947639292, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-  m_PrefabInstance: {fileID: 654048565}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1371572323
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1371572317}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0047c36ee6ab65408f1d8b10985087e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1453586881
 GameObject:
   m_ObjectHideFlags: 0
@@ -40954,7 +40929,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-7996
+  m_Name: pb_Mesh32120
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2

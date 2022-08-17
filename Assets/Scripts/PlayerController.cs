@@ -29,14 +29,19 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Additional gravity is added when falling, in order to increasing the feeling of weight with the character ")]
     public float CharacterFallingWeight = 5f;
     public float JumpForce = 10f;
+    [Tooltip("How many times the character jumps including the first jump before the jump key doesnt work anymore")]
+    public int JumpCount = 2;
     //[Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
     //public float AirAcceleration = 15f;
+    [Tooltip("How much we multiply jump force by in the air to account for artificial gravity")]
+    public float airJumpMultiplier = 2;
 
     Vector2 keyboardInputs;
-    bool JumpAlreadyKeyPressed = false;
+    private int remainingJumps;
 
     void Start()
     {
+        remainingJumps  = JumpCount - 1; //this works off array numbers so its technically 2 :)
         bodyRigidBody = GetComponent<Rigidbody>();
 
     }
@@ -49,20 +54,16 @@ public class PlayerController : MonoBehaviour
 
         if (GroundDetector.IsOnGround)
         {
-            if (!JumpAlreadyKeyPressed && Input.GetKeyDown(KeyCode.Space))
-            {
-                JumpAlreadyKeyPressed = true;
-                bodyRigidBody.AddForce(transform.up * JumpForce, ForceMode.Impulse);
-            }
-        }
-        else
-        {
-            if (JumpAlreadyKeyPressed)
-            {
-                JumpAlreadyKeyPressed = false;
-            }
+            remainingJumps = JumpCount - 1;
         }
 
+        if (remainingJumps > 0 && Input.GetKeyDown(KeyCode.Space))
+        {
+            remainingJumps--;
+            if(!GroundDetector.IsOnGround) bodyRigidBody.AddForce(transform.up * airJumpMultiplier * JumpForce, ForceMode.Impulse);
+            else bodyRigidBody.AddForce(transform.up * JumpForce, ForceMode.Impulse);
+        }
+  
     }
 
     private void FixedUpdate()
