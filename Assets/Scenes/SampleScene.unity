@@ -50415,6 +50415,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Speedometer
       objectReference: {fileID: 0}
+    - target: {fileID: 4830269640342643995, guid: b3e2e5e0cac676c4eab064cdd6562d73, type: 3}
+      propertyPath: m_fontColorGradient.topRight.b
+      value: 0.8773585
+      objectReference: {fileID: 0}
+    - target: {fileID: 4830269640342643995, guid: b3e2e5e0cac676c4eab064cdd6562d73, type: 3}
+      propertyPath: m_fontColorGradient.topRight.g
+      value: 0.8773585
+      objectReference: {fileID: 0}
+    - target: {fileID: 4830269640342643995, guid: b3e2e5e0cac676c4eab064cdd6562d73, type: 3}
+      propertyPath: m_fontColorGradient.topRight.r
+      value: 0.8773585
+      objectReference: {fileID: 0}
+    - target: {fileID: 4830269640342643995, guid: b3e2e5e0cac676c4eab064cdd6562d73, type: 3}
+      propertyPath: m_fontColorGradient.bottomRight.b
+      value: 0.6226415
+      objectReference: {fileID: 0}
+    - target: {fileID: 4830269640342643995, guid: b3e2e5e0cac676c4eab064cdd6562d73, type: 3}
+      propertyPath: m_fontColorGradient.bottomRight.g
+      value: 0.6226415
+      objectReference: {fileID: 0}
+    - target: {fileID: 4830269640342643995, guid: b3e2e5e0cac676c4eab064cdd6562d73, type: 3}
+      propertyPath: m_fontColorGradient.bottomRight.r
+      value: 0.6226415
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b3e2e5e0cac676c4eab064cdd6562d73, type: 3}
