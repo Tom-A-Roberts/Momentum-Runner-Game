@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Known Objects")]
     public Transform mainCamera;
     public CollisionDetector GroundDetector;
     private Rigidbody bodyRigidBody;
-
+    [Header("----------------")]
     [Header("Movement Settings")]
     [Tooltip("The maximum speed the player will accelerate to when on the ground as a result of key-presses.")]
     public float WalkingSpeed = 8f;
@@ -27,38 +28,42 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("How much drag the character should have when no keys are pressed (how quick they slow down).")]
     public float DragWhenNoKeysPressed = 10f;
-
-    [Header("Air Related Settings")]
+    [Header("----------------")]
+    [Header("Jumping Settings")]
     [Tooltip("Additional gravity is added when falling, in order to increasing the feeling of weight with the character ")]
     public float CharacterFallingWeight = 5f;
     [Tooltip("Force applied when jump key is pressed")]
-    public float JumpForce = 10f;
+    public float JumpForce = 12f;
 
-    public float MinJumpForce = 0f; 
+    public float MinJumpForce = 2f; 
     [Tooltip("How many times the character jumps including the first jump before the jump key doesnt work anymore")]
     public int JumpCount = 2;
     //[Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
     //public float AirAcceleration = 15f;
     [Tooltip("How much we multiply jump force by in the air to account for artificial gravity")]
-    public float AirJumpMultiplier = 2;
+    public float AirJumpMultiplier = 1.5f;
+    // needs tooltip
+    public float JumpLerpStart = 10f;
+    [Header("----------------")]
+    [Header("Dash Settings")]
     [Tooltip("How much force is applied when air dashing")]
-    public float DashForce = 10f;
+    public float DashForce = 60f;
+    [Tooltip("Amount of seconds the dash force lasts")]
+    public float DashForceActiveTime = 0.1f;
+    [Tooltip("Amount of seconds for the dash cooldown, measured from time the key was pressed")]
+    public float DashCooldown = 1f;
 
     [Tooltip("Allow the player to accelerate to walkspeed while in the air. This does not effect ability to slow down while in the air")]
     public bool PlayerHasAirControl = true;
 
 
-    // needs tooltip
-    public float JumpLerpStart = 10f;
-
-
-
-    Vector2 keyboardInputs;
     private int remainingJumps;
     private float movementSpeed;
     private float currentJumpForce;
     private float yVelocity;
-    private bool canDash;
+    //private bool canDash;
+    private float airDashProgress = 0;
+    private float airDashCooldownProgress = 0;
 
     void Start()
     {
@@ -69,10 +74,6 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        keyboardInputs.x = Input.GetAxisRaw("Horizontal");
-        keyboardInputs.y = Input.GetAxisRaw("Vertical");
-
-
 
         #region JUMPING LOGIC
         if (remainingJumps != JumpCount)
@@ -111,11 +112,15 @@ public class PlayerController : MonoBehaviour
 
 
         #region AIR DASH LOGIC
-        if (GroundDetector.IsOnGround) canDash = true;
-        if (Input.GetKeyDown(KeyCode.Q) && canDash == true && !GroundDetector.IsOnGround) //if the player is in the air, hasnt already dashed, and presses q
+        //if (GroundDetector.IsOnGround) canDash = true;  && canDash == true 
+        if (Input.GetKeyDown(KeyCode.Q) && airDashCooldownProgress <= 0) //if the player is in the air, hasnt already dashed, and presses q
         {
-            canDash = false;
-            bodyRigidBody.AddForce(transform.forward * DashForce, ForceMode.Impulse); //add a forward horizontal force
+
+            //canDash = false;
+            // Start air dash
+            airDashProgress = 1;
+            // Start air dash cooldown
+            airDashCooldownProgress = 1;
         }
         #endregion
 
@@ -131,7 +136,21 @@ public class PlayerController : MonoBehaviour
 
         processMotion(xInput, yInput);
 
+        if(airDashProgress > 0)
+        {
+            processAirDashMotion();
+        }
+        if (airDashCooldownProgress > 0)
+        {
+            airDashCooldownProgress -=  Time.fixedDeltaTime / DashCooldown;
+            if (airDashCooldownProgress < 0)
+                airDashCooldownProgress = 0;
+        }
+
+        print(airDashProgress);
+
     }
+
 
     void processMotion(float xInput, float yInput)
     {
@@ -199,6 +218,16 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    void processAirDashMotion()
+    {
+        airDashProgress -= Time.fixedDeltaTime / DashForceActiveTime;
+        if (airDashProgress < 0)
+            airDashProgress = 0;
 
+        // Increase the dash force over time, as the dash happens
+        float currentDashForceAmount = DashForce * (1 - airDashProgress) * 2f;
+        currentDashForceAmount = DashForce;
+        bodyRigidBody.AddForce(transform.forward * currentDashForceAmount, ForceMode.Acceleration); //add a forward horizontal force
+    }
 
 }
