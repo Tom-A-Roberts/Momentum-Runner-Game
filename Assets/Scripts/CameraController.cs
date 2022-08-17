@@ -10,6 +10,8 @@ public class CameraController : MonoBehaviour
     private void Start()
     {
 		cameraOffsetFromBody = transform.position - body.transform.position;
+
+		Cursor.lockState = CursorLockMode.Locked; //Lock mouse cursor to screen
 	}
 
     // Code thanks to: https://gist.github.com/KarlRamstedt/407d50725c7b6abeaf43aee802fdd88e
