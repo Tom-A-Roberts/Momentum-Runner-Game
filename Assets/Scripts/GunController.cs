@@ -70,7 +70,7 @@ public class GunController : MonoBehaviour
     void SetGunTransformBasedOnProgress(float progress)
     {
         float angleresult = ((Mathf.Pow(progress - 1, 2) + Mathf.Pow(progress - 1, 51))) / 0.8418f;
-        float halfProgress = Mathf.Clamp01(progress * 1.4f);
+        float halfProgress = Mathf.Clamp01(progress * 3f);
         float slidebackResult = 0;
         if (halfProgress < 1)
         {
