@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Known Objects")]
     public Transform mainCamera;
+    public CollisionDetector GroundDetector;
     private Rigidbody bodyRigidBody;
 
     [Header("Movement Settings")]
@@ -21,17 +21,19 @@ public class PlayerController : MonoBehaviour
     public float CancellationPower = 50f;
     [Tooltip("The power of the deceleration that stops the player sliding sideways")]
     public float SidewaysDeceleration = 10f;
-    [Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
-    public float AirAcceleration = 15f;
+
     [Tooltip("How much drag the character should have when no keys are pressed (how quick they slow down).")]
-    public float DragWhenNoKeysPressed = 19f;
-    [Tooltip("Force applied to player when jump button is pressed.")]
-    public float jumpHeight = 100f;
+    public float DragWhenNoKeysPressed = 10f;
+
+    [Header("Air Related Settings")]
+    [Tooltip("Additional gravity is added when falling, in order to increasing the feeling of weight with the character ")]
+    public float CharacterFallingWeight = 5f;
+    public float JumpForce = 10f;
+    //[Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
+    //public float AirAcceleration = 15f;
 
     Vector2 keyboardInputs;
-    bool JumpKeyPressed = false;
-    bool isOnFloor = true;
-    int jumpNumber = 2;
+    bool JumpAlreadyKeyPressed = false;
 
     void Start()
     {
@@ -41,16 +43,24 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (isOnFloor)
-        {
-            jumpNumber = 2;
-        }
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
-        if(Input.GetKeyDown(KeyCode.Space) && jumpNumber > 0)
+
+
+        if (GroundDetector.IsOnGround)
         {
-            jumpNumber--;
-            Jump();
+            if (!JumpAlreadyKeyPressed && Input.GetKeyDown(KeyCode.Space))
+            {
+                JumpAlreadyKeyPressed = true;
+                bodyRigidBody.AddForce(transform.up * JumpForce, ForceMode.Impulse);
+            }
+        }
+        else
+        {
+            if (JumpAlreadyKeyPressed)
+            {
+                JumpAlreadyKeyPressed = false;
+            }
         }
 
     }
@@ -66,24 +76,10 @@ public class PlayerController : MonoBehaviour
         processMotion(xInput, yInput);
 
     }
-    void Jump()
-    {
-        bodyRigidBody.AddForce(new Vector3 (0,jumpHeight,0));
-    }
 
     void processMotion(float xInput, float yInput)
     {
-
-        if (xInput == 0 && yInput == 0 && isOnFloor)
-        {
-            bodyRigidBody.drag = DragWhenNoKeysPressed;
-        }
-        else
-        {
-            bodyRigidBody.drag = 0.025f;
-
-        }
-
+        // Check if there's motion input
         if (xInput != 0 || yInput != 0)
         {
 
@@ -108,17 +104,16 @@ public class PlayerController : MonoBehaviour
 
             float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
 
-            float requiredAcc = 0;
 
             // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
             if (forwardsSpeed < 0)
             {
                 bodyRigidBody.AddForce(wishDirection * CancellationPower, ForceMode.Acceleration);
             }
-            else if (forwardsSpeed < WalkingSpeed)
+            else if (forwardsSpeed < WalkingSpeed && GroundDetector.IsOnGround)
             {
                 // How much required acceleration there is to reach the intended speed (walkingspeed).
-                requiredAcc = (WalkingSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration)*25 + 1));
+                float requiredAcc = (WalkingSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
 
                 bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
 
@@ -126,27 +121,25 @@ public class PlayerController : MonoBehaviour
 
             bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
 
-
-            //if (isOnFloor)
-            //{
-
-            //    MultiplierV = (MultiplierV * (MaxAcceleration - MinAcceleration)) + MinAcceleration;
-            //    MultiplierH = (MultiplierH * (MaxAcceleration - MinAcceleration)) + MinAcceleration;
-
-            //    bodyRigidBody.AddForce(targetForwardVector * MultiplierV);
-            //    bodyRigidBody.AddForce(targetHorizontalVector * MultiplierH);
-            //}
-            //else
-            //{
-            //    MultiplierV = MultiplierV * AirAcceleration;
-            //    MultiplierH = MultiplierH * AirAcceleration;
-
-            //    bodyRigidBody.AddForce(targetForwardVector * MultiplierV);
-            //    bodyRigidBody.AddForce(targetHorizontalVector * MultiplierH);
-
-            //    bodyRigidBody.AddForce(Vector3.down * 20);
-            //}
         }
+
+        if (xInput == 0 && yInput == 0 && GroundDetector.IsOnGround)
+        {
+            bodyRigidBody.drag = DragWhenNoKeysPressed;
+        }
+        else
+        {
+            bodyRigidBody.drag = 0.025f;
+
+        }
+
+        if (!GroundDetector.IsOnGround)
+        {
+            bodyRigidBody.AddForce(Vector3.down * 20);
+        }
+
     }
+
+
 
 }
