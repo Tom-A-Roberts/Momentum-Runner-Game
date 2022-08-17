@@ -226,6 +226,7 @@ public class PlayerController : MonoBehaviour
         float currentDashForceAmount = DashForce * (1 - airDashProgress) * 2f;
         currentDashForceAmount = DashForce;
         bodyRigidBody.AddForce(transform.forward * currentDashForceAmount, ForceMode.Acceleration); //add a forward horizontal force
+        bodyRigidBody.AddForce(new Vector3(0,bodyRigidBody.velocity.y * -1,0), ForceMode.Impulse);
     }
 
 }
