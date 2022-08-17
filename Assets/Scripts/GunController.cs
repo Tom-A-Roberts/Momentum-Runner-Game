@@ -129,7 +129,7 @@ public class GunController : MonoBehaviour
         }
         else
         {
-            lr.SetPosition(1, shootDirection * 100f);
+            lr.SetPosition(1, Camera.main.transform.position + shootDirection * 100f);
         }
         GameObject muzzle_particle = Instantiate(muzzleFlashParticlePrefab, muzzlePoint.position, muzzlePoint.rotation);//
         muzzle_particle.transform.parent = muzzlePoint.transform;
