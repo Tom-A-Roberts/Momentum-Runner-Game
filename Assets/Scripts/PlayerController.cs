@@ -34,10 +34,13 @@ public class PlayerController : MonoBehaviour
     //[Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
     //public float AirAcceleration = 15f;
     [Tooltip("How much we multiply jump force by in the air to account for artificial gravity")]
-    public float airJumpMultiplier = 2;
+    public float AirJumpMultiplier = 2;
+    [Tooltip("How much sprinting increases your speed by")]
+    public float SprintMultiplier = 1.5f;
 
     Vector2 keyboardInputs;
     private int remainingJumps;
+    private float movementSpeed; 
 
     void Start()
     {
@@ -57,10 +60,13 @@ public class PlayerController : MonoBehaviour
             remainingJumps = JumpCount - 1;
         }
 
+        if (Input.GetKey(KeyCode.LeftShift)) movementSpeed = WalkingSpeed * SprintMultiplier;
+        else movementSpeed = WalkingSpeed;
+
         if (remainingJumps > 0 && Input.GetKeyDown(KeyCode.Space))
         {
             remainingJumps--;
-            if(!GroundDetector.IsOnGround) bodyRigidBody.AddForce(transform.up * airJumpMultiplier * JumpForce, ForceMode.Impulse);
+            if(!GroundDetector.IsOnGround) bodyRigidBody.AddForce(transform.up * AirJumpMultiplier * JumpForce, ForceMode.Impulse);
             else bodyRigidBody.AddForce(transform.up * JumpForce, ForceMode.Impulse);
         }
   
@@ -111,10 +117,10 @@ public class PlayerController : MonoBehaviour
             {
                 bodyRigidBody.AddForce(wishDirection * CancellationPower, ForceMode.Acceleration);
             }
-            else if (forwardsSpeed < WalkingSpeed && GroundDetector.IsOnGround)
+            else if (forwardsSpeed < movementSpeed )//&& GroundDetector.IsOnGround)
             {
                 // How much required acceleration there is to reach the intended speed (walkingspeed).
-                float requiredAcc = (WalkingSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
+                float requiredAcc = (movementSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
 
                 bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
 
