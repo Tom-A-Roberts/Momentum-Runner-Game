@@ -37695,34 +37695,6 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4316027073834798312, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: MaxFOVSpeed
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027073834798312, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: MaxFOVMultiplier
-      value: 1.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: DashTime
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: DashForce
-      value: 90
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: DashCooldown
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: DashForceActiveTime
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: PlayerHasAirControl
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4316027075412832466, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab
