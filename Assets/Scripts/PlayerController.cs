@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     Vector2 keyboardInputs;
     private int remainingJumps;
     private float movementSpeed;
-    private float airJumpForce;
+    private float currentJumpForce;
     private float yVelocity;
 
     void Start()
@@ -60,12 +60,6 @@ public class PlayerController : MonoBehaviour
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
 
-        yVelocity = bodyRigidBody.velocity.y;
-        float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
-
-
-        airJumpForce = (Mathf.Lerp(MinJumpForce,JumpForce,airLerp)) * AirJumpMultiplier;
-
         if (GroundDetector.IsOnGround)
         {
             remainingJumps = JumpCount - 1;
@@ -76,9 +70,20 @@ public class PlayerController : MonoBehaviour
 
         if (remainingJumps > 0 && Input.GetKeyDown(KeyCode.Space))
         {
+            yVelocity = bodyRigidBody.velocity.y;
+
+            // don't apply as much force if beginning the jump
+            float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
+
+            currentJumpForce = (Mathf.Lerp(MinJumpForce, JumpForce, airLerp));
+
+            if(!GroundDetector.IsOnGround) currentJumpForce *= AirJumpMultiplier; //apply air jump multiplier if in air
+
+            if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
+
+            bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
+
             remainingJumps--;
-            if(!GroundDetector.IsOnGround) bodyRigidBody.AddForce((transform.up * airJumpForce), ForceMode.Impulse);
-            else bodyRigidBody.AddForce(transform.up * JumpForce, ForceMode.Impulse);
         }
   
     }

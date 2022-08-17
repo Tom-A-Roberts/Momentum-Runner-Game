@@ -37633,28 +37633,8 @@ PrefabInstance:
       value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: JumpCount
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: JumpForce
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: AirForceMax
       value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: MinJumpForce
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: JumpLerpStart
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: AirJumpMultiplier
-      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: airJumpMultiplier
