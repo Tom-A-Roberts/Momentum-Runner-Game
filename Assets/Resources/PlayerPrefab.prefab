@@ -234,7 +234,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 119
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -799,7 +799,7 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5988328233710087386
 GameObject:
@@ -1068,16 +1068,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82d90a8d7e874e94a98c4a7eb2a972e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineShader: {fileID: 207, guid: 0000000000000000f000000000000000, type: 0}
-  lineMat: {fileID: 0}
   gunTop: {fileID: 7645874948040482442}
   muzzlePoint: {fileID: 1461484504120033369}
-  lineColor: {r: 1, g: 1, b: 1, a: 0.65882355}
-  animationDuration: 0.3
+  shootCooldown: 0.5
+  innacuracy: 0.01
+  animationDuration: 0.8
   kickbackAngle: 20
   slidebackDistance: 0.16
-  shootCooldown: 0.15
-  innacuracy: 0.01
+  lineColor: {r: 1, g: 1, b: 1, a: 0.65882355}
+  lineShader: {fileID: 207, guid: 0000000000000000f000000000000000, type: 0}
+  groundHitParticlePrefab: {fileID: 5155380658188059227, guid: 56be379ae260e5747b140d2ebfb352b7, type: 3}
 --- !u!4 &4354737557993813582 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d127773f32d01e47afd735fb4986dd1, type: 3}

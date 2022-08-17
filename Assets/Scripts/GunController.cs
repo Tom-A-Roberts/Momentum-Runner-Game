@@ -4,24 +4,29 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
-    public Shader lineShader;
-    public Material lineMat;
+    [Header("Related Objects")]
     public Transform gunTop;
     public Transform muzzlePoint;
-    public Color lineColor;
+
+
+    [Header("Gameplay Settings")]
+    [Tooltip("How long in seconds between times you can shoot")]
+    public float shootCooldown = 0.5f;
+    [Tooltip("Innacuracy of gun. 0 is perfect, 0.25 means 45-degrees of variation, 1 means 360-degrees.")]
+    public float innacuracy = 0.01f;
+
     [Header("Animation Settings")]
     [Tooltip("How long in seconds the shooting animation will last")]
-    public float animationDuration = 0.3f;
+    public float animationDuration = 0.8f;
     [Tooltip("How far back (in degrees) each shot will kick the gun back in your hand")]
     public float kickbackAngle = 20f;
     [Tooltip("How far back (in spacial units) each shot will slide the sliding element of the gun back")]
     public float slidebackDistance = 0.16f;
 
-    [Header("Gameplay Settings")]
-    [Tooltip("How long in seconds between times you can shoot")]
-    public float shootCooldown = 0.15f;
-    [Tooltip("Innacuracy of gun. 0 is perfect, 0.25 means 45-degrees of variation, 1 means 360-degrees.")]
-    public float innacuracy = 0.01f;
+    [Header("Effects Settings")]
+    public Color lineColor;
+    public Shader lineShader;
+    public GameObject groundHitParticlePrefab;
 
     private float animationProgress = 1;
     private bool animationActive = false;
@@ -114,11 +119,18 @@ public class GunController : MonoBehaviour
         lr.SetPosition(0, muzzlePoint.position);
         if (hit)
         {
+
             lr.SetPosition(1, hitObj.point);
+
+
+            GameObject ground_particle = Instantiate(groundHitParticlePrefab, hitObj.point, Quaternion.FromToRotation(Vector3.forward, hitObj.normal));
         }
         else
         {
             lr.SetPosition(1, shootDirection * 100f);
         }
+
+
+
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class BulletFadeOut : MonoBehaviour
 {
     // Start is called before the first frame update
-    public float fadeOutSpeed = 0.2f;
+    public float fadeOutSpeed = 0.1f;
     private float fadeOutProgress = 1f;
     private LineRenderer lr;
     private Color originalColour;
