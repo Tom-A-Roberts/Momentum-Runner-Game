@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Additional gravity is added when falling, in order to increasing the feeling of weight with the character ")]
     public float CharacterFallingWeight = 5f;
     public float JumpForce = 10f;
+    public float MinJumpForce = 0f; 
+
     [Tooltip("How many times the character jumps including the first jump before the jump key doesnt work anymore")]
     public int JumpCount = 2;
     //[Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
@@ -38,9 +40,13 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How much sprinting increases your speed by")]
     public float SprintMultiplier = 1.5f;
 
+    public float JumpLerpStart = 10f;
+
     Vector2 keyboardInputs;
     private int remainingJumps;
-    private float movementSpeed; 
+    private float movementSpeed;
+    private float airJumpForce;
+    private float yVelocity;
 
     void Start()
     {
@@ -51,9 +57,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(bodyRigidBody.velocity.y);
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
 
+        yVelocity = bodyRigidBody.velocity.y;
+        float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
+
+
+        airJumpForce = (Mathf.Lerp(MinJumpForce,JumpForce,airLerp)) * AirJumpMultiplier;
 
         if (GroundDetector.IsOnGround)
         {
@@ -66,7 +78,7 @@ public class PlayerController : MonoBehaviour
         if (remainingJumps > 0 && Input.GetKeyDown(KeyCode.Space))
         {
             remainingJumps--;
-            if(!GroundDetector.IsOnGround) bodyRigidBody.AddForce(transform.up * AirJumpMultiplier * JumpForce, ForceMode.Impulse);
+            if(!GroundDetector.IsOnGround) bodyRigidBody.AddForce((transform.up * airJumpForce), ForceMode.Impulse);
             else bodyRigidBody.AddForce(transform.up * JumpForce, ForceMode.Impulse);
         }
   
