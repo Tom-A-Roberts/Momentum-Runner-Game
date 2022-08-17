@@ -57,7 +57,6 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(bodyRigidBody.velocity.y);
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
 
