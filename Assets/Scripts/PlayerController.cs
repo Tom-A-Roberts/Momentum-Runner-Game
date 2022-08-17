@@ -13,6 +13,9 @@ public class PlayerController : MonoBehaviour
     [Tooltip("The maximum speed the player will accelerate to when on the ground as a result of key-presses.")]
     public float WalkingSpeed = 8f;
 
+    [Tooltip("How much sprinting increases your speed by")]
+    public float SprintMultiplier = 1.5f;
+
     [Tooltip("The power of the acceleration. 1 means instant acceleration to full walking speed. 0 means something slow.")]
     [Range(0f, 1f)]
     public float Acceleration = 0.8f;
@@ -28,9 +31,10 @@ public class PlayerController : MonoBehaviour
     [Header("Air Related Settings")]
     [Tooltip("Additional gravity is added when falling, in order to increasing the feeling of weight with the character ")]
     public float CharacterFallingWeight = 5f;
+    [Tooltip("Force applied when jump key is pressed")]
     public float JumpForce = 10f;
-    public float MinJumpForce = 0f; 
 
+    public float MinJumpForce = 0f; 
     [Tooltip("How many times the character jumps including the first jump before the jump key doesnt work anymore")]
     public int JumpCount = 2;
     //[Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
@@ -42,7 +46,14 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How much force is applied when air dashing")]
     public float DashForce = 10f;
 
+    [Tooltip("Allow the player to accelerate to walkspeed while in the air. This does not effect ability to slow down while in the air")]
+    public bool PlayerHasAirControl = true;
+
+
+    // needs tooltip
     public float JumpLerpStart = 10f;
+
+
 
     Vector2 keyboardInputs;
     private int remainingJumps;
@@ -147,9 +158,12 @@ public class PlayerController : MonoBehaviour
             // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
             if (forwardsSpeed < 0)
             {
-                bodyRigidBody.AddForce(wishDirection * CancellationPower, ForceMode.Acceleration);
+                float activeCancellationPower = CancellationPower;
+                if (!PlayerHasAirControl) activeCancellationPower /= 8;
+
+                bodyRigidBody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
             }
-            else if (forwardsSpeed < movementSpeed )//&& GroundDetector.IsOnGround)
+            else if (forwardsSpeed < movementSpeed && (GroundDetector.IsOnGround || PlayerHasAirControl))
             {
                 // How much required acceleration there is to reach the intended speed (walkingspeed).
                 float requiredAcc = (movementSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
