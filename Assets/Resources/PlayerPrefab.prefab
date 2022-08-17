@@ -195,7 +195,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -234,6 +234,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 4316027074644905779}
+  FOVMultiperWhenSprinting: 1.1
+  MaxFOVMultiplier: 1.4
+  MaxFOVSpeed: 20
   sensitivity: 2
   yRotationLimit: 88
 --- !u!1 &4316027073947639292
@@ -611,9 +614,11 @@ MonoBehaviour:
   DragWhenNoKeysPressed: 10
   CharacterFallingWeight: 5
   JumpForce: 10
+  MinJumpForce: 0
   JumpCount: 2
   AirJumpMultiplier: 2
   SprintMultiplier: 1.5
+  JumpLerpStart: 10
 --- !u!1 &4316027074863493586
 GameObject:
   m_ObjectHideFlags: 0
@@ -743,7 +748,7 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7233889231954664563
 GameObject:
