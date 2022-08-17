@@ -5,6 +5,7 @@ using UnityEngine;
 public class GrappleGun : MonoBehaviour
 {
     public Transform GunEndPosition;
+    public Camera PlayerCamera;
     public LineRenderer RopeRenderer;
     public float MaxGrappleLength = 20f;
 
@@ -38,7 +39,7 @@ public class GrappleGun : MonoBehaviour
         Debug.Log("Grapple Initiated");
 
         RaycastHit hit;
-        if (Physics.Raycast(GunEndPosition.position, GunEndPosition.transform.forward, out hit, MaxGrappleLength))
+        if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
             Debug.Log("Grapple Connected");
 

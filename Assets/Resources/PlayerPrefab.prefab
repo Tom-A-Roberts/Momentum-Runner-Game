@@ -931,6 +931,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GunEndPosition: {fileID: 5170917926509469355}
+  PlayerCamera: {fileID: 4316027073834798314}
   RopeRenderer: {fileID: 5224529714271308080}
   MaxGrappleLength: 20
 --- !u!1001 &4316027075111195045
