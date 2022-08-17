@@ -65,7 +65,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -115,9 +115,9 @@ GameObject:
   - component: {fileID: 4316027073947639282}
   - component: {fileID: 1371572323}
   - component: {fileID: 7414070647618193404}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Feet
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -255,9 +255,9 @@ GameObject:
   - component: {fileID: 4316027074644905781}
   - component: {fileID: 4316027074644905780}
   - component: {fileID: 4316027074644905738}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -476,7 +476,8 @@ MonoBehaviour:
   CharacterFallingWeight: 5
   JumpForce: 10
   JumpCount: 2
-  airJumpMultiplier: 2
+  AirJumpMultiplier: 2
+  SprintMultiplier: 1.5
 --- !u!1 &4316027074863493586
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,7 +490,7 @@ GameObject:
   - component: {fileID: 4316027074863493590}
   - component: {fileID: 4316027074863493585}
   - component: {fileID: 4316027074863493584}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -606,5 +607,5 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
