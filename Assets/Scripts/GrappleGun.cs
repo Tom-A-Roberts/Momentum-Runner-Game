@@ -22,24 +22,48 @@ public class GrappleGun : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Grapple Initiated");
-
-            RaycastHit hit;
-            if (Physics.Raycast(GunEndPosition.position, GunEndPosition.transform.forward, out hit, MaxGrappleLength))
-            {
-                Debug.Log("Grapple Connected");
-
-                grappleConnected = true;
-                connectionPoint = hit.point;
-            }
+            ConnectGrapple();
         }
 
-        if (grappleConnected)
-            ConnectGrapple();
+        if (Input.GetMouseButtonUp(0))
+        {
+            DisconnectGrapple();
+        }
+
+        UpdateGrapple();
     }
 
     void ConnectGrapple()
     {
-        RopeRenderer.SetPositions(new Vector3[] { GunEndPosition.transform.position, connectionPoint });
+        Debug.Log("Grapple Initiated");
+
+        RaycastHit hit;
+        if (Physics.Raycast(GunEndPosition.position, GunEndPosition.transform.forward, out hit, MaxGrappleLength))
+        {
+            Debug.Log("Grapple Connected");
+
+            connectionPoint = hit.point;
+
+            grappleConnected = true;
+        }
+
+    }
+
+    void UpdateGrapple()
+    {
+        if (grappleConnected)
+        {
+            RopeRenderer.SetPositions(new Vector3[] { GunEndPosition.transform.position, connectionPoint });
+
+            if (!RopeRenderer.enabled)
+                RopeRenderer.enabled = true;
+        }
+    }
+
+    void DisconnectGrapple()
+    {
+        RopeRenderer.enabled = false;
+
+        grappleConnected = false;
     }
 }
