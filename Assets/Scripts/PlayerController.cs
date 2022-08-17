@@ -72,8 +72,9 @@ public class PlayerController : MonoBehaviour
         keyboardInputs.x = Input.GetAxisRaw("Horizontal");
         keyboardInputs.y = Input.GetAxisRaw("Vertical");
 
-        if (GroundDetector.IsOnGround) canDash = true;
 
+
+        #region JUMPING LOGIC
         if (remainingJumps != JumpCount)
         {
             if (GroundDetector.IsOnGround)
@@ -83,16 +84,6 @@ public class PlayerController : MonoBehaviour
         {
             remainingJumps = JumpCount - 1;
         }
-
-        if (Input.GetKey(KeyCode.LeftShift)) movementSpeed = WalkingSpeed * SprintMultiplier;
-        else movementSpeed = WalkingSpeed;
-
-        if(Input.GetKeyDown(KeyCode.Q) && canDash == true && !GroundDetector.IsOnGround) //if the player is in the air, hasnt already dashed, and presses q
-        {
-            canDash = false;
-            bodyRigidBody.AddForce(transform.forward * DashForce, ForceMode.Impulse); //add a forward horizontal force
-        }
-
         if (remainingJumps > 0 && Input.GetKeyDown(KeyCode.Space))
         {
             yVelocity = bodyRigidBody.velocity.y;
@@ -110,7 +101,24 @@ public class PlayerController : MonoBehaviour
 
             remainingJumps--;
         }
-  
+        #endregion
+
+
+        #region SPRINTING LOGIC
+        if (Input.GetKey(KeyCode.LeftShift)) movementSpeed = WalkingSpeed * SprintMultiplier;
+        else movementSpeed = WalkingSpeed;
+        #endregion
+
+
+        #region AIR DASH LOGIC
+        if (GroundDetector.IsOnGround) canDash = true;
+        if (Input.GetKeyDown(KeyCode.Q) && canDash == true && !GroundDetector.IsOnGround) //if the player is in the air, hasnt already dashed, and presses q
+        {
+            canDash = false;
+            bodyRigidBody.AddForce(transform.forward * DashForce, ForceMode.Impulse); //add a forward horizontal force
+        }
+        #endregion
+
     }
 
     private void FixedUpdate()
