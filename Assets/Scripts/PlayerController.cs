@@ -147,8 +147,6 @@ public class PlayerController : MonoBehaviour
                 airDashCooldownProgress = 0;
         }
 
-        print(airDashProgress);
-
     }
 
 
