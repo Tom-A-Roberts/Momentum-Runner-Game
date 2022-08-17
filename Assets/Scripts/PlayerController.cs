@@ -41,7 +41,6 @@ public class PlayerController : MonoBehaviour
     //public float AirAcceleration = 15f;
     [Tooltip("How much we multiply jump force by in the air to account for artificial gravity")]
     public float AirJumpMultiplier = 2;
-
     [Tooltip("How much force is applied when air dashing")]
     public float DashForce = 10f;
 
