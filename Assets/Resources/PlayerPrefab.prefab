@@ -1039,7 +1039,7 @@ MonoBehaviour:
   maxWallRunTime: 120
   wallRunTimer: 120
   stickingForce: 100
-  WallRunCameraAngle: 20
+  WallRunCameraAngle: 15
   attachAngleTimer: 0.15
   detachAngleTimer: 0.25
   effectOfGravityDuringWallrun: 0.3
@@ -1347,9 +1347,7 @@ MonoBehaviour:
   MaxGrappleLength: 20
   RopeEquilibrium: 0.95
   RopeConstant: 500
-  Rope: {fileID: 0}
-  GroundDetector: {fileID: 1371572323}
-  PlayerController: {fileID: 4316027074644905738}
+  playerController: {fileID: 0}
 --- !u!1001 &4316027075111195045
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1467,6 +1465,7 @@ MonoBehaviour:
   lineShader: {fileID: 207, guid: 0000000000000000f000000000000000, type: 0}
   groundHitParticlePrefab: {fileID: 5155380658188059227, guid: 56be379ae260e5747b140d2ebfb352b7, type: 3}
   muzzleFlashParticlePrefab: {fileID: 1548731787465841113, guid: 14a375f0b95638a479fd733831292beb, type: 3}
+  bulletHoleDecalPrefab: {fileID: 5283180142859109130, guid: 64bd2bd14a346084ea6636f4b2fcfb4d, type: 3}
   muzzleLight: {fileID: 459832530}
 --- !u!4 &4354737557993813582 stripped
 Transform:
