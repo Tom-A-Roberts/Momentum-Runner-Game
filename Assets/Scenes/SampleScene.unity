@@ -37021,6 +37021,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &459832526 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 459832526, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+  m_PrefabInstance: {fileID: 654048565}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &459832530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459832526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb659c2f18d36d24ea1618dc2f9458e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashDuration: 0.02
 --- !u!1 &538818318
 GameObject:
   m_ObjectHideFlags: 0
@@ -37759,6 +37777,18 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 459832526, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 459832529, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2020538239, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: muzzleLight
+      value: 
+      objectReference: {fileID: 459832530}
     - target: {fileID: 4316027075412832466, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab
