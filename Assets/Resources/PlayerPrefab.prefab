@@ -835,7 +835,7 @@ MonoBehaviour:
   JumpCount: 2
   AirJumpMultiplier: 1.5
   JumpLerpStart: 10
-  WallKickoffForce: 20
+  MaxWallKickOffForce: 25
   DashForce: 90
   DashForceActiveTime: 0.2
   DashCooldown: 5
@@ -1034,12 +1034,12 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  wallRunForce: 100
+  wallRunForce: 0
   maxWallRunTime: 120
   wallRunTimer: 120
   stickingForce: 100
-  verticalUpFrictionalCoefficient: 1
-  verticalDownFrictionalCoefficient: 1
+  verticalUpFrictionalCoefficient: 3
+  verticalDownFrictionalCoefficient: 3
   wallCheckDistance: 1
   minJumpHeight: 0.1
   GroundDetector: {fileID: 1371572323}
