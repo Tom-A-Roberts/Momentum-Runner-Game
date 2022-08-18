@@ -63,6 +63,8 @@ public class PlayerController : MonoBehaviour
     private float airDashProgress = 0;
     private float airDashCooldownProgress = 0;
 
+    private bool jumpKeyPressed = false;
+
     void Start()
     {
         remainingJumps = JumpCount - 1; //this works off array numbers so its technically 2 :)
@@ -72,42 +74,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-
-        #region JUMPING LOGIC
-        if (remainingJumps != JumpCount)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (GroundDetector.IsOnGround)
-                remainingJumps = JumpCount;
+            jumpKeyPressed = true;
         }
-        else
-        {
-            remainingJumps = JumpCount - 1;
-        }
-        if (remainingJumps > 0 && Input.GetKeyDown(KeyCode.Space))
-        {
-            yVelocity = bodyRigidBody.velocity.y;
 
-            // don't apply as much force if beginning the jump
-            float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
 
-            currentJumpForce = (Mathf.Lerp(MinJumpForce, JumpForce, airLerp));
 
-            if(!GroundDetector.IsOnGround) currentJumpForce *= AirJumpMultiplier; //apply air jump multiplier if in air
-
-            if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
-
-            bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
-
-            // unstick and 'kick off wall
-            wallRunning.Unstick();
-
-            // kick hardest when facing into wall
-            float wallKickRatio = 1f - Vector3.Dot(transform.forward, wallNormal) / 2f;
-            bodyRigidBody.AddForce(wallNormal * MaxWallKickOffForce * wallKickRatio, ForceMode.Impulse);
-
-            remainingJumps--;
-        }
-        #endregion
 
 
         #region SPRINTING LOGIC
@@ -147,6 +120,49 @@ public class PlayerController : MonoBehaviour
                 airDashCooldownProgress = 0;
         }
 
+
+        #region JUMPING LOGIC
+        if (remainingJumps != JumpCount)
+        {
+            if (GroundDetector.IsOnGroundCoyote)
+                remainingJumps = JumpCount;
+        }
+        else
+        {
+            remainingJumps = JumpCount - 1;
+        }
+        if (remainingJumps > 0 && jumpKeyPressed)
+        {
+            yVelocity = bodyRigidBody.velocity.y;
+
+            // don't apply as much force if beginning the jump
+            float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
+
+            currentJumpForce = (Mathf.Lerp(MinJumpForce, JumpForce, airLerp));
+
+            if (!GroundDetector.IsOnGroundCoyote) currentJumpForce *= AirJumpMultiplier; //apply air jump multiplier if in air
+
+            if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
+
+            bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
+
+            // force end coyote time due to jump
+            GroundDetector.EndCoyoteTime();
+
+            // unstick and 'kick off wall
+            wallRunning.Unstick();
+
+            // kick hardest when facing into wall
+            float wallKickRatio = 1f - Vector3.Dot(transform.forward, wallNormal) / 2f;
+            bodyRigidBody.AddForce(wallNormal * MaxWallKickOffForce * wallKickRatio, ForceMode.Impulse);
+
+            remainingJumps--;
+        }
+        #endregion
+
+        // Reset jump key pressed
+        if (jumpKeyPressed)
+            jumpKeyPressed = false;
     }
 
 
