@@ -37021,35 +37021,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!114 &446807161 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1371572323, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-  m_PrefabInstance: {fileID: 654048565}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0047c36ee6ab65408f1d8b10985087e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &459832526 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 459832526, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-  m_PrefabInstance: {fileID: 654048565}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &459832530
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 459832526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb659c2f18d36d24ea1618dc2f9458e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  flashDuration: 0.02
 --- !u!1 &538818318
 GameObject:
   m_ObjectHideFlags: 0
@@ -37788,18 +37759,14 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 459832526, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 1970319852, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: wallRunForce
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 459832529, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2020538239, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: muzzleLight
+    - target: {fileID: 4316027074644905777, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: m_Material
       value: 
-      objectReference: {fileID: 459832530}
+      objectReference: {fileID: 13400000, guid: b28a10cb366b3694a8ec629368ca8d33, type: 2}
     - target: {fileID: 4316027075412832466, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab
@@ -37848,10 +37815,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5224529714271308080, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: bc3f7d6c6ee1e7b478ac72ba443a9601, type: 2}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
@@ -41419,11 +41382,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &1237262771 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4316027074644905779, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
-  m_PrefabInstance: {fileID: 654048565}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1269453824
 GameObject:
   m_ObjectHideFlags: 0
@@ -51693,30 +51651,6 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 4316027074644905781, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
   m_PrefabInstance: {fileID: 654048565}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1970319852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1237262771}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22c252e76bd9b3a49bc3e336113fccb6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  whatIsWall:
-    serializedVersion: 2
-    m_Bits: 64
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 64
-  wallRunForce: 100
-  maxWallRunTime: 120
-  wallRunTimer: 120
-  wallCheckDistance: 1
-  minJumpHeight: 0.1
-  GroundDetector: {fileID: 446807161}
 --- !u!1 &2023756760
 GameObject:
   m_ObjectHideFlags: 0
