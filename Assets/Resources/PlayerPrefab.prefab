@@ -1040,10 +1040,10 @@ MonoBehaviour:
   wallRunTimer: 120
   stickingForce: 100
   WallRunCameraAngle: 20
-  attachAngleTimer: 0.1
+  attachAngleTimer: 0.15
   detachAngleTimer: 0.25
   effectOfGravityDuringWallrun: 0.3
-  verticalUpFrictionalCoefficient: 10
+  verticalUpFrictionalCoefficient: 6
   verticalDownFrictionalCoefficient: 1
   wallCheckDistance: 1
   minJumpHeight: 0.1
