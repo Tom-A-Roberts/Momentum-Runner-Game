@@ -113,11 +113,8 @@ public class PlayerController : MonoBehaviour
 
 
         #region AIR DASH LOGIC
-        //if (GroundDetector.IsOnGround) canDash = true;  && canDash == true 
         if (Input.GetKeyDown(KeyCode.Q) && airDashCooldownProgress <= 0) //if the player is in the air, hasnt already dashed, and presses q
         {
-
-            //canDash = false;
             // Start air dash
             airDashProgress = 1;
             // Start air dash cooldown
@@ -238,4 +235,8 @@ public class PlayerController : MonoBehaviour
         return Tuple.Create(xInput, yInput);
     }
 
+    public void AddForce(float strength, Vector3 direction, ForceMode forceMode)
+    {
+        bodyRigidBody.AddForce(direction * strength, forceMode);
+    }
 }
