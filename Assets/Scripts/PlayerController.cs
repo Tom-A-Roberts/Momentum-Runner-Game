@@ -15,36 +15,30 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Settings")]
     [Tooltip("The maximum speed the player will accelerate to when on the ground as a result of key-presses.")]
     public float WalkingSpeed = 8f;
-
     [Tooltip("How much sprinting increases your speed by")]
     public float SprintMultiplier = 1.5f;
-
     [Tooltip("The power of the acceleration. 1 means instant acceleration to full walking speed. 0 means something slow.")]
     [Range(0f, 1f)]
     public float Acceleration = 0.8f;
-
     [Tooltip("The power of the deceleration when the player is actively cancelling motion.")]
     public float CancellationPower = 50f;
     [Tooltip("The power of the deceleration that stops the player sliding sideways")]
     public float SidewaysDeceleration = 10f;
-
     [Tooltip("How much drag the character should have when no keys are pressed (how quick they slow down).")]
     public float DragWhenNoKeysPressed = 10f;
     [Header("----------------")]
     [Header("Jumping Settings")]
     [Tooltip("Additional gravity is added when falling, in order to increasing the feeling of weight with the character ")]
-    public float CharacterFallingWeight = 5f;
+    public float CharacterFallingWeight = 20f;
     [Tooltip("Force applied when jump key is pressed")]
     public float JumpForce = 12f;
-
+    [Tooltip("Force applied double jumping at the very start of a jump")]
     public float MinJumpForce = 2f; 
     [Tooltip("How many times the character jumps including the first jump before the jump key doesnt work anymore")]
     public int JumpCount = 2;
-    //[Tooltip("The acceleration felt when controlling the ball in the air, ONLY CONTROLLING, no increase in speed is possible.")]
-    //public float AirAcceleration = 15f;
     [Tooltip("How much we multiply jump force by in the air to account for artificial gravity")]
     public float AirJumpMultiplier = 1.5f;
-    // needs tooltip
+    [Tooltip("At what part in the jump should the jump power start increasing")]
     public float JumpLerpStart = 10f;
     [Tooltip("How hard we 'kick' away from walls when on them")]
     public float MaxWallKickOffForce = 25f;
@@ -60,7 +54,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Allow the player to accelerate to walkspeed while in the air. This does not effect ability to slow down while in the air")]
     public bool PlayerHasAirControl = true;
 
-    
     private int remainingJumps;
     private Vector3 wallNormal;
     private float movementSpeed;
@@ -218,7 +211,7 @@ public class PlayerController : MonoBehaviour
 
         if (!GroundDetector.IsOnGround)
         {
-            bodyRigidBody.AddForce(Vector3.down * 20);
+            bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight, ForceMode.Acceleration);
         }
 
     }

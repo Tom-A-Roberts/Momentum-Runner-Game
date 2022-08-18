@@ -14,6 +14,10 @@ public class WallRunning : MonoBehaviour
     Tuple<float, float> axisValues;
     public float stickingForce = 100f;
 
+    [Tooltip("0= weightless, 1= as weighty as normal")]
+    [Range(0f, 1f)]
+    public float effectOfGravityDuringWallrun = 0.3f;
+
     [Tooltip("Amount of friction added to slow you moving down a wall during wallrunning")]
     public float verticalUpFrictionalCoefficient = 1;
     [Tooltip("Amount of friction added to slow you moving up a wall during wallrunning")]
@@ -88,8 +92,9 @@ public class WallRunning : MonoBehaviour
 
     private void WallRunningMovement()
     {
-        //rb.AddForce(transform.up * 29.81f, ForceMode.Acceleration);
-        rb.AddForce(transform.up * 24.81f, ForceMode.Acceleration);
+        // Remove effect of gravity, according to "effectOfGravityDuringWallrun"
+        rb.AddForce(transform.up * (pc.CharacterFallingWeight + Physics.gravity.magnitude) * (1- effectOfGravityDuringWallrun), ForceMode.Acceleration);
+
         Vector3 wallNormal = wallRight ? rightWallHit.normal: leftWallHit.normal;
         Vector3 wallForward = Vector3.Cross(wallNormal, transform.up);
 
@@ -108,9 +113,6 @@ public class WallRunning : MonoBehaviour
         {
             rb.AddForce(-wallNormal * currentStickingForce, ForceMode.Force);
         }
-
-        //verticalUpFrictionalCoefficient = 1;
-        //verticalDownFrictionalCoefficient = 1;
 
         float y_speed = rb.velocity.y;
         if(y_speed < 0)
