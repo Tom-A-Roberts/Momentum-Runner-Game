@@ -11,12 +11,17 @@ public class GrappleGun : MonoBehaviour
     public float MaxGrappleLength = 20f;
     public float RopeEquilibrium = 1f;
     public float RopeConstant = 50f;
-    public PlayerController playerController;
+    public float GrappleForce = 10f;
+
+    private ConfigurableJoint Rope;
+    public CollisionDetector GroundDetector;
+    public PlayerController PlayerController;
 
     private bool grappleConnected = false;
     private Vector3 connectionPoint;
     private float connectedDistance;
     private float connectedEquilibriumDistance;
+
 
     // Update is called once per frame
     void Update()
@@ -52,11 +57,32 @@ public class GrappleGun : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
-            Debug.Log("Grapple Connected");
-
             connectionPoint = hit.point;
             connectedDistance = hit.distance;
             connectedEquilibriumDistance = connectedDistance * RopeEquilibrium;
+
+            Rope = playerCentreOfMass.gameObject.AddComponent<ConfigurableJoint>();
+            Rope.autoConfigureConnectedAnchor = false;
+            Rope.connectedAnchor = connectionPoint;
+
+            Rope.xMotion = ConfigurableJointMotion.Limited;
+            Rope.yMotion = ConfigurableJointMotion.Limited;
+            Rope.zMotion = ConfigurableJointMotion.Limited;
+
+            // make a springy limit
+            //SoftJointLimitSpring linearLimitSpring = Rope.linearLimitSpring;
+            //linearLimitSpring.spring = 30f;
+            //Rope.linearLimitSpring = linearLimitSpring;
+
+            // make a limit
+            SoftJointLimit limit = Rope.linearLimit;
+            limit.limit = connectedDistance;
+            limit.contactDistance = 0.5f;         
+            Rope.linearLimit = limit;
+
+            Rope.enablePreprocessing = true;
+
+            Rope.massScale = 0.5f;
 
             grappleConnected = true;
             RopeRenderer.enabled = true;
@@ -73,9 +99,9 @@ public class GrappleGun : MonoBehaviour
 
     void DisconnectGrapple()
     {
-        Debug.Log("Grapple Disconnected");
-
         RopeRenderer.enabled = false;
+
+        Destroy(Rope);
         grappleConnected = false;
     }
 
@@ -84,15 +110,10 @@ public class GrappleGun : MonoBehaviour
         if (grappleConnected)
         {
             Vector3 ropeVec = connectionPoint - playerCentreOfMass.position;
-            Vector3 ropeDir = ropeVec.normalized;
 
-            // check rope should be applying force
-            if (ropeVec.magnitude > connectedEquilibriumDistance)
-            {
-                float forceAmount = RopeConstant * (ropeVec.magnitude - connectedEquilibriumDistance);
+            Vector3 forceDir = Vector3.Cross(playerCentreOfMass.right, ropeVec).normalized;
 
-                playerController.AddForce(forceAmount, ropeDir, ForceMode.Force);
-            }
+            PlayerController.AddForce(GrappleForce, forceDir, ForceMode.Force);
         }
     }
 }

@@ -770,6 +770,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0047c36ee6ab65408f1d8b10985087e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  coyoteTime: 0.5
 --- !u!1 &4316027074644905779
 GameObject:
   m_ObjectHideFlags: 0
@@ -1347,7 +1348,9 @@ MonoBehaviour:
   MaxGrappleLength: 20
   RopeEquilibrium: 0.95
   RopeConstant: 500
-  playerController: {fileID: 0}
+  GrappleForce: 10
+  GroundDetector: {fileID: 1371572323}
+  PlayerController: {fileID: 4316027074644905738}
 --- !u!1001 &4316027075111195045
 PrefabInstance:
   m_ObjectHideFlags: 0
