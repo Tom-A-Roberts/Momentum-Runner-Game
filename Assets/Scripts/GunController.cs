@@ -28,6 +28,7 @@ public class GunController : MonoBehaviour
     public Shader lineShader;
     public GameObject groundHitParticlePrefab;
     public GameObject muzzleFlashParticlePrefab;
+    public GameObject bulletHoleDecalPrefab;
     public LightFlashController muzzleLight;
 
     private float animationProgress = 1;
@@ -126,7 +127,7 @@ public class GunController : MonoBehaviour
 
 
             GameObject ground_particle = Instantiate(groundHitParticlePrefab, hitObj.point, Quaternion.FromToRotation(Vector3.forward, hitObj.normal));
-            
+            GameObject ground_decal = Instantiate(bulletHoleDecalPrefab, hitObj.point, Quaternion.FromToRotation(Vector3.forward, hitObj.normal));
         }
         else
         {
