@@ -5,19 +5,15 @@ using UnityEngine;
 public class GrappleGun : MonoBehaviour
 {
     public Transform GunEndPosition;
+    public Transform playerCentreOfMass;
     public Camera PlayerCamera;
     public LineRenderer RopeRenderer;
     public float MaxGrappleLength = 20f;
+    public PlayerController playerController;
 
     private bool grappleConnected = false;
     private Vector3 connectionPoint;
     private float connectedDistance;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -33,20 +29,23 @@ public class GrappleGun : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        ApplyGrappleForce();
+    }
+
     private void OnEnable()
     {
-        Application.onBeforeRender += UpdateGrapple;
+        Application.onBeforeRender += UpdateGrappleVisual;
     }
 
     private void OnDisable()
     {
-        Application.onBeforeRender -= UpdateGrapple;
+        Application.onBeforeRender -= UpdateGrappleVisual;
     }
 
     void ConnectGrapple()
     {
-        Debug.Log("Grapple Initiated");
-
         RaycastHit hit;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
@@ -58,11 +57,9 @@ public class GrappleGun : MonoBehaviour
             grappleConnected = true;
             RopeRenderer.enabled = true;
         }
-
     }
 
-
-    void UpdateGrapple()
+    void UpdateGrappleVisual()
     {
         if (grappleConnected)
         {
@@ -72,8 +69,18 @@ public class GrappleGun : MonoBehaviour
 
     void DisconnectGrapple()
     {
-        RopeRenderer.enabled = false;
+        Debug.Log("Grapple Disconnected");
 
+        RopeRenderer.enabled = false;
         grappleConnected = false;
+    }
+
+    void ApplyGrappleForce()
+    {
+        if (grappleConnected)
+        {
+            Vector3 forceDirection = connectionPoint - playerCentreOfMass.position;
+            playerController.AddForce(10f, forceDirection, ForceMode.Acceleration);
+        }
     }
 }
