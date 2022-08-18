@@ -1341,6 +1341,8 @@ MonoBehaviour:
   PlayerCamera: {fileID: 4316027073834798314}
   RopeRenderer: {fileID: 5224529714271308080}
   MaxGrappleLength: 20
+  RopeEquilibrium: 1
+  RopeConstant: 50
   playerController: {fileID: 4316027074644905738}
 --- !u!1001 &4316027075111195045
 PrefabInstance:

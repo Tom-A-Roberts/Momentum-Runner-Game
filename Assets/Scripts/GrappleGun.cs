@@ -9,11 +9,14 @@ public class GrappleGun : MonoBehaviour
     public Camera PlayerCamera;
     public LineRenderer RopeRenderer;
     public float MaxGrappleLength = 20f;
+    public float RopeEquilibrium = 1f;
+    public float RopeConstant = 50f;
     public PlayerController playerController;
 
     private bool grappleConnected = false;
     private Vector3 connectionPoint;
     private float connectedDistance;
+    private float connectedEquilibriumDistance;
 
     // Update is called once per frame
     void Update()
@@ -53,6 +56,7 @@ public class GrappleGun : MonoBehaviour
 
             connectionPoint = hit.point;
             connectedDistance = hit.distance;
+            connectedEquilibriumDistance = connectedDistance * RopeEquilibrium;
 
             grappleConnected = true;
             RopeRenderer.enabled = true;
@@ -79,8 +83,16 @@ public class GrappleGun : MonoBehaviour
     {
         if (grappleConnected)
         {
-            Vector3 forceDirection = connectionPoint - playerCentreOfMass.position;
-            playerController.AddForce(10f, forceDirection, ForceMode.Acceleration);
+            Vector3 ropeVec = connectionPoint - playerCentreOfMass.position;
+            Vector3 ropeDir = ropeVec.normalized;
+
+            // check rope should be applying force
+            if (ropeVec.magnitude > connectedEquilibriumDistance)
+            {
+                float forceAmount = RopeConstant * (ropeVec.magnitude - connectedEquilibriumDistance);
+
+                playerController.AddForce(forceAmount, ropeDir, ForceMode.Force);
+            }
         }
     }
 }
