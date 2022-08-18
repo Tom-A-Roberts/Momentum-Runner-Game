@@ -64,12 +64,10 @@ public class WallRunning : MonoBehaviour
         if(wallLeft || wallRight && axisValues.Item2 > 0 && !GroundDetector.IsOnGround)
         {
             StartWallRun();
-            Debug.Log("WallRunning");
         }
         else
         {
             StopWallRun();
-            Debug.Log("no");
         }
     }
 
