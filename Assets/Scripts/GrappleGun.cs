@@ -77,7 +77,7 @@ public class GrappleGun : MonoBehaviour
             // make a limit
             SoftJointLimit limit = Rope.linearLimit;
             limit.limit = connectedDistance;
-            limit.contactDistance = 0.5f;         
+            limit.contactDistance = 0.05f;         
             Rope.linearLimit = limit;
 
             Rope.enablePreprocessing = true;

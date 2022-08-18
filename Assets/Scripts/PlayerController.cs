@@ -217,7 +217,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            bodyRigidBody.drag = 0.025f;
+            bodyRigidBody.drag = 0.005f;
         }
 
         if (!GroundDetector.IsOnGround)
