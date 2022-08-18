@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
     // needs tooltip
     public float JumpLerpStart = 10f;
     [Tooltip("How hard we 'kick' away from walls when on them")]
-    public float WallKickoffForce = 25f;
+    public float MaxWallKickOffForce = 25f;
     [Header("----------------")]
     [Header("Dash Settings")]
     [Tooltip("How much force is applied when air dashing")]
@@ -107,7 +107,10 @@ public class PlayerController : MonoBehaviour
 
             // unstick and 'kick off wall
             wallRunning.Unstick();
-            bodyRigidBody.AddForce(wallNormal * WallKickoffForce, ForceMode.Impulse);
+
+            // kick hardest when facing into wall
+            float wallKickRatio = 1f - Vector3.Dot(transform.forward, wallNormal) / 2f;
+            bodyRigidBody.AddForce(wallNormal * MaxWallKickOffForce * wallKickRatio, ForceMode.Impulse);
 
             remainingJumps--;
         }
