@@ -37021,6 +37021,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &446807161 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1371572323, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+  m_PrefabInstance: {fileID: 654048565}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0047c36ee6ab65408f1d8b10985087e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &459832526 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 459832526, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
@@ -51705,7 +51716,7 @@ MonoBehaviour:
   wallRunTimer: 120
   wallCheckDistance: 1
   minJumpHeight: 0.1
-  GroundDetector: {fileID: 654048566}
+  GroundDetector: {fileID: 446807161}
 --- !u!1 &2023756760
 GameObject:
   m_ObjectHideFlags: 0

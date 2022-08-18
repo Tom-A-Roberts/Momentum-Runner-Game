@@ -11,13 +11,14 @@ GameObject:
   - component: {fileID: 459832527}
   - component: {fileID: 459832529}
   - component: {fileID: 459832528}
+  - component: {fileID: 459832530}
   m_Layer: 0
   m_Name: MuzzleFlashLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &459832527
 Transform:
   m_ObjectHideFlags: 0
@@ -40,7 +41,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 459832526}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
@@ -217,6 +218,19 @@ MonoBehaviour:
   m_PointlightHDType: 0
   m_SpotLightShape: 0
   m_AreaLightShape: 0
+--- !u!114 &459832530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459832526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb659c2f18d36d24ea1618dc2f9458e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashDuration: 0.02
 --- !u!1 &2851636133934878852
 GameObject:
   m_ObjectHideFlags: 0
@@ -770,6 +784,7 @@ GameObject:
   - component: {fileID: 4316027074644905777}
   - component: {fileID: 4316027074644905781}
   - component: {fileID: 4316027074644905780}
+  - component: {fileID: 1970319852}
   m_Layer: 3
   m_Name: Body
   m_TagString: Player
@@ -1000,6 +1015,30 @@ ConfigurableJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 10
   m_ConnectedMassScale: 1
+--- !u!114 &1970319852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4316027074644905779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c252e76bd9b3a49bc3e336113fccb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whatIsWall:
+    serializedVersion: 2
+    m_Bits: 64
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 64
+  wallRunForce: 100
+  maxWallRunTime: 120
+  wallRunTimer: 120
+  wallCheckDistance: 1
+  minJumpHeight: 0.1
+  GroundDetector: {fileID: 1371572323}
 --- !u!1 &4316027074863493586
 GameObject:
   m_ObjectHideFlags: 0
@@ -1129,7 +1168,7 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5988328233710087386
 GameObject:
@@ -1414,7 +1453,7 @@ MonoBehaviour:
   lineShader: {fileID: 207, guid: 0000000000000000f000000000000000, type: 0}
   groundHitParticlePrefab: {fileID: 5155380658188059227, guid: 56be379ae260e5747b140d2ebfb352b7, type: 3}
   muzzleFlashParticlePrefab: {fileID: 1548731787465841113, guid: 14a375f0b95638a479fd733831292beb, type: 3}
-  muzzleLight: {fileID: 0}
+  muzzleLight: {fileID: 459832530}
 --- !u!4 &4354737557993813582 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d127773f32d01e47afd735fb4986dd1, type: 3}
