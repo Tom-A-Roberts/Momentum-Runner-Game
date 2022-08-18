@@ -1041,7 +1041,7 @@ MonoBehaviour:
   stickingForce: 100
   effectOfGravityDuringWallrun: 0.3
   verticalUpFrictionalCoefficient: 3
-  verticalDownFrictionalCoefficient: 3
+  verticalDownFrictionalCoefficient: 1
   wallCheckDistance: 1
   minJumpHeight: 0.1
   GroundDetector: {fileID: 1371572323}
