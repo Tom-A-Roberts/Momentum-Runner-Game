@@ -19,8 +19,9 @@ public class CameraController : MonoBehaviour
 	[Range(0f, 0.1f)]
 	public float fovChangeSmoothing = 0.1f;
 
-	
-	private Vector3 cameraOffsetFromBody;
+	[System.NonSerialized]
+	public float zRotation = 0;
+
 	private float originalFOV;
 	private float targetFOV;
 	private float FOVchangeCurrentVelocity = 0.0f;
@@ -29,7 +30,6 @@ public class CameraController : MonoBehaviour
 	private Rigidbody playerRigidBody;
     private void Start()
     {
-		cameraOffsetFromBody = transform.position - body.transform.position;
 		myCamera = GetComponent<Camera>();
 		playerScript = body.GetComponent<PlayerController>();
 		playerRigidBody = body.GetComponent<Rigidbody>();
@@ -59,7 +59,11 @@ public class CameraController : MonoBehaviour
 		var xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
 		var yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);
 
-		transform.localRotation = xQuat * yQuat; //Quaternions seem to rotate more consistently than EulerAngles. Sensitivity seemed to change slightly at certain degrees using Euler. transform.localEulerAngles = new Vector3(-rotation.y, rotation.x, 0);
+		
+		var zQuat = Quaternion.AngleAxis(zRotation, Vector3.forward);
+
+		transform.localRotation = xQuat * yQuat * zQuat; //Quaternions seem to rotate more consistently than EulerAngles. Sensitivity seemed to change slightly at certain degrees using Euler. transform.localEulerAngles = new Vector3(-rotation.y, rotation.x, 0);
+
 
 		UpdateCameraFOV();
 	}
