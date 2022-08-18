@@ -829,13 +829,13 @@ MonoBehaviour:
   CancellationPower: 50
   SidewaysDeceleration: 10
   DragWhenNoKeysPressed: 10
-  CharacterFallingWeight: 5
-  JumpForce: 12
+  CharacterFallingWeight: 20
+  JumpForce: 8
   MinJumpForce: 2
   JumpCount: 2
   AirJumpMultiplier: 1.5
   JumpLerpStart: 10
-  MaxWallKickOffForce: 25
+  MaxWallKickOffForce: 20
   DashForce: 90
   DashForceActiveTime: 0.2
   DashCooldown: 5
@@ -897,7 +897,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4316027074644905779}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: b28a10cb366b3694a8ec629368ca8d33, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
@@ -1038,6 +1038,7 @@ MonoBehaviour:
   maxWallRunTime: 120
   wallRunTimer: 120
   stickingForce: 100
+  effectOfGravityDuringWallrun: 0.3
   verticalUpFrictionalCoefficient: 3
   verticalDownFrictionalCoefficient: 3
   wallCheckDistance: 1
