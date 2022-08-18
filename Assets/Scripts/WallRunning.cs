@@ -13,6 +13,9 @@ public class WallRunning : MonoBehaviour
     public float wallRunTimer;
     Tuple<float, float> axisValues;
 
+    public float verticalUpFrictionalCoefficient = 1;
+    public float verticalDownFrictionalCoefficient = 1;
+
     [Header("Input")]
     private float horizontalInput;
     private float verticalInput;
@@ -76,7 +79,8 @@ public class WallRunning : MonoBehaviour
 
     private void WallRunningMovement()
     {
-        rb.AddForce(transform.up * 29.81f, ForceMode.Acceleration);
+        //rb.AddForce(transform.up * 29.81f, ForceMode.Acceleration);
+        rb.AddForce(transform.up * 24.81f, ForceMode.Acceleration);
         Vector3 wallNormal = wallRight ? rightWallHit.normal: leftWallHit.normal;
         Vector3 wallForward = Vector3.Cross(wallNormal, transform.up);
 
@@ -93,8 +97,21 @@ public class WallRunning : MonoBehaviour
         {
             rb.AddForce(-wallNormal * 100, ForceMode.Force);
         }
-        
-    }
+
+        //verticalUpFrictionalCoefficient = 1;
+        //verticalDownFrictionalCoefficient = 1;
+
+        float y_speed = rb.velocity.y;
+        if(y_speed < 0)
+        {
+            rb.AddForce(transform.up * y_speed * verticalUpFrictionalCoefficient, ForceMode.Acceleration);
+        }
+        else
+        {
+            rb.AddForce(transform.up * -y_speed * verticalDownFrictionalCoefficient, ForceMode.Acceleration);
+        }
+
+}
 
     private void StopWallRun()
     {
