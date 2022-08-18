@@ -11,6 +11,7 @@ public class GrappleGun : MonoBehaviour
 
     private bool grappleConnected = false;
     private Vector3 connectionPoint;
+    private float connectedDistance;
 
     // Start is called before the first frame update
     void Start()
@@ -30,8 +31,16 @@ public class GrappleGun : MonoBehaviour
         {
             DisconnectGrapple();
         }
+    }
 
-        UpdateGrapple();
+    private void OnEnable()
+    {
+        Application.onBeforeRender += UpdateGrapple;
+    }
+
+    private void OnDisable()
+    {
+        Application.onBeforeRender -= UpdateGrapple;
     }
 
     void ConnectGrapple()
@@ -44,20 +53,20 @@ public class GrappleGun : MonoBehaviour
             Debug.Log("Grapple Connected");
 
             connectionPoint = hit.point;
+            connectedDistance = hit.distance;
 
             grappleConnected = true;
+            RopeRenderer.enabled = true;
         }
 
     }
+
 
     void UpdateGrapple()
     {
         if (grappleConnected)
         {
             RopeRenderer.SetPositions(new Vector3[] { GunEndPosition.transform.position, connectionPoint });
-
-            if (!RopeRenderer.enabled)
-                RopeRenderer.enabled = true;
         }
     }
 
