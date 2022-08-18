@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public Transform mainCamera;
     public CollisionDetector GroundDetector;
     private Rigidbody bodyRigidBody;
+    private WallRunning wallRunning;
     [Header("----------------")]
     [Header("Movement Settings")]
     [Tooltip("The maximum speed the player will accelerate to when on the ground as a result of key-presses.")]
@@ -45,6 +46,8 @@ public class PlayerController : MonoBehaviour
     public float AirJumpMultiplier = 1.5f;
     // needs tooltip
     public float JumpLerpStart = 10f;
+    [Tooltip("How hard we 'kick' away from walls when on them")]
+    public float WallKickoffForce = 25f;
     [Header("----------------")]
     [Header("Dash Settings")]
     [Tooltip("How much force is applied when air dashing")]
@@ -59,6 +62,7 @@ public class PlayerController : MonoBehaviour
 
     
     private int remainingJumps;
+    private Vector3 wallNormal;
     private float movementSpeed;
     private float currentJumpForce;
     private float yVelocity;
@@ -68,9 +72,9 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        remainingJumps  = JumpCount - 1; //this works off array numbers so its technically 2 :)
+        remainingJumps = JumpCount - 1; //this works off array numbers so its technically 2 :)
         bodyRigidBody = GetComponent<Rigidbody>();
-
+        wallRunning = GetComponent<WallRunning>();
     }
 
     void Update()
@@ -101,6 +105,10 @@ public class PlayerController : MonoBehaviour
 
             bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
 
+            // unstick and 'kick off wall
+            wallRunning.Unstick();
+            bodyRigidBody.AddForce(wallNormal * WallKickoffForce, ForceMode.Impulse);
+
             remainingJumps--;
         }
         #endregion
@@ -128,9 +136,7 @@ public class PlayerController : MonoBehaviour
     {
         transform.localRotation = Quaternion.identity * Quaternion.Euler(0, mainCamera.transform.localEulerAngles.y, 0);
 
-        Tuple<float, float> axisValues = GetMovementAxis();
-        
-       
+        Tuple<float, float> axisValues = GetMovementAxis();               
 
         processMotion(axisValues.Item1, axisValues.Item2);
 
@@ -238,5 +244,15 @@ public class PlayerController : MonoBehaviour
     public void AddForce(float strength, Vector3 direction, ForceMode forceMode)
     {
         bodyRigidBody.AddForce(direction * strength, forceMode);
+    }
+
+    public void ResetJumps(int numJumps)
+    {
+        remainingJumps = numJumps;
+    }
+
+    public void SetWallNormal(Vector3 normal)
+    {
+        wallNormal = normal;
     }
 }

@@ -12,6 +12,7 @@ public class WallRunning : MonoBehaviour
     public float maxWallRunTime;
     public float wallRunTimer;
     Tuple<float, float> axisValues;
+    public float stickingForce = 100f;
 
     [Tooltip("Amount of friction added to slow you moving down a wall during wallrunning")]
     public float verticalUpFrictionalCoefficient = 1;
@@ -35,6 +36,8 @@ public class WallRunning : MonoBehaviour
     public CollisionDetector GroundDetector;
     private PlayerController pc;
     private Rigidbody rb;
+
+    private float currentStickingForce;
 
     // Start is called before the first frame update
     private void Start()
@@ -76,6 +79,10 @@ public class WallRunning : MonoBehaviour
 
     private void StartWallRun()
     {
+        pc.ResetJumps(pc.JumpCount - 1);
+
+        Stick();
+
         isWallRunning = true;
     }
 
@@ -86,18 +93,20 @@ public class WallRunning : MonoBehaviour
         Vector3 wallNormal = wallRight ? rightWallHit.normal: leftWallHit.normal;
         Vector3 wallForward = Vector3.Cross(wallNormal, transform.up);
 
+        pc.SetWallNormal(wallNormal);
+
         if((transform.forward - wallForward).magnitude > (transform.forward + wallForward).magnitude)
         {
             wallForward *= -1;
         }
 
         //forward force applied to player
-        rb.AddForce(wallForward*wallRunForce, ForceMode.Force);
+        rb.AddForce(wallForward * wallRunForce, ForceMode.Force);
 
         //nudge player towards wall if they are not actively trying to escape wallrun
         if(!(wallLeft && axisValues.Item1 > 0 ) && !(wallRight && axisValues.Item1 < 0))
         {
-            rb.AddForce(-wallNormal * 100, ForceMode.Force);
+            rb.AddForce(-wallNormal * currentStickingForce, ForceMode.Force);
         }
 
         //verticalUpFrictionalCoefficient = 1;
@@ -112,11 +121,12 @@ public class WallRunning : MonoBehaviour
         {
             rb.AddForce(transform.up * -y_speed * verticalDownFrictionalCoefficient, ForceMode.Acceleration);
         }
-
-}
+    }
 
     private void StopWallRun()
     {
+        pc.SetWallNormal(Vector3.zero);
+
         isWallRunning = false;
     }
 
@@ -124,5 +134,15 @@ public class WallRunning : MonoBehaviour
     {
         wallRight = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallCheckDistance, whatIsWall);
         wallLeft = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallCheckDistance, whatIsWall);
+    }
+
+    public void Unstick()
+    {
+        currentStickingForce = 0f;
+    }
+
+    public void Stick()
+    {
+        currentStickingForce = stickingForce;
     }
 }
