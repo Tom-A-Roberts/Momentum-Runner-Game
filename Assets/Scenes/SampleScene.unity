@@ -37976,6 +37976,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: GroundDetector
+      value: 
+      objectReference: {fileID: 654048566}
     - target: {fileID: 4316027075412832466, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab
@@ -38030,6 +38034,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 459832527}
   m_SourcePrefab: {fileID: 100100000, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+--- !u!114 &654048566 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1371572323, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+  m_PrefabInstance: {fileID: 654048565}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0047c36ee6ab65408f1d8b10985087e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &675343427
 GameObject:
   m_ObjectHideFlags: 0
