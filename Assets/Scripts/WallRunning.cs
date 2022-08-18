@@ -15,7 +15,11 @@ public class WallRunning : MonoBehaviour
     public float stickingForce = 100f;
     private float targetAngle;
     private float originalAngle = 0f;
-    public float angleChangeRate;
+    public float WallRunCameraAngle = 25f;
+    public float attachAngleTimer = 0.5f;
+    public float detachAngleTimer = 0.7f;
+    private float currentTargetTime;
+    private float angleTimer;
 
     [Tooltip("0= weightless, 1= as weighty as normal")]
     [Range(0f, 1f)]
@@ -53,6 +57,20 @@ public class WallRunning : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (currentTargetTime - angleTimer >= 0f)
+        {
+            angleTimer += Time.deltaTime;
+
+            if (currentTargetTime != 0f)
+            {
+                cc.zRotation = Mathf.Lerp(originalAngle, targetAngle, angleTimer / currentTargetTime);
+            }
+            else
+            {
+                cc.zRotation = targetAngle;
+            }
+        }
+
         CheckForWalls();
         StateMachine();
     }
@@ -81,11 +99,11 @@ public class WallRunning : MonoBehaviour
 
     private void StartWallRun()
     {
-        originalAngle = 0;
-        if (wallRight) targetAngle = 10;
-        else if (wallLeft) targetAngle = -10;
-
-        cc.zRotation = Mathf.Lerp(originalAngle, targetAngle, angleChangeRate);
+        originalAngle = cc.zRotation;
+        if (wallRight) targetAngle = WallRunCameraAngle;
+        else if (wallLeft) targetAngle = -WallRunCameraAngle;
+        currentTargetTime = attachAngleTimer;
+        angleTimer = 0f;
         
         pc.ResetJumps(pc.JumpCount - 1);
 
@@ -133,8 +151,10 @@ public class WallRunning : MonoBehaviour
     {
         targetAngle = 0;
         originalAngle = cc.zRotation;
+        currentTargetTime = detachAngleTimer; //lower than attach feels nicer
+        angleTimer = 0f;
+
         pc.SetWallNormal(Vector3.zero);
-        cc.zRotation = Mathf.Lerp(originalAngle, targetAngle, (angleChangeRate/2)); //returning the angle back at half the rate is for pure game feel reasons
         isWallRunning = false;
     }
 
