@@ -13,7 +13,6 @@ public class WallRunning : MonoBehaviour
     public float wallRunTimer;
     Tuple<float, float> axisValues;
     public float stickingForce = 100f;
-    private float angleChangeReference = 0f;
     private float targetAngle;
     private float originalAngle = 0f;
     public float angleChangeRate;
@@ -26,10 +25,6 @@ public class WallRunning : MonoBehaviour
     public float verticalUpFrictionalCoefficient = 1;
     [Tooltip("Amount of friction added to slow you moving up a wall during wallrunning")]
     public float verticalDownFrictionalCoefficient = 1;
-
-    [Header("Input")]
-    private float horizontalInput;
-    private float verticalInput;
 
     [Header("Detection")]
     public float wallCheckDistance;
