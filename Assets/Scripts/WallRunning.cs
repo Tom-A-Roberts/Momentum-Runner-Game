@@ -13,7 +13,9 @@ public class WallRunning : MonoBehaviour
     public float wallRunTimer;
     Tuple<float, float> axisValues;
 
+    [Tooltip("Amount of friction added to slow you moving down a wall during wallrunning")]
     public float verticalUpFrictionalCoefficient = 1;
+    [Tooltip("Amount of friction added to slow you moving up a wall during wallrunning")]
     public float verticalDownFrictionalCoefficient = 1;
 
     [Header("Input")]
