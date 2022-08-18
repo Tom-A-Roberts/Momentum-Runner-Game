@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,7 +57,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Allow the player to accelerate to walkspeed while in the air. This does not effect ability to slow down while in the air")]
     public bool PlayerHasAirControl = true;
 
-
+    
     private int remainingJumps;
     private float movementSpeed;
     private float currentJumpForce;
@@ -130,11 +131,11 @@ public class PlayerController : MonoBehaviour
     {
         transform.localRotation = Quaternion.identity * Quaternion.Euler(0, mainCamera.transform.localEulerAngles.y, 0);
 
+        Tuple<float, float> axisValues = GetMovementAxis();
+        
+       
 
-        float xInput = Input.GetAxisRaw("Horizontal");
-        float yInput = Input.GetAxisRaw("Vertical");
-
-        processMotion(xInput, yInput);
+        processMotion(axisValues.Item1, axisValues.Item2);
 
         if(airDashProgress > 0)
         {
@@ -225,8 +226,16 @@ public class PlayerController : MonoBehaviour
         // Increase the dash force over time, as the dash happens
         float currentDashForceAmount = DashForce * (1 - airDashProgress) * 2f;
         currentDashForceAmount = DashForce;
-        bodyRigidBody.AddForce(transform.forward * currentDashForceAmount, ForceMode.Acceleration); //add a forward horizontal force
+        bodyRigidBody.AddForce(transform.forward * currentDashForceAmount, ForceMode.Force); //add a forward horizontal force
         bodyRigidBody.AddForce(new Vector3(0,bodyRigidBody.velocity.y * -1,0), ForceMode.Impulse);
+    }
+
+    public Tuple<float, float> GetMovementAxis()
+    {
+        float xInput = Input.GetAxisRaw("Horizontal");
+        float yInput = Input.GetAxisRaw("Vertical");
+
+        return Tuple.Create(xInput, yInput);
     }
 
 }

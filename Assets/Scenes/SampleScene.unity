@@ -36353,7 +36353,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh30118
+  m_Name: pb_Mesh53110
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -41609,6 +41609,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1237262771 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4316027074644905779, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+  m_PrefabInstance: {fileID: 654048565}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1269453824
 GameObject:
   m_ObjectHideFlags: 0
@@ -41664,7 +41669,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh29898
+  m_Name: pb_Mesh52798
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -43134,7 +43139,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh29946
+  m_Name: pb_Mesh52874
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -51883,6 +51888,30 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 4316027074644905781, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
   m_PrefabInstance: {fileID: 654048565}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1970319852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1237262771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c252e76bd9b3a49bc3e336113fccb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whatIsWall:
+    serializedVersion: 2
+    m_Bits: 64
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 64
+  wallRunForce: 100
+  maxWallRunTime: 120
+  wallRunTimer: 120
+  wallCheckDistance: 1
+  minJumpHeight: 0.1
+  GroundDetector: {fileID: 654048566}
 --- !u!1 &2023756760
 GameObject:
   m_ObjectHideFlags: 0
