@@ -590,7 +590,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 4316027073834798315}
-  GroundDetector: {fileID: 0}
+  GroundDetector: {fileID: 1371572323}
   WalkingSpeed: 8
   SprintMultiplier: 1.5
   Acceleration: 0.8
@@ -912,7 +912,7 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5988328233710087386
 GameObject:
