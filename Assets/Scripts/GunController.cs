@@ -7,7 +7,7 @@ public class GunController : MonoBehaviour
     [Header("Related Objects")]
     public Transform gunTop;
     public Transform muzzlePoint;
-
+    
 
     [Header("Gameplay Settings")]
     [Tooltip("How long in seconds between times you can shoot")]
@@ -28,6 +28,7 @@ public class GunController : MonoBehaviour
     public Shader lineShader;
     public GameObject groundHitParticlePrefab;
     public GameObject muzzleFlashParticlePrefab;
+    public LightFlashController muzzleLight;
 
     private float animationProgress = 1;
     private bool animationActive = false;
@@ -133,5 +134,6 @@ public class GunController : MonoBehaviour
         }
         GameObject muzzle_particle = Instantiate(muzzleFlashParticlePrefab, muzzlePoint.position, muzzlePoint.rotation);//
         muzzle_particle.transform.parent = muzzlePoint.transform;
+        //muzzleLight.Flash();
     }
 }
