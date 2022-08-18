@@ -1039,12 +1039,14 @@ MonoBehaviour:
   maxWallRunTime: 120
   wallRunTimer: 120
   stickingForce: 100
+  angleChangeRate: 0.5
   effectOfGravityDuringWallrun: 0.3
   verticalUpFrictionalCoefficient: 3
   verticalDownFrictionalCoefficient: 1
   wallCheckDistance: 1
   minJumpHeight: 0.1
   GroundDetector: {fileID: 1371572323}
+  cc: {fileID: 4316027073834798312}
 --- !u!1 &4316027074863493586
 GameObject:
   m_ObjectHideFlags: 0
@@ -1341,9 +1343,11 @@ MonoBehaviour:
   PlayerCamera: {fileID: 4316027073834798314}
   RopeRenderer: {fileID: 5224529714271308080}
   MaxGrappleLength: 20
-  RopeEquilibrium: 1
-  RopeConstant: 50
-  playerController: {fileID: 4316027074644905738}
+  RopeEquilibrium: 0.95
+  RopeConstant: 500
+  Rope: {fileID: 0}
+  GroundDetector: {fileID: 1371572323}
+  PlayerController: {fileID: 4316027074644905738}
 --- !u!1001 &4316027075111195045
 PrefabInstance:
   m_ObjectHideFlags: 0

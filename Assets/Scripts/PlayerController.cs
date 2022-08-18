@@ -155,9 +155,7 @@ public class PlayerController : MonoBehaviour
         // Check if there's motion input
         if (xInput != 0 || yInput != 0)
         {
-
             Vector2 input = new Vector2(xInput, yInput).normalized;
-
 
             // Calculate what directions the inputs mean in worldcoordinate terms
             Vector3 verticalInputWorldDirection = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * input.y;
@@ -177,7 +175,6 @@ public class PlayerController : MonoBehaviour
 
             float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
 
-
             // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
             if (forwardsSpeed < 0)
             {
@@ -192,7 +189,6 @@ public class PlayerController : MonoBehaviour
                 float requiredAcc = (movementSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
 
                 bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
-
             }
 
             bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
@@ -206,7 +202,6 @@ public class PlayerController : MonoBehaviour
         else
         {
             bodyRigidBody.drag = 0.025f;
-
         }
 
         if (!GroundDetector.IsOnGround)

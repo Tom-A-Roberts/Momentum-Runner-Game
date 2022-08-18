@@ -64,7 +64,6 @@ public class CameraController : MonoBehaviour
 
 		transform.localRotation = xQuat * yQuat * zQuat; //Quaternions seem to rotate more consistently than EulerAngles. Sensitivity seemed to change slightly at certain degrees using Euler. transform.localEulerAngles = new Vector3(-rotation.y, rotation.x, 0);
 
-
 		UpdateCameraFOV();
 	}
 
@@ -75,7 +74,6 @@ public class CameraController : MonoBehaviour
 
 		Vector3 planarVelocity = new Vector3(playerRigidBody.velocity.x, 0, playerRigidBody.velocity.z);
 		float currentSpeed = planarVelocity.magnitude;
-
 
 		if (currentSpeed < walkSpeed)
         {
@@ -96,8 +94,6 @@ public class CameraController : MonoBehaviour
         {
 			targetFOV = originalFOV * MaxFOVMultiplier;
 		}
-
-
 		
 		myCamera.fieldOfView = Mathf.SmoothDamp(myCamera.fieldOfView, targetFOV,  ref FOVchangeCurrentVelocity, fovChangeSmoothing);
 	}
