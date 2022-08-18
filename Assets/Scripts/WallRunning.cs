@@ -104,7 +104,7 @@ public class WallRunning : MonoBehaviour
         float y_speed = rb.velocity.y;
         if(y_speed < 0)
         {
-            rb.AddForce(transform.up * y_speed * verticalUpFrictionalCoefficient, ForceMode.Acceleration);
+            rb.AddForce(transform.up * -y_speed * verticalUpFrictionalCoefficient, ForceMode.Acceleration);
         }
         else
         {

@@ -37763,6 +37763,14 @@ PrefabInstance:
       propertyPath: wallRunForce
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1970319852, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: verticalUpFrictionalCoefficient
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970319852, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+      propertyPath: verticalDownFrictionalCoefficient
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4316027074644905777, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
       propertyPath: m_Material
       value: 
