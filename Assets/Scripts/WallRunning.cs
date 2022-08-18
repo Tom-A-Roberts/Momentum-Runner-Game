@@ -13,6 +13,10 @@ public class WallRunning : MonoBehaviour
     public float wallRunTimer;
     Tuple<float, float> axisValues;
     public float stickingForce = 100f;
+    private float angleChangeReference = 0f;
+    private float targetAngle;
+    private float originalAngle = 0f;
+    public float angleChangeRate;
 
     [Tooltip("0= weightless, 1= as weighty as normal")]
     [Range(0f, 1f)]
@@ -38,6 +42,7 @@ public class WallRunning : MonoBehaviour
 
     [Header("References")]
     public CollisionDetector GroundDetector;
+    public CameraController cc;
     private PlayerController pc;
     private Rigidbody rb;
 
@@ -81,6 +86,12 @@ public class WallRunning : MonoBehaviour
 
     private void StartWallRun()
     {
+        originalAngle = 0;
+        if (wallRight) targetAngle = 10;
+        else if (wallLeft) targetAngle = -10;
+
+        cc.zRotation = Mathf.Lerp(originalAngle, targetAngle, angleChangeRate);
+        
         pc.ResetJumps(pc.JumpCount - 1);
 
         Stick();
@@ -125,8 +136,10 @@ public class WallRunning : MonoBehaviour
 
     private void StopWallRun()
     {
+        targetAngle = 0;
+        originalAngle = cc.zRotation;
         pc.SetWallNormal(Vector3.zero);
-
+        cc.zRotation = Mathf.Lerp(originalAngle, targetAngle, (angleChangeRate/2)); //returning the angle back at half the rate is for pure game feel reasons
         isWallRunning = false;
     }
 
