@@ -229,4 +229,8 @@ public class PlayerController : MonoBehaviour
         bodyRigidBody.AddForce(new Vector3(0,bodyRigidBody.velocity.y * -1,0), ForceMode.Impulse);
     }
 
+    public void AddForce(float strength, Vector3 direction, ForceMode forceMode)
+    {
+        bodyRigidBody.AddForce(direction * strength, forceMode);
+    }
 }
