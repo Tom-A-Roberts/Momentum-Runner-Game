@@ -14,7 +14,7 @@ public class LevelController : MonoBehaviour
     private Quaternion feetStartRotation;
 
     private bool resetRequired = false;
-    // Start is called before the first frame update
+
     void Start()
     {
 
@@ -24,14 +24,9 @@ public class LevelController : MonoBehaviour
         feetStartRotation = playerFeet.transform.rotation;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            resetRequired = true;
 
-        }
     }
 
     private void FixedUpdate()
@@ -46,5 +41,10 @@ public class LevelController : MonoBehaviour
 
             playerBody.velocity = Vector3.zero;
         }
+    }
+
+    public void PlayerDeath()
+    {
+        resetRequired = true;
     }
 }

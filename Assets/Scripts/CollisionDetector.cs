@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CollisionDetector : MonoBehaviour
 {
-
+    public LevelController levelController;
     public float coyoteTime = 0.5f;
     private bool m_IsOnGround;
     private bool m_IsOnGroundCoyote;
@@ -76,6 +76,14 @@ public class CollisionDetector : MonoBehaviour
         cyoteEnded = true;
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.collider.tag == "TriggerDeath")
+        {
+            levelController.PlayerDeath();
+        }
+
+    }
     void OnCollisionStay()
     {
         m_IsOnGround = true;
