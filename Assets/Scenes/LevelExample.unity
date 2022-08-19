@@ -1541,7 +1541,7 @@ PrefabInstance:
     - target: {fileID: 210850929, guid: 03ef1b32b0fed5246a1467bb0a91acf5, type: 3}
       propertyPath: pc
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1268895558}
     - target: {fileID: 3904358891167487457, guid: 03ef1b32b0fed5246a1467bb0a91acf5, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -3985,7 +3985,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh44776
+  m_Name: pb_Mesh32896
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -6205,6 +6205,17 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 323c39ef1cd9d0342b694fb284b3565c, type: 3}
+--- !u!114 &1268895558 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4316027074644905738, guid: 8f0714dbbeaffeb429bd12bb69b1476c, type: 3}
+  m_PrefabInstance: {fileID: 1445570252}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69f08ca36219c684882037ca2edd1ad0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1291388638 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 323c39ef1cd9d0342b694fb284b3565c, type: 3}
