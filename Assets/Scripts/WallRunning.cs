@@ -79,7 +79,7 @@ public class WallRunning : MonoBehaviour
     {
         axisValues = pc.GetMovementAxis();
         
-        if((wallLeft || wallRight) && axisValues.Item2 > 0 && !GroundDetector.IsOnGroundCoyote)
+        if((wallLeft || wallRight) && axisValues.Item2 > 0 && !GroundDetector.IsOnGround)
         {
             StartWallRun();
         }
