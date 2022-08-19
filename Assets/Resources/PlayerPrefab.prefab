@@ -1044,7 +1044,7 @@ MonoBehaviour:
   attachAngleTimer: 0.15
   detachAngleTimer: 0.25
   effectOfGravityDuringWallrun: 0.3
-  verticalUpFrictionalCoefficient: 6
+  verticalUpFrictionalCoefficient: 4
   verticalDownFrictionalCoefficient: 1
   wallCheckDistance: 1
   minJumpHeight: 0.1
