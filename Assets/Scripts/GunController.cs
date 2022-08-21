@@ -122,6 +122,11 @@ public class GunController : MonoBehaviour
         lr.SetPosition(0, muzzlePoint.position);
         if (hit)
         {
+            Target hitObject = hitObj.transform.gameObject.GetComponent<Target>();
+            if(!(hitObject == null))
+            {
+                hitObject.TargetHit();
+            }
 
             lr.SetPosition(1, hitObj.point);
 
