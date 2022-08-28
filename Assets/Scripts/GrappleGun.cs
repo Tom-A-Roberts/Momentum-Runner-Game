@@ -9,8 +9,6 @@ public class GrappleGun : MonoBehaviour
     public Camera PlayerCamera;
     public LineRenderer RopeRenderer;
     public float MaxGrappleLength = 20f;
-    public float RopeEquilibrium = 1f;
-    public float RopeConstant = 50f;
     public float GrappleForce = 10f;
 
     public GrapplingRope grapplingRope;

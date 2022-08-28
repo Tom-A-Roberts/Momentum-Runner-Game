@@ -9,8 +9,8 @@ public class GrapplingRope : MonoBehaviour
     public float damper = 14f;
     public float strength = 800f;
     public float speed = 15f;
-    public float waveCount = 3f;
-    public float waveHeight = 1f;
+    public float waveCount = 4f;
+    public float waveHeight = 6f;
     public float maxExtendAnimTime = 0.25f;
     public float maxRetractAnimTime = 0.15f;
     public AnimationCurve affectCurve;
@@ -23,7 +23,6 @@ public class GrapplingRope : MonoBehaviour
     private LineRenderer lr;
     private bool ropeEnabled = false;
     private bool extending = false;
-    //private Vector3 originalRopePosition;
     private float animTime;
     private float animTimeRatio;
     private float targetAnimTime;

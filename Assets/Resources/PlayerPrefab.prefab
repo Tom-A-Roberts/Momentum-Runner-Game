@@ -271,6 +271,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5170917926509469355}
+  - component: {fileID: 1777984287}
   - component: {fileID: 5224529714271308080}
   m_Layer: 0
   m_Name: Rope Start
@@ -294,6 +295,51 @@ Transform:
   m_Father: {fileID: 9112686551321005626}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1777984287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4173788609210005263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59d1855090ee1334ba9e6858796fb6c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GrappleGun: {fileID: 6966176926615907479}
+  quality: 500
+  damper: 14
+  strength: 800
+  speed: 15
+  waveCount: 4
+  waveHeight: 7
+  maxExtendAnimTime: 0.25
+  maxRetractAnimTime: 0.15
+  affectCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1.7972542
+      outSlope: 1.7972542
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.025029797
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!120 &5224529714271308080
 LineRenderer:
   serializedVersion: 2
@@ -336,12 +382,10 @@ LineRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Positions:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 1}
+  m_Positions: []
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.1
+    widthMultiplier: 0.05
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -1167,7 +1211,7 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &153934500
 MonoBehaviour:
@@ -1348,9 +1392,8 @@ MonoBehaviour:
   PlayerCamera: {fileID: 4316027073834798314}
   RopeRenderer: {fileID: 5224529714271308080}
   MaxGrappleLength: 20
-  RopeEquilibrium: 0.95
-  RopeConstant: 500
   GrappleForce: 10
+  grapplingRope: {fileID: 1777984287}
   GroundDetector: {fileID: 1371572323}
   PlayerController: {fileID: 4316027074644905738}
 --- !u!1001 &4316027075111195045
