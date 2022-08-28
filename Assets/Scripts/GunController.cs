@@ -66,7 +66,7 @@ public class GunController : MonoBehaviour
             }
         }
         
-        if (Input.GetMouseButton(1) && cooldownProgress <= 0)
+        if (Input.GetButton("Shoot") && cooldownProgress <= 0)
         {
             animationActive = true;
             animationProgress = 0;

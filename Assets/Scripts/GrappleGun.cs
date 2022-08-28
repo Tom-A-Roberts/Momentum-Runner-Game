@@ -13,6 +13,7 @@ public class GrappleGun : MonoBehaviour
     public float RopeConstant = 50f;
     public float GrappleForce = 10f;
 
+    public GrapplingRope grapplingRope;
     private ConfigurableJoint Rope;
     public CollisionDetector GroundDetector;
     public PlayerController PlayerController;
@@ -20,18 +21,18 @@ public class GrappleGun : MonoBehaviour
     private bool grappleConnected = false;
     private Vector3 connectionPoint;
     private float connectedDistance;
-    private float connectedEquilibriumDistance;
+    private Vector3 currentRopePosition;
 
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetButtonDown("Grapple"))
         {
             ConnectGrapple();
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetButtonUp("Grapple"))
         {
             DisconnectGrapple();
         }
@@ -42,16 +43,6 @@ public class GrappleGun : MonoBehaviour
         ApplyGrappleForce();
     }
 
-    private void OnEnable()
-    {
-        Application.onBeforeRender += UpdateGrappleVisual;
-    }
-
-    private void OnDisable()
-    {
-        Application.onBeforeRender -= UpdateGrappleVisual;
-    }
-
     void ConnectGrapple()
     {
         RaycastHit hit;
@@ -59,7 +50,6 @@ public class GrappleGun : MonoBehaviour
         {
             connectionPoint = hit.point;
             connectedDistance = hit.distance;
-            connectedEquilibriumDistance = connectedDistance * RopeEquilibrium;
 
             Rope = playerCentreOfMass.gameObject.AddComponent<ConfigurableJoint>();
             Rope.autoConfigureConnectedAnchor = false;
@@ -84,22 +74,19 @@ public class GrappleGun : MonoBehaviour
 
             Rope.massScale = 0.5f;
 
-            grappleConnected = true;
-            RopeRenderer.enabled = true;
-        }
-    }
+            currentRopePosition = GunEndPosition.position;
 
-    void UpdateGrappleVisual()
-    {
-        if (grappleConnected)
-        {
-            RopeRenderer.SetPositions(new Vector3[] { GunEndPosition.transform.position, connectionPoint });
+            grappleConnected = true;
+
+            grapplingRope.Extend(connectionPoint);
         }
     }
 
     void DisconnectGrapple()
     {
-        RopeRenderer.enabled = false;
+        connectedDistance = 0;
+
+        grapplingRope.Retract();
 
         Destroy(Rope);
         grappleConnected = false;
@@ -115,5 +102,24 @@ public class GrappleGun : MonoBehaviour
 
             PlayerController.AddForce(GrappleForce, forceDir, ForceMode.Force);
         }
+    }
+
+    public bool IsGrappling()
+    {
+        return grappleConnected;
+    }
+
+    public Vector3 GetPoint()
+    {
+        return connectionPoint;
+    }
+
+    public float GetSqrDistance()
+    {
+        return connectedDistance * connectedDistance;
+    }
+    public float GetDistance()
+    {
+        return connectedDistance;
     }
 }

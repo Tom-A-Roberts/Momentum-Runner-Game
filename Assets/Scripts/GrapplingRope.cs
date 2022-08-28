@@ -1,0 +1,126 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GrapplingRope : MonoBehaviour
+{
+    public GrappleGun GrappleGun;
+    public int quality = 500;
+    public float damper = 14f;
+    public float strength = 800f;
+    public float speed = 15f;
+    public float waveCount = 3f;
+    public float waveHeight = 1f;
+    public float maxExtendAnimTime = 0.25f;
+    public float maxRetractAnimTime = 0.15f;
+    public AnimationCurve affectCurve;
+
+    private Vector3 currentRopePosition;
+    private Vector3 startPosition;
+    private Vector3 targetPosition;
+
+    private Spring spring;
+    private LineRenderer lr;
+    private bool ropeEnabled = false;
+    private bool extending = false;
+    //private Vector3 originalRopePosition;
+    private float animTime;
+    private float animTimeRatio;
+    private float targetAnimTime;
+
+    private void Awake()
+    {
+        lr = GrappleGun.RopeRenderer;
+
+        spring = new Spring();
+        spring.SetTarget(0);
+    }
+
+    private void LateUpdate()
+    {
+        DrawRope();
+    }
+
+    public void Extend(Vector3 target)
+    {
+        targetPosition = target;
+        startPosition = GrappleGun.GunEndPosition.position;
+
+        animTimeRatio = (startPosition - targetPosition).sqrMagnitude / (GrappleGun.MaxGrappleLength * GrappleGun.MaxGrappleLength);
+        targetAnimTime = animTimeRatio * maxExtendAnimTime;
+
+        animTime = 0;
+
+        spring.SetVelocity(speed);
+
+        if (lr.positionCount == 0)
+        {
+            lr.positionCount = quality + 1;
+        }
+
+        extending = true;
+        ropeEnabled = true;
+    }
+
+    public void Retract()
+    {
+        startPosition = targetPosition;
+        targetPosition = GrappleGun.GunEndPosition.position;
+
+        animTimeRatio = (startPosition - targetPosition).sqrMagnitude / (GrappleGun.MaxGrappleLength * GrappleGun.MaxGrappleLength);
+        targetAnimTime = animTime * maxRetractAnimTime;
+
+        animTime = 0;
+
+        spring.SetVelocity(speed);
+
+        extending = false;
+    }
+
+    void DrawRope()
+    {
+        Vector3 gunTipPosition = GrappleGun.GunEndPosition.position;
+
+        if (ropeEnabled)
+        {
+            if (!extending)
+            {
+                if (currentRopePosition == gunTipPosition)
+                {
+                    spring.Reset();
+
+                    ropeEnabled = false;
+
+                    if (lr.positionCount > 0)
+                        lr.positionCount = 0;
+
+                    return;
+                }
+
+                targetPosition = gunTipPosition;
+            }
+            else
+            {
+                startPosition = gunTipPosition;
+            }
+
+            spring.SetDamper(damper);
+            spring.SetStrength(strength);
+            spring.Update(Time.deltaTime);            
+
+            animTime += Time.deltaTime;
+
+            Vector3 up = Quaternion.LookRotation((targetPosition - startPosition).normalized) * Vector3.up;
+
+            currentRopePosition = Vector3.Lerp(startPosition, targetPosition, animTime / targetAnimTime);
+
+            for (int i = 0; i < quality + 1; i++)
+            {
+                float delta = i / (float)quality;
+                Vector3 offset = up * waveHeight * Mathf.Sin(delta * waveCount * Mathf.PI) * spring.Value * affectCurve.Evaluate(delta);
+
+                lr.SetPosition(i, Vector3.Lerp(gunTipPosition, currentRopePosition, delta) + offset);
+            }
+        }
+    }
+}
