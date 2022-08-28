@@ -76,9 +76,14 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            
             jumpKeyPressed = true;
         }
-
+        //if (Input.GetKey(KeyCode.Space) && !jumpKeyPressed)
+        //{
+        //    jumpKeyPressed = true;
+        //}
+        
 
 
 
@@ -133,6 +138,7 @@ public class PlayerController : MonoBehaviour
         }
         if (remainingJumps > 0 && jumpKeyPressed)
         {
+            
             yVelocity = bodyRigidBody.velocity.y;
 
             // don't apply as much force if beginning the jump
@@ -162,7 +168,10 @@ public class PlayerController : MonoBehaviour
 
         // Reset jump key pressed
         if (jumpKeyPressed)
+        {
+            //Debug.Log("jumped");
             jumpKeyPressed = false;
+        }
     }
 
 
