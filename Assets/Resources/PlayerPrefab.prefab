@@ -1044,7 +1044,7 @@ MonoBehaviour:
   WallRunCameraAngle: 15
   attachAngleTimer: 0.15
   detachAngleTimer: 0.25
-  effectOfGravityDuringWallrun: 0.3
+  effectOfGravityDuringWallrun: 0.6
   verticalUpFrictionalCoefficient: 4
   verticalDownFrictionalCoefficient: 1
   wallCheckDistance: 1
@@ -1146,7 +1146,7 @@ GameObject:
   - component: {fileID: 153934500}
   m_Layer: 0
   m_Name: PlayerPrefab
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1167,7 +1167,7 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &153934500
 MonoBehaviour:

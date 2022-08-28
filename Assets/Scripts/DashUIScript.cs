@@ -22,6 +22,10 @@ public class DashUIScript : MonoBehaviour
     {
         imageCooldown.fillAmount = 0.0f;
         textCooldown.text = "Q"; //Again later change this to not be hardcoded
+        if(pc == null)
+        {
+            pc = GameObject.FindObjectOfType<PlayerController>();
+        }
     }
 
     // Update is called once per frame

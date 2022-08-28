@@ -5,77 +5,7 @@ using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
 
 
-public class ManipulatableCurvedWall
-{
-    public GameObject gameObject;
-    public ProBuilderMesh proBuilderMesh;
-    public Vector3 LocalExtrusionDirection => localExtrusionDirection;
-    private Vector3 localExtrusionDirection = Vector3.zero;
-    public Dictionary<int, List<int>> RingSegments => ringSegments;
-    private Dictionary<int, List<int>> ringSegments;
-    private HashSet<int> addedVerts;
 
-    public ManipulatableCurvedWall(GameObject proBuilderGameObject)
-    {
-        gameObject = proBuilderGameObject;
-        proBuilderMesh = gameObject.GetComponent<ProBuilderMesh>();
-        ringSegments = new Dictionary<int, List<int>>();
-        addedVerts = new HashSet<int>();
-    }
-
-    public void RebuildRingSegments(float errorRange = 0.01f)
-    {
-        ringSegments.Clear();
-        addedVerts.Clear();
-        if(localExtrusionDirection == Vector3.zero) { return; }
-        //ringsTracker = new Dictionary<int, List<int>>();
-        for (int vert = 0; vert < proBuilderMesh.vertexCount; vert++)
-        {
-            float distance = Vector3.Dot(proBuilderMesh.positions[vert], localExtrusionDirection);
-            distance /= errorRange;
-            int bucket = Mathf.RoundToInt(distance);
-            if (ringSegments.ContainsKey(bucket))
-            {
-                ringSegments[bucket].Add(vert);
-            }
-            else
-            {
-                ringSegments[bucket] = new List<int>();
-                ringSegments[bucket].Add(vert);
-            }
-        }
-        Debug.Log("Segments: " + ringSegments.Values.Count.ToString());
-    }
-
-
-    /// <summary>
-    /// Finds the boundary face(s) in direction and extrudes them by extrusionDistance n times.
-    /// </summary>
-    /// <param name="direction">Direction of the side to extrude. E.g Vector3.up will extrude the top faces.</param>
-    /// <param name="numberOfExtrusions">Number of rings to add .E.g. 1 would be a single extrusion on the shape, resulting in 1 extra ring.</param>
-    public void ExtrudeMeshSide(Vector3 direction, int numberOfExtrusions, float extrusionDistance)
-    {
-        localExtrusionDirection = direction.normalized;
-        List<Face> boundaryFaces = MeshManipulator.GetBoundaryFaces(proBuilderMesh, localExtrusionDirection);
-
-        for (int i = 0; i < numberOfExtrusions; i++)
-        {
-            ExtrudeElements.Extrude(proBuilderMesh, boundaryFaces, ExtrudeMethod.FaceNormal, extrusionDistance);
-        }
-        proBuilderMesh.ToMesh();
-        proBuilderMesh.Refresh();
-        RebuildRingSegments();
-    }
-
-    public void RefreshMesh()
-    {
-        proBuilderMesh.ToMesh();
-        proBuilderMesh.Refresh();
-    }
-
-    
-
-}
 
 [RequireComponent(typeof(ProBuilderMesh))]
 public class MeshManipulator : MonoBehaviour
