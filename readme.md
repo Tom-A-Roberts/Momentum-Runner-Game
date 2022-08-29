@@ -1,6 +1,12 @@
 
 # Momentum-based running game 🏃
 **Thomas Roberts 🎮, Jonathan Watts 👾, Oscar Rummery 🔬**
+
+
+<p align="left">
+  <img src="./InGameCapture.PNG" width="450" title="hover text">
+</p>
+
 ## Introduction ⚡
 A group-created game made by a bunch of friends.
 Not just to gain experience working together, but also to make a game we can actually enjoy ourselves.
