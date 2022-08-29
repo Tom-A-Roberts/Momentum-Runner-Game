@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LevelController : MonoBehaviour
 {
+    public bool SobelEnabled = true;
 
     public Rigidbody playerBody;
     public Rigidbody playerFeet;
@@ -22,6 +23,19 @@ public class LevelController : MonoBehaviour
         bodyStartRotation = playerBody.transform.rotation;
         feetStartPosition = playerFeet.transform.position;
         feetStartRotation = playerFeet.transform.rotation;
+
+        UnityEngine.Rendering.Volume sceneVolume = GameObject.FindObjectOfType<UnityEngine.Rendering.Volume>();
+        if(sceneVolume != null && SobelEnabled)
+        {
+            for (int componentID = 0; componentID < sceneVolume.profile.components.Count; componentID++)
+            {
+                if (sceneVolume.profile.components[componentID].name.Contains("Sobel"))
+                {
+                    sceneVolume.profile.components[componentID].active = true;
+                }
+            }
+            
+        }
     }
 
     void Update()
