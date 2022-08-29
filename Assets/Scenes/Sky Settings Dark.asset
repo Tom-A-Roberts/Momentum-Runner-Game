@@ -151,6 +151,7 @@ MonoBehaviour:
   - {fileID: -6967889715112068413}
   - {fileID: 2196219510081798584}
   - {fileID: 1668339357230273413}
+  - {fileID: 2778633596929386676}
 --- !u!114 &1668339357230273413
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -360,6 +361,40 @@ MonoBehaviour:
   directionalLightsOnly:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &2778633596929386676
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e26a18d3dc6f85e4894fb7bb90cf1776, type: 3}
+  m_Name: Sobel
+  m_EditorClassIdentifier: 
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.5
+  outlineColour:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  outlineThickness:
+    m_OverrideState: 0
+    m_Value: 1
+  depthMultiplier:
+    m_OverrideState: 0
+    m_Value: 1
+  depthBias:
+    m_OverrideState: 0
+    m_Value: 1
+  normalMultiplier:
+    m_OverrideState: 0
+    m_Value: 1
+  normalBias:
+    m_OverrideState: 0
+    m_Value: 1
 --- !u!114 &6934592572219519968
 MonoBehaviour:
   m_ObjectHideFlags: 3

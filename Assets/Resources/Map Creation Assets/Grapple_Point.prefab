@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8370048351356607912}
   - component: {fileID: 8958455733269182756}
   - component: {fileID: 8768776824391026440}
+  - component: {fileID: 906950716}
   m_Layer: 6
   m_Name: Grapple_Point
   m_TagString: Untagged
@@ -26,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7452211695183553943}
-  m_LocalRotation: {x: 0.000000081460335, y: 0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.27978164, y: 0.407898, z: 3.6265721}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3.3103554, y: 1.4881346, z: 1.4881346}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 31
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8370048351356607912
 MeshFilter:
@@ -62,8 +63,8 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5738ff22542deb940b62418bb7393384, type: 2}
-  - {fileID: 2100000, guid: 31fc403bf627b03498d1b9ba3d876f6c, type: 2}
+  - {fileID: 2100000, guid: ccd969ff627a8404ab4897221e9e91a1, type: 2}
+  - {fileID: 2100000, guid: 0cd8194fc0b226a499cdfe9ea609c9ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -97,5 +98,19 @@ MeshCollider:
   m_Enabled: 1
   serializedVersion: 4
   m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5721656286150894371, guid: e4207d64bdc80014a8231cb30b98fedf, type: 3}
+--- !u!64 &906950716
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7452211695183553943}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -5721656286150894371, guid: e4207d64bdc80014a8231cb30b98fedf, type: 3}
