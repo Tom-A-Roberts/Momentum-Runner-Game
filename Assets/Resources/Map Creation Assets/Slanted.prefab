@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8087632181483700357}
   - component: {fileID: 8183168143972801409}
   - component: {fileID: -313107218503682543}
+  - component: {fileID: -7830486385692680432}
   m_Layer: 6
   m_Name: Slanted
   m_TagString: Untagged
@@ -99,3 +100,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -8120385891336964224, guid: e4207d64bdc80014a8231cb30b98fedf, type: 3}
+--- !u!114 &-7830486385692680432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6499883431172780970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9794ac87dad59e34391976b01e0aef07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowIncreaseTime: 0.1
+  glowDecaySpeed: 0.5
+  glowIncreaseMultiplier: 5
+  hueChange: 0.05

@@ -45,6 +45,11 @@ public class WallRunning : MonoBehaviour
     private PlayerController pc;
     private Rigidbody rb;
 
+    public GameObject CurrentWallrunWall => currentWallrunWall;
+    private GameObject currentWallrunWall;
+
+    public bool IsWallRunning => isWallRunning;
+
     private float currentStickingForce;
 
     // Start is called before the first frame update
@@ -82,6 +87,7 @@ public class WallRunning : MonoBehaviour
         if((wallLeft || wallRight) && axisValues.Item2 > 0 && !GroundDetector.IsOnGround)
         {
             StartWallRun();
+            
         }
         else
         {
@@ -110,6 +116,15 @@ public class WallRunning : MonoBehaviour
         Stick();
 
         isWallRunning = true;
+
+        if(currentWallrunWall != null)
+        {
+            GlowFlashObject glowFlashObject = currentWallrunWall.GetComponent<GlowFlashObject>();
+            if (glowFlashObject != null)
+            {
+                glowFlashObject.WallRunStarted(referenceInitiator: this);
+            }
+        }
     }
 
     private void WallRunningMovement()
@@ -162,6 +177,11 @@ public class WallRunning : MonoBehaviour
     {
         wallRight = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallCheckDistance, whatIsWall);
         wallLeft = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallCheckDistance, whatIsWall);
+
+        if(wallRight)
+            currentWallrunWall = rightWallHit.collider.gameObject;
+        else if (wallLeft)
+            currentWallrunWall = leftWallHit.collider.gameObject;
     }
 
     public void Unstick()
