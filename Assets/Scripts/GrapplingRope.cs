@@ -8,7 +8,8 @@ public class GrapplingRope : MonoBehaviour
     public int quality = 500;
     public float damper = 14f;
     public float strength = 800f;
-    public float speed = 15f;
+    public float extendSpeed = 15f;
+    public float retractSpeed = 9f;
     public float waveCount = 4f;
     public float waveHeight = 6f;
     public float maxExtendAnimTime = 0.25f;
@@ -40,17 +41,22 @@ public class GrapplingRope : MonoBehaviour
         DrawRope();
     }
 
-    public void Extend(Vector3 target)
+    private void SetRopeParams(Vector3 start, Vector3 target, float maxAnimTime, float _speed)
     {
+        startPosition = start;
         targetPosition = target;
-        startPosition = GrappleGun.GunEndPosition.position;
 
         animTimeRatio = (startPosition - targetPosition).sqrMagnitude / (GrappleGun.MaxGrappleLength * GrappleGun.MaxGrappleLength);
-        targetAnimTime = animTimeRatio * maxExtendAnimTime;
+        targetAnimTime = animTimeRatio * maxAnimTime;
 
         animTime = 0;
 
-        spring.SetVelocity(speed);
+        spring.SetVelocity(_speed);
+    }
+
+    public void Extend(Vector3 target)
+    {
+        SetRopeParams(GrappleGun.GunEndPosition.position, target, maxExtendAnimTime, extendSpeed);
 
         if (lr.positionCount == 0)
         {
@@ -63,15 +69,7 @@ public class GrapplingRope : MonoBehaviour
 
     public void Retract()
     {
-        startPosition = targetPosition;
-        targetPosition = GrappleGun.GunEndPosition.position;
-
-        animTimeRatio = (startPosition - targetPosition).sqrMagnitude / (GrappleGun.MaxGrappleLength * GrappleGun.MaxGrappleLength);
-        targetAnimTime = animTime * maxRetractAnimTime;
-
-        animTime = 0;
-
-        spring.SetVelocity(speed);
+        SetRopeParams(targetPosition, GrappleGun.GunEndPosition.position, maxRetractAnimTime, retractSpeed);
 
         extending = false;
     }
