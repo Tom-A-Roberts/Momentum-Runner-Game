@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8958455733269182756}
   - component: {fileID: 8768776824391026440}
   - component: {fileID: 906950716}
+  - component: {fileID: 456656088}
   m_Layer: 6
   m_Name: Grapple_Point
   m_TagString: Untagged
@@ -33,7 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 31
+  m_RootOrder: 30
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8370048351356607912
 MeshFilter:
@@ -114,3 +115,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -5721656286150894371, guid: e4207d64bdc80014a8231cb30b98fedf, type: 3}
+--- !u!114 &456656088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7452211695183553943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9794ac87dad59e34391976b01e0aef07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowIncreaseTime: 0.1
+  glowDecaySpeed: 1
+  glowIncreaseMultiplier: 5
+  hueChange: -0.02

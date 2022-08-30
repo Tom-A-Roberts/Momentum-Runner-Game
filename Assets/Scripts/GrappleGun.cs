@@ -49,6 +49,12 @@ public class GrappleGun : MonoBehaviour
             connectionPoint = hit.point;
             connectedDistance = hit.distance;
 
+            // See if the object has the glow effect enabled. if so, make it glow and let it know
+            // that this script is what is grappled to it
+            GlowFlashObject connectedGlowObject = hit.collider.gameObject.GetComponent<GlowFlashObject>();
+            if(connectedGlowObject != null)
+                connectedGlowObject.GrappleStarted(referenceInitiator: this);
+
             Rope = playerCentreOfMass.gameObject.AddComponent<ConfigurableJoint>();
             Rope.autoConfigureConnectedAnchor = false;
             Rope.connectedAnchor = connectionPoint;

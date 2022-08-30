@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2463063577772356808}
   - component: {fileID: 234313959385491526}
   - component: {fileID: -8097582768991853285}
+  - component: {fileID: -1904764879287136989}
   m_Layer: 6
   m_Name: Sbend_2
   m_TagString: Untagged
@@ -99,3 +100,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8131751966279368401, guid: e4207d64bdc80014a8231cb30b98fedf, type: 3}
+--- !u!114 &-1904764879287136989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635786099000828409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9794ac87dad59e34391976b01e0aef07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowIncreaseTime: 0.1
+  glowDecaySpeed: 0.5
+  glowIncreaseMultiplier: 5
+  hueChange: 0.05

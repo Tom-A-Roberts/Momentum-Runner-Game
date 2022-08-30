@@ -1,0 +1,5 @@
+For each object:
+
+- Make sure it's static (check the static checkbox)
+- Add it to the terrain layer
+- If it's emissive, give it the GlowFlashObject script.
