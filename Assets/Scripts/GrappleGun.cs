@@ -11,16 +11,24 @@ public class GrappleGun : MonoBehaviour
     public float MaxGrappleLength = 20f;
     public float GrappleForce = 10f;
 
+    /// <summary>
+    /// How much the grapple gun moves when trying to face the grapple point
+    /// </summary>
+    public float GrappleLookAtPower = 0.4f;
+    public float lookAtSmoothSpeed = 0.05f;
+
     public GrapplingRope grapplingRope;
     private ConfigurableJoint Rope;
     public CollisionDetector GroundDetector;
     public PlayerController PlayerController;
+    public GameObject grappleGunModel;
 
     private bool grappleConnected = false;
     private Vector3 connectionPoint;
     private float connectedDistance;
     private Vector3 currentRopePosition;
 
+    private Vector3 targD;
 
     // Update is called once per frame
     void Update()
@@ -34,6 +42,33 @@ public class GrappleGun : MonoBehaviour
         {
             DisconnectGrapple();
         }
+        if (grappleConnected)
+        {
+            Vector3 lookDirection = connectionPoint - grappleGunModel.transform.position;
+            Vector3 forwardPlanar = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
+            Vector3 rightPlanar = Vector3.Cross(forwardPlanar, Vector3.up).normalized;
+
+            float forwardElement = Vector3.Dot(lookDirection, forwardPlanar);
+            float upElement = Vector3.Dot(lookDirection, Vector3.up);
+            float rightElement = Vector3.Dot(lookDirection, rightPlanar);
+
+            if (forwardElement < 0.1f)
+            {
+                forwardElement = 0.1f;
+            }
+            rightElement /= 2;
+
+            Vector3 combinedLook = forwardPlanar * forwardElement + Vector3.up * upElement + rightPlanar * rightElement;
+            Vector3 lookForwards = combinedLook.normalized * GrappleLookAtPower + forwardPlanar * (1- GrappleLookAtPower);
+            lookForwards = -lookForwards.normalized;
+            targD = lookForwards;
+        }
+        else
+        {
+            targD = -transform.forward;
+        }
+        Quaternion rotGoal = Quaternion.LookRotation(targD, Vector3.up);
+        grappleGunModel.transform.rotation = Quaternion.Slerp(grappleGunModel.transform.rotation, rotGoal, lookAtSmoothSpeed);
     }
 
     private void FixedUpdate()
@@ -125,5 +160,37 @@ public class GrappleGun : MonoBehaviour
     public float GetDistance()
     {
         return connectedDistance;
+    }
+
+
+    /// <summary>
+    /// Thankyou to https://gist.github.com/maxattack/4c7b4de00f5c1b95a33b for this code
+    /// </summary>
+    public static Quaternion SmoothDamp(Quaternion rot, Quaternion target, ref Quaternion deriv, float time)
+    {
+        if (Time.deltaTime < Mathf.Epsilon) return rot;
+        // account for double-cover
+        var Dot = Quaternion.Dot(rot, target);
+        var Multi = Dot > 0f ? 1f : -1f;
+        target.x *= Multi;
+        target.y *= Multi;
+        target.z *= Multi;
+        target.w *= Multi;
+        // smooth damp (nlerp approx)
+        var Result = new Vector4(
+            Mathf.SmoothDamp(rot.x, target.x, ref deriv.x, time),
+            Mathf.SmoothDamp(rot.y, target.y, ref deriv.y, time),
+            Mathf.SmoothDamp(rot.z, target.z, ref deriv.z, time),
+            Mathf.SmoothDamp(rot.w, target.w, ref deriv.w, time)
+        ).normalized;
+
+        // ensure deriv is tangent
+        var derivError = Vector4.Project(new Vector4(deriv.x, deriv.y, deriv.z, deriv.w), Result);
+        deriv.x -= derivError.x;
+        deriv.y -= derivError.y;
+        deriv.z -= derivError.z;
+        deriv.w -= derivError.w;
+
+        return new Quaternion(Result.x, Result.y, Result.z, Result.w);
     }
 }

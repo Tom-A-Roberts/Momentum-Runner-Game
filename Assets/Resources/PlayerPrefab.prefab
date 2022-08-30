@@ -287,12 +287,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4173788609210005263}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0293, y: -0.106, z: 1.247}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 0.9926177, z: -0.12128567, w: 0}
+  m_LocalPosition: {x: 0.0003197787, y: 0.04713489, z: -0.47406086}
+  m_LocalScale: {x: 1.0659498, y: 1.0659503, z: 1.0659497}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 9112686551321005626}
+  m_Father: {fileID: 543450652403755233}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1777984287
@@ -1200,16 +1200,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8853182101087441441}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.414, y: -0.065, z: -0.08}
+  m_LocalRotation: {x: -0.081459664, y: -0, z: -0, w: 0.9966767}
+  m_LocalPosition: {x: -0.414, y: -0.20895433, z: -0.1152514}
   m_LocalScale: {x: 1.0199089, y: 1.0199089, z: 1.0199089}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5170917926509469355}
   - {fileID: 543450652403755233}
   m_Father: {fileID: 4316027073834798315}
   m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -9.345, y: 0, z: 0}
 --- !u!114 &6966176926615907479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1228,9 +1227,13 @@ MonoBehaviour:
   RopeRenderer: {fileID: 5224529714271308080}
   MaxGrappleLength: 20
   GrappleForce: 10
+  GrappleLookAtPower: 0.4
+  GrappleLookAtTime: 0.1
+  lookAtSmoothSpeed: 0.05
   grapplingRope: {fileID: 1777984287}
   GroundDetector: {fileID: 1371572323}
   PlayerController: {fileID: 4316027074644905738}
+  grappleGunModel: {fileID: 919132148211561051}
 --- !u!1001 &1338478346
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1273,19 +1276,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.9926177
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.12128567
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 13.933
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -1432,7 +1435,10 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5170917926509469355}
   m_SourcePrefab: {fileID: 100100000, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
 --- !u!4 &543450652403755233 stripped
 Transform:
@@ -1444,27 +1450,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
   m_PrefabInstance: {fileID: 1338478346}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &435038665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132148211561051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1d57d33ef101f74d80fc7146a7a326f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GunEndPosition: {fileID: 5170917926509469355}
-  playerCentreOfMass: {fileID: 4316027074644905776}
-  PlayerCamera: {fileID: 4316027073834798314}
-  RopeRenderer: {fileID: 5224529714271308080}
-  MaxGrappleLength: 20
-  GrappleForce: 10
-  grapplingRope: {fileID: 1777984287}
-  GroundDetector: {fileID: 1371572323}
-  PlayerController: {fileID: 4316027074644905738}
 --- !u!1001 &4316027075111195045
 PrefabInstance:
   m_ObjectHideFlags: 0
