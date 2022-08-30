@@ -1200,15 +1200,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8853182101087441441}
-  m_LocalRotation: {x: -0.081459664, y: -0, z: -0, w: 0.9966767}
-  m_LocalPosition: {x: -0.414, y: -0.20895433, z: -0.1152514}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.414, y: -0.11, z: -0.115}
   m_LocalScale: {x: 1.0199089, y: 1.0199089, z: 1.0199089}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 543450652403755233}
   m_Father: {fileID: 4316027073834798315}
   m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: -9.345, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6966176926615907479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1228,7 +1228,6 @@ MonoBehaviour:
   MaxGrappleLength: 20
   GrappleForce: 10
   GrappleLookAtPower: 0.4
-  GrappleLookAtTime: 0.1
   lookAtSmoothSpeed: 0.05
   grapplingRope: {fileID: 1777984287}
   GroundDetector: {fileID: 1371572323}
