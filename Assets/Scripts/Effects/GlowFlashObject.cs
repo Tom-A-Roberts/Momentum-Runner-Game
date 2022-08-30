@@ -74,7 +74,7 @@ public class GlowFlashObject : MonoBehaviour
             float glowMultiplier = 1 + glowState * glowIncreaseMultiplier;
             float currentHueChange = glowState * hueChange;
 
-            if (!increaseGlow)
+            if (!increaseGlow && myMat != null)
                 myMat.SetColor("_EmissiveColor", Color.HSVToRGB(hOriginal + currentHueChange, sOriginal, vOriginal) * glowMultiplier);
             
         }
@@ -87,7 +87,8 @@ public class GlowFlashObject : MonoBehaviour
             float glowMultiplier = 1 + glowState * glowIncreaseMultiplier;
             float currentHueChange = glowState * hueChange;
 
-            myMat.SetColor("_EmissiveColor", Color.HSVToRGB(hOriginal + currentHueChange, sOriginal, vOriginal) * glowMultiplier);
+            if (myMat != null)
+                myMat.SetColor("_EmissiveColor", Color.HSVToRGB(hOriginal + currentHueChange, sOriginal, vOriginal) * glowMultiplier);
         }
         increaseGlow = false;
     }
