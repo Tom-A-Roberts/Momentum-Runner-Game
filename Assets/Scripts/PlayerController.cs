@@ -67,7 +67,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        remainingJumps = JumpCount - 1; //this works off array numbers so its technically 2 :)
         bodyRigidBody = GetComponent<Rigidbody>();
         wallRunning = GetComponent<WallRunning>();
     }
@@ -134,7 +133,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            remainingJumps = JumpCount - 1;
+            if (!GroundDetector.IsOnGroundCoyote)            
+                remainingJumps = JumpCount - 1;
         }
         if (remainingJumps > 0 && jumpKeyPressed)
         {

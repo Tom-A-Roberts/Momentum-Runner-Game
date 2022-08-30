@@ -111,7 +111,7 @@ public class WallRunning : MonoBehaviour
         currentTargetTime = attachAngleTimer;
         angleTimer = 0f;
         
-        pc.ResetJumps(pc.JumpCount - 1);
+        pc.ResetJumps(pc.JumpCount);
 
         Stick();
 

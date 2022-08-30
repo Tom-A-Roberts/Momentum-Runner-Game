@@ -33,15 +33,15 @@ public class GrappleGun : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("Grapple"))
+        if (Input.GetButton("Grapple") && !grappleConnected)
         {
             ConnectGrapple();
         }
-
-        if (Input.GetButtonUp("Grapple"))
-        {
+        else if (!Input.GetButton("Grapple") && grappleConnected)
+        { 
             DisconnectGrapple();
         }
+
         if (grappleConnected)
         {
             Vector3 lookDirection = connectionPoint - grappleGunModel.transform.position;
@@ -67,6 +67,7 @@ public class GrappleGun : MonoBehaviour
         {
             targD = -transform.forward;
         }
+
         Quaternion rotGoal = Quaternion.LookRotation(targD, Vector3.up);
         grappleGunModel.transform.rotation = Quaternion.Slerp(grappleGunModel.transform.rotation, rotGoal, lookAtSmoothSpeed);
     }
