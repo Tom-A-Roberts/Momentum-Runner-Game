@@ -11,34 +11,34 @@ public class MenuUIScript : MonoBehaviour
     public GameObject SettingsPanel;
     public GameObject GameModePanel;
 
-    public void SingleplayerLevelSelect()
+    public void DisableMainPanel()
     {
-        //temporarily disable main menu
-        //enable level select screen
-    }
-
-    public void LoadGameModePanel()
-    {   
-        GameModePanel.SetActive(true);
         MainMenuPanel.SetActive(false);
     }
-    public void GameModeBacktoMenuButton()
+    public void EnableMainPanel()
     {
-        MainMenuPanel.SetActive(true);
-        GameModePanel.SetActive(false);
+        MainMenuPanel.SetActive(false);
     }
 
-    public void SettingsBacktoMenuButton()
+    public void DisableSettingsPanel()
+    {   
+        SettingsPanel.SetActive(false);
+    }
+    public void EnableSettingsPanel()
     {
-        MainMenuPanel.SetActive(true);
         SettingsPanel.SetActive(false);
     }
 
-    public void SettingsScreenLoad()
+    public void DisableGamePanel()
     {
-        SettingsPanel.SetActive(true);
-        MainMenuPanel.SetActive(false);
+        GameModePanel.SetActive(false);
     }
+    public void EnableGamePanel()
+    {
+        GameModePanel.SetActive(false);
+    }
+
+
     public void QuitButton()
     {
         Debug.Log("game quit");
