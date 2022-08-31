@@ -76,9 +76,9 @@ public class CollisionDetector : MonoBehaviour
         cyoteEnded = true;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider deathbox)
     {
-        if(collision.collider.tag == "TriggerDeath")
+        if(deathbox.gameObject.tag == "TriggerDeath")
         {
             levelController.PlayerDeath();
         }
