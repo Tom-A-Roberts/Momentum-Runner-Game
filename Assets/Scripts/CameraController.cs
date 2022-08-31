@@ -78,6 +78,7 @@ public class CameraController : MonoBehaviour
 		if (currentSpeed < walkSpeed)
         {
 			// We are walking or slower, so use original FOV with multiplier at 1
+			// Tom is a silly spogert
 			targetFOV = originalFOV * 1;
 		}else if(currentSpeed < sprintSpeed)
         {
