@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2071111906510709053}
   - component: {fileID: 4276983716828927479}
   - component: {fileID: 3214289917959293297}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Buoy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 7125090336500179056}
   - component: {fileID: 2067658065100469590}
   - component: {fileID: 7160033652988746969}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Chain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
