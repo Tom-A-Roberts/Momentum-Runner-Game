@@ -346,7 +346,7 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: {r: 0.28977427, g: 0.25872704, b: 0.63129395, a: 1}
   tint:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: {r: 0.36383677, g: 0, b: 1, a: 1}
   maxFogDistance:
     m_OverrideState: 0
@@ -423,7 +423,7 @@ MonoBehaviour:
   active: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.26
   outlineColour:
     m_OverrideState: 1
     m_Value: {r: 0, g: 0, b: 0, a: 1}
