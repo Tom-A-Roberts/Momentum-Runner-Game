@@ -11,33 +11,31 @@ public class MenuUIScript : MonoBehaviour
     public GameObject SettingsPanel;
     public GameObject GameModePanel;
 
-    public void DisableMainPanel()
+    public void EnableGamePanel()
     {
-        MainMenuPanel.SetActive(false);
+        GameModePanel.SetActive(true);
     }
     public void EnableMainPanel()
     {
-        MainMenuPanel.SetActive(false);
-    }
-
-    public void DisableSettingsPanel()
-    {   
-        SettingsPanel.SetActive(false);
+        MainMenuPanel.SetActive(true);
     }
     public void EnableSettingsPanel()
     {
-        SettingsPanel.SetActive(false);
+        SettingsPanel.SetActive(true);
     }
 
     public void DisableGamePanel()
     {
         GameModePanel.SetActive(false);
     }
-    public void EnableGamePanel()
+    public void DisableMainPanel()
     {
-        GameModePanel.SetActive(false);
+        MainMenuPanel.SetActive(false);
     }
-
+    public void DisableSettingsPanel()
+    {   
+        SettingsPanel.SetActive(false);
+    }
 
     public void QuitButton()
     {
