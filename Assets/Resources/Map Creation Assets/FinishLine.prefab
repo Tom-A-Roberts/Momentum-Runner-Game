@@ -26,8 +26,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 168776638}
   m_LocalRotation: {x: -1, y: -0, z: -0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: -9.02}
-  m_LocalScale: {x: 1.4132818, y: 1.4132818, z: 1.4132818}
+  m_LocalPosition: {x: 0, y: 0, z: -0.84}
+  m_LocalScale: {x: 1.1634419, y: 1.1634419, z: 1.1634419}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1405719283741369027}
@@ -115,8 +115,8 @@ ParticleSystem:
     enabled: 1
     startLifetime:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 15
+      minMaxState: 3
+      scalar: 20
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -221,9 +221,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startColor:
       serializedVersion: 2
-      minMaxState: 0
-      minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.740566, g: 0.93172795, b: 1, a: 0.65882355}
+      minMaxState: 2
+      minColor: {r: 1, g: 1, b: 1, a: 0.019607844}
+      maxColor: {r: 1, g: 1, b: 1, a: 0.101960786}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -662,15 +662,15 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 5
-    angle: 25
+    type: 4
+    angle: 15.5
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 15, y: 15, z: 15}
+    m_Scale: {x: 5, y: 5, z: 5}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -746,10 +746,10 @@ ParticleSystem:
     m_TextureAlphaAffectsParticles: 1
     m_TextureBilinearFiltering: 0
     randomDirectionAmount: 1
-    sphericalDirectionAmount: 0
-    randomPositionAmount: 0
+    sphericalDirectionAmount: 0.03
+    randomPositionAmount: 0.63
     radius:
-      value: 14.85
+      value: 1.03
       mode: 0
       spread: 0
       speed:
@@ -1324,7 +1324,7 @@ ParticleSystem:
         ctime7: 0
         atime0: 0
         atime1: 10601
-        atime2: 52621
+        atime2: 46453
         atime3: 65535
         atime4: 0
         atime5: 0
