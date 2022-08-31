@@ -32,6 +32,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: RingMetal
+    second: {fileID: 2100000, guid: e3472fcd4e0a84e45aa7643819c6d806, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Teleporter
     second: {fileID: 2100000, guid: b836d3606080528409fc3b185d093098, type: 2}
   materials:
