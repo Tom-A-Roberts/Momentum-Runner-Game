@@ -45,7 +45,7 @@ namespace Unity.Netcode.Samples
                             if (networkManager.LocalClient.PlayerObject.TryGetComponent(out BootstrapPlayer bootstrapPlayer))
                             {
                                 // Invoke a `ServerRpc` from client-side to teleport player to a random position on the server-side
-                                bootstrapPlayer.RandomTeleportServerRpc();
+                                bootstrapPlayer.RandomTeleportClientRpc();
                             }
                         }
                     }

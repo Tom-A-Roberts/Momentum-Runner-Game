@@ -15,13 +15,15 @@ namespace Unity.Netcode.Samples
         /// Since a `NetworkTransform` component is attached to this player, and the authority on that component is set to "Server",
         /// this transform's position modification can only be performed on the server, where it will then be replicated down to all clients through `NetworkTransform`.
         /// </remarks>
-        [ServerRpc]
-        public void RandomTeleportServerRpc()
+        //[ServerRpc]
+        [ClientRpc]
+        public void RandomTeleportClientRpc()
         {
             var oldPosition = transform.position;
             transform.position = GetRandomPositionOnXYPlane();
             var newPosition = transform.position;
-            print($"{nameof(RandomTeleportServerRpc)}() -> {nameof(OwnerClientId)}: {OwnerClientId} --- {nameof(oldPosition)}: {oldPosition} --- {nameof(newPosition)}: {newPosition}");
+
+            //print($"{nameof(RandomTeleportServerRpc)}() -> {nameof(OwnerClientId)}: {OwnerClientId} --- {nameof(oldPosition)}: {oldPosition} --- {nameof(newPosition)}: {newPosition}");
         }
 
         private static Vector3 GetRandomPositionOnXYPlane()
