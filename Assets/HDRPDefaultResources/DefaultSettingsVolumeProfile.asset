@@ -859,7 +859,7 @@ MonoBehaviour:
     m_Value: {x: 1, y: 0.87, z: 0.94149995, w: 0}
   highlights:
     m_OverrideState: 1
-    m_Value: {x: 1, y: 1, z: 1, w: 0}
+    m_Value: {x: 1, y: 0.82, z: 0.91899997, w: 0}
   shadowsStart:
     m_OverrideState: 0
     m_Value: 0
