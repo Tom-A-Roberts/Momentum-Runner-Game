@@ -40,25 +40,27 @@ public class LevelController : MonoBehaviour
 
     void Update()
     {
+        //if (resetRequired)
+        //{
+        //    resetRequired = false;
+        //    playerBody.transform.position = bodyStartPosition;
+        //    playerBody.transform.rotation = bodyStartRotation;
+        //    playerFeet.transform.position = feetStartPosition;
+        //    playerFeet.transform.rotation = feetStartRotation;
 
-    }
-
-    private void FixedUpdate()
-    {
-        if (resetRequired)
-        {
-            resetRequired = false;
-            playerBody.transform.position = bodyStartPosition;
-            playerBody.transform.rotation = bodyStartRotation;
-            playerFeet.transform.position = feetStartPosition;
-            playerFeet.transform.rotation = feetStartRotation;
-
-            playerBody.velocity = Vector3.zero;
-        }
+        //    playerBody.velocity = Vector3.zero;
+        //}
     }
 
     public void PlayerDeath()
     {
         resetRequired = true;
+        resetRequired = false;
+        playerBody.transform.position = bodyStartPosition;
+        playerBody.transform.rotation = bodyStartRotation;
+        playerFeet.transform.position = feetStartPosition;
+        playerFeet.transform.rotation = feetStartRotation;
+
+        playerBody.velocity = Vector3.zero;
     }
 }

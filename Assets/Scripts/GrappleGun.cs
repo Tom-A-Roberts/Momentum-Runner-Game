@@ -163,7 +163,6 @@ public class GrappleGun : MonoBehaviour
         return connectedDistance;
     }
 
-
     /// <summary>
     /// Thankyou to https://gist.github.com/maxattack/4c7b4de00f5c1b95a33b for this code
     /// </summary>
