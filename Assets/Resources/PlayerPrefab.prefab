@@ -582,7 +582,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   volumeAnchorOverride: {fileID: 0}
-  antialiasing: 3
+  antialiasing: 2
   SMAAQuality: 2
   dithering: 0
   stopNaNs: 1
@@ -882,7 +882,8 @@ MonoBehaviour:
   JumpCount: 2
   AirJumpMultiplier: 1.5
   JumpLerpStart: 10
-  MaxWallKickOffForce: 20
+  MaxWallKickoffForce: 50
+  MaxWallBoostForce: 10
   DashForce: 90
   DashForceActiveTime: 0.2
   DashCooldown: 5
@@ -1128,7 +1129,7 @@ Transform:
   - {fileID: 4316027074644905776}
   - {fileID: 4316027073947639293}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &153934500
 MonoBehaviour:
