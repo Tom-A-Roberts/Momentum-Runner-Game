@@ -153,13 +153,13 @@ public class PlayerController : MonoBehaviour
             // unstick and 'kick off' wall
             wallRunning.Unstick();
 
-            // kick hardest when facing into wall
+
             if (wallRunning.IsWallRunning)
             {
                 float dot = Vector3.Dot(transform.forward, wallNormal);
-                float wallKickRatio = (1f - dot) / 2f;
-                float wallBoostRatio = 1f - Mathf.Abs(dot);
-                Debug.Log(wallBoostRatio);
+                float wallKickRatio = (1f - dot) / 2f; // kick hardest when facing into wall
+                float wallBoostRatio = 1f - Mathf.Abs(dot); // boost hardest when facing along direction of the wall
+               
                 bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
                 bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
             }
