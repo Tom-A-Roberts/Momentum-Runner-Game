@@ -41,7 +41,9 @@ public class PlayerController : MonoBehaviour
     [Tooltip("At what part in the jump should the jump power start increasing")]
     public float JumpLerpStart = 10f;
     [Tooltip("How hard we 'kick' away from walls when on them")]
-    public float MaxWallKickOffForce = 25f;
+    public float MaxWallKickoffForce = 50f;
+    [Tooltip("How hard we boost forwards from a wall jump")]
+    public float MaxWallBoostForce = 10f;
     [Header("----------------")]
     [Header("Dash Settings")]
     [Tooltip("How much force is applied when air dashing")]
@@ -77,15 +79,7 @@ public class PlayerController : MonoBehaviour
         {
             
             jumpKeyPressed = true;
-        }
-        //if (Input.GetKey(KeyCode.Space) && !jumpKeyPressed)
-        //{
-        //    jumpKeyPressed = true;
-        //}
-        
-
-
-
+        }     
 
         #region SPRINTING LOGIC
         if (Input.GetKey(KeyCode.LeftShift)) movementSpeed = WalkingSpeed * SprintMultiplier;
@@ -136,6 +130,7 @@ public class PlayerController : MonoBehaviour
             if (!GroundDetector.IsOnGroundCoyote)            
                 remainingJumps = JumpCount - 1;
         }
+
         if (remainingJumps > 0 && jumpKeyPressed)
         {
             
@@ -155,16 +150,22 @@ public class PlayerController : MonoBehaviour
             // force end coyote time due to jump
             GroundDetector.EndCoyoteTime();
 
-            // unstick and 'kick off wall
+            // unstick and 'kick off' wall
             wallRunning.Unstick();
 
             // kick hardest when facing into wall
-            float wallKickRatio = 1f - Vector3.Dot(transform.forward, wallNormal) / 2f;
-            bodyRigidBody.AddForce(wallNormal * MaxWallKickOffForce * wallKickRatio, ForceMode.Impulse);
+            if (wallRunning.IsWallRunning)
+            {
+                float dot = Vector3.Dot(transform.forward, wallNormal);
+                float wallKickRatio = (1f - dot) / 2f;
+                float wallBoostRatio = 1f - Mathf.Abs(dot);
+                Debug.Log(wallBoostRatio);
+                bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
+                bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
+            }
 
             remainingJumps--;
         }
-        #endregion
 
         // Reset jump key pressed
         if (jumpKeyPressed)
@@ -172,6 +173,7 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("jumped");
             jumpKeyPressed = false;
         }
+        #endregion
     }
 
 
