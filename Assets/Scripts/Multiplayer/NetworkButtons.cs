@@ -1,18 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class NetworkButtons : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    private void OnGUI()
     {
-        
+        GUILayout.BeginArea(new Rect(10, 10, 300, 300));
+        if(!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
+        {
+            if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
+            if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
+            if (GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
+        }
+
+        GUILayout.EndArea();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            NetworkManager.Singleton.StartHost();
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            NetworkManager.Singleton.StartClient();
+        }
     }
 }
