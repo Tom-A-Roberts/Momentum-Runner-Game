@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class MenuUIScript : MonoBehaviour
 {
-
-    SceneManager sceneManager = new SceneManager();
     public GameObject MainMenuPanel;
     public GameObject SettingsPanel;
     public GameObject GameModePanel;
+    public GameObject LevelSelectPanel;
+    bool isMultiplayer;
 
     public void EnableGamePanel()
     {
@@ -22,6 +22,10 @@ public class MenuUIScript : MonoBehaviour
     public void EnableSettingsPanel()
     {
         SettingsPanel.SetActive(true);
+    }
+    public void EnableLevelSelect()
+    {
+        LevelSelectPanel.SetActive(true);
     }
 
     public void DisableGamePanel()
@@ -36,7 +40,23 @@ public class MenuUIScript : MonoBehaviour
     {   
         SettingsPanel.SetActive(false);
     }
+    public void DisableLevelSelect()
+    {
+        LevelSelectPanel.SetActive(false);
+    }
 
+    public void LoadExampleLevel()
+    {
+        SceneManager.LoadScene("LevelExample",LoadSceneMode.Single);
+    }
+    public void SingleplayerLevelSelect()
+    {
+        isMultiplayer = false;
+    }
+    public void MultiplayerLevelSelect()
+    {
+        isMultiplayer = true;
+    }
     public void QuitButton()
     {
         Debug.Log("game quit");
