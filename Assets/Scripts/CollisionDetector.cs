@@ -80,7 +80,7 @@ public class CollisionDetector : MonoBehaviour
     {
         if(deathbox.gameObject.tag == "TriggerDeath")
         {
-            levelController.PlayerDeath();
+            levelController.RespawnPlayer();
         }
 
     }
