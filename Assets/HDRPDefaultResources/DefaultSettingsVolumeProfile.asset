@@ -24,7 +24,7 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.213
+    m_Value: 0.102
   smoothness:
     m_OverrideState: 0
     m_Value: 0.2
@@ -376,11 +376,11 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
   dirtTexture:
-    m_OverrideState: 0
-    m_Value: {fileID: 2800000, guid: 226606efa7f8c0c48bc73bd4713dc35b, type: 3}
+    m_OverrideState: 1
+    m_Value: {fileID: 2800000, guid: 0f9173f06334ecf4a840f1648f11d784, type: 3}
   dirtIntensity:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.4
   anamorphic:
     m_OverrideState: 0
     m_Value: 1
@@ -435,14 +435,14 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0
   cloudType:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   skyAmbientMode:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 1
   windOrientation:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 120.5
   windSpeed:
     m_OverrideState: 0
     m_Value: 100
