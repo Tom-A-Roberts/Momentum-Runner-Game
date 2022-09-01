@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerTestor : MonoBehaviour
+public class PlayerTestor : NetworkBehaviour
 {
     public float Speed = 1;
     public float CancellationPower = 1;
@@ -14,6 +15,14 @@ public class PlayerTestor : MonoBehaviour
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody>();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (!IsOwner)
+        {
+            Destroy(this);
+        }
     }
 
     // Update is called once per frame
