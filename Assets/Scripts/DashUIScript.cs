@@ -22,16 +22,13 @@ public class DashUIScript : MonoBehaviour
     {
         imageCooldown.fillAmount = 0.0f;
         textCooldown.text = "Q"; //Again later change this to not be hardcoded
-        if(pc == null)
-        {
-            pc = GameObject.FindObjectOfType<PlayerController>();
-        }
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q)) UseDash(); //change this to a rebindable dash key later.
+
         if (isOnCooldown)
         {
             ApplyCooldown();
@@ -65,9 +62,13 @@ public class DashUIScript : MonoBehaviour
         {
             isOnCooldown = true;
             textCooldown.gameObject.SetActive(true);
-            coolDownTimer = pc.DashCooldown;
-            return true;
-        
+
+            if (pc != null)
+            {
+                coolDownTimer = pc.DashCooldown;
+            }
+
+            return true;        
         }
     }
 }
