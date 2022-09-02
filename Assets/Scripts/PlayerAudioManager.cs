@@ -59,11 +59,14 @@ public class PlayerAudioManager : NetworkBehaviour
     {
         mainAudioSource = GetComponent<AudioSource>();
 
-        ambianceSource = gameObject.AddComponent<AudioSource>();
-        ambianceSource.clip = ambiance;
-        ambianceSource.volume = startVolume * 0.6f;
-        ambianceSource.loop = true;
-        ambianceSource.Play();
+        if (IsOwner)
+        {
+            ambianceSource = gameObject.AddComponent<AudioSource>();
+            ambianceSource.clip = ambiance;
+            ambianceSource.volume = startVolume * 0.6f;
+            ambianceSource.loop = true;
+            ambianceSource.Play();
+        }
 
         rollingSource = gameObject.AddComponent<AudioSource>();
         rollingSource.clip = rollingLoop;
@@ -123,11 +126,7 @@ public class PlayerAudioManager : NetworkBehaviour
 
 
     public override void OnNetworkSpawn()
-    {
-        if (!IsOwner)
-        {
-            //ambianceSource.Stop();
-        }
+    {        
     }
 
     public void Jump()
@@ -163,7 +162,7 @@ public class PlayerAudioManager : NetworkBehaviour
     }
 
     public void Update()
-    {
+    { 
         rollingCurrentIntensity = Mathf.SmoothDamp(rollingCurrentIntensity, rollingTargetIntensity, ref rollingIntensityDif, rollingSoundSmoothAmount);
         wallRollingCurrentIntensity = Mathf.SmoothDamp(wallRollingCurrentIntensity, wallRollingTargetIntensity, ref wallRollingIntensityDif, wallRollingSoundSmoothAmount);
         windCurrentIntensity = Mathf.SmoothDamp(windCurrentIntensity, windTargetIntensity, ref windIntensityDif, windSoundSmoothAmount);
