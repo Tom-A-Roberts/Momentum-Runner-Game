@@ -80,15 +80,30 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        MultiplayerModel[] modelsToHide = mainCamera.GetComponentsInChildren<MultiplayerModel>();
+
+        // OR: make sure remote players weapons aren't showing through objects
+        foreach(MultiplayerModel model in modelsToHide)
+        {
+            model.NetworkInitialize(IsOwner);
+        }
+
         if (!IsOwner)
         {
             Destroy(this);
         }
-    }
-    void Start()
-    {
-        bodyRigidBody = GetComponent<Rigidbody>();
-        wallRunning = GetComponent<WallRunning>();
+        else
+        {
+            bodyRigidBody = GetComponent<Rigidbody>();
+            wallRunning = GetComponent<WallRunning>();
+
+            DashUIScript dashUI = FindObjectOfType<DashUIScript>();
+            Speedometer speedometer = FindObjectOfType<Speedometer>();
+
+            dashUI.pc = this;
+
+            speedometer.bodyToTrack = bodyRigidBody;
+        }
     }
 
     void Update()
