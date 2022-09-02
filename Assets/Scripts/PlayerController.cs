@@ -82,6 +82,8 @@ public class PlayerController : NetworkBehaviour
     {
         MultiplayerModel[] modelsToHide = mainCamera.GetComponentsInChildren<MultiplayerModel>();
 
+        Debug.Log(IsOwner);
+
         // OR: make sure remote players weapons aren't showing through objects
         foreach(MultiplayerModel model in modelsToHide)
         {
@@ -216,8 +218,11 @@ public class PlayerController : NetworkBehaviour
 
     void processMotion(float xInput, float yInput)
     {
-        // Check if there's motion input
-        if (xInput != 0 || yInput != 0)
+
+        if (bodyRigidBody)
+        {
+            // Check if there's motion input
+            if (xInput != 0 || yInput != 0)
         {
             Vector2 input = new Vector2(xInput, yInput).normalized;
 
@@ -259,27 +264,27 @@ public class PlayerController : NetworkBehaviour
 
         }
 
-        if (xInput == 0 && yInput == 0 && GroundDetector.IsOnGround)
-        {
-            bodyRigidBody.drag = DragWhenNoKeysPressed;
-        }
-        else
-        {
-            bodyRigidBody.drag = 0.005f;
-        }
+            if (xInput == 0 && yInput == 0 && GroundDetector.IsOnGround)
+            {
+                bodyRigidBody.drag = DragWhenNoKeysPressed;
+            }
+            else
+            {
+                bodyRigidBody.drag = 0.005f;
+            }
 
-        if (!GroundDetector.IsOnGround)
-        {
-            bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight, ForceMode.Acceleration);
-            audioManager.UpdateRunningIntensity(0);
-        }
-        else
-        {
-            audioManager.UpdateRunningIntensity(bodyRigidBody.velocity.magnitude / 25f);
-        }
+            if (!GroundDetector.IsOnGround)
+            {
+                bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight, ForceMode.Acceleration);
+                audioManager.UpdateRunningIntensity(0);
+            }
+            else
+            {
+                audioManager.UpdateRunningIntensity(bodyRigidBody.velocity.magnitude / 25f);
+            }
 
-        audioManager.UpdateWindIntensity((bodyRigidBody.velocity.magnitude - 25f) / 70f);
-
+            audioManager.UpdateWindIntensity((bodyRigidBody.velocity.magnitude - 25f) / 70f);
+        }
     }
 
     void processAirDashMotion()

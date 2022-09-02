@@ -126,7 +126,7 @@ public class PlayerAudioManager : NetworkBehaviour
     {
         if (!IsOwner)
         {
-            ambianceSource.Stop();
+            //ambianceSource.Stop();
         }
     }
 
