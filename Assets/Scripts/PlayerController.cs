@@ -75,7 +75,6 @@ public class PlayerController : NetworkBehaviour
         // OR: make sure remote players weapons aren't showing through objects
         foreach(MultiplayerModel model in modelsToHide)
         {
-            Debug.Log(model.name);
             model.NetworkInitialize(IsOwner);
         }
 
