@@ -9,6 +9,8 @@ public class PlayerNetworking : NetworkBehaviour
     private Vector3 _vel;
     private float _rotVelX;
     private float _rotVelY;
+    private float _rotVelZ;
+    private Vector3 _rotVels;
 
     public LevelController myLevelController;
     public GameObject myCamera;
@@ -38,7 +40,9 @@ public class PlayerNetworking : NetworkBehaviour
             _netState.Value = new PlayerNetworkData()
             {
                 Position = bodyRigidbody.position,
-                Rotation = new Vector3(myCamera.transform.rotation.eulerAngles.x , bodyRigidbody.rotation.eulerAngles.y, 0),
+                // OR: camera rotation used because locally it has the wallrunning rotation applied
+                // ...definitely not a janky way of animating this differently locally and remotely
+                Rotation = myCamera.transform.rotation.eulerAngles, 
                 Velocity = bodyRigidbody.velocity,
             };
         }
@@ -49,20 +53,16 @@ public class PlayerNetworking : NetworkBehaviour
             bodyRigidbody.position = Vector3.SmoothDamp(bodyRigidbody.position, _netState.Value.Position, ref _vel, _cheapInterpolationTime);
             feetRigidbody.position = bodyRigidbody.position - myLevelController.bodyFeetOffset;
 
-            bodyRigidbody.rotation = Quaternion.Euler(
-                0,
-                Mathf.SmoothDampAngle(bodyRigidbody.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVelY, _cheapInterpolationTime),
-                0);
-
-            myCamera.transform.rotation = Quaternion.Euler(
-                Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.x, _netState.Value.Rotation.x, ref _rotVelX, _cheapInterpolationTime),
-                bodyRigidbody.rotation.eulerAngles.y,
-                0);
+            _rotVels.x = Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.x, _netState.Value.Rotation.x, ref _rotVelX, _cheapInterpolationTime);
+            _rotVels.y = Mathf.SmoothDampAngle(bodyRigidbody.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVelY, _cheapInterpolationTime);
+            _rotVels.z = Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.z, _netState.Value.Rotation.z, ref _rotVelZ, _cheapInterpolationTime);
+  
+            bodyRigidbody.rotation = Quaternion.Euler(0, _rotVels.y, _rotVels.z);
+            myCamera.transform.rotation = Quaternion.Euler(_rotVels);
 
             // Keep velocities in sync (Might be a bad idea!)
             bodyRigidbody.velocity = _netState.Value.Velocity;
             feetRigidbody.velocity = _netState.Value.Velocity;
-
         }
     }
     //[ServerRpc]
@@ -141,7 +141,7 @@ public class PlayerNetworking : NetworkBehaviour
         /// Use shorts to save on network bandwidth
         /// </summary>
         private short _xVel, _yVel, _zVel;
-        private short _xRot, _yRot;
+        private short _xRot, _yRot, _zRot;
 
         /// <summary>
         /// Gets/Sets position
@@ -171,11 +171,12 @@ public class PlayerNetworking : NetworkBehaviour
         /// </summary>
         internal Vector3 Rotation
         {
-            get => new Vector3(_xRot, _yRot, 0);
+            get => new Vector3(_xRot, _yRot, _zRot);
             set
             {
                 _xRot = (short)value.x;
                 _yRot = (short)value.y;
+                _zRot = (short)value.z;
             }
         }
 
@@ -192,6 +193,7 @@ public class PlayerNetworking : NetworkBehaviour
             serializer.SerializeValue(ref _zVel);
             serializer.SerializeValue(ref _xRot);
             serializer.SerializeValue(ref _yRot);
+            serializer.SerializeValue(ref _zRot);
         }
     }
 
