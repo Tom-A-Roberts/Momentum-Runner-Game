@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class GrappleGun : MonoBehaviour
+public class GrappleGun : NetworkBehaviour
 {
     public Transform GunEndPosition;
     public Transform playerCentreOfMass;
@@ -30,16 +31,21 @@ public class GrappleGun : MonoBehaviour
 
     private Vector3 targD;
 
+
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButton("Grapple") && !grappleConnected)
+        // Check if grapple gun is being controlled by the owner. If yes, then engage grapple
+        if (IsOwner)
         {
-            ConnectGrapple();
-        }
-        else if (!Input.GetButton("Grapple") && grappleConnected)
-        { 
-            DisconnectGrapple();
+            if (Input.GetButton("Grapple") && !grappleConnected)
+            {
+                ConnectGrapple();
+            }
+            else if (!Input.GetButton("Grapple") && grappleConnected)
+            {
+                DisconnectGrapple();
+            }
         }
 
         if (grappleConnected)
@@ -163,34 +169,4 @@ public class GrappleGun : MonoBehaviour
         return connectedDistance;
     }
 
-    /// <summary>
-    /// Thankyou to https://gist.github.com/maxattack/4c7b4de00f5c1b95a33b for this code
-    /// </summary>
-    public static Quaternion SmoothDamp(Quaternion rot, Quaternion target, ref Quaternion deriv, float time)
-    {
-        if (Time.deltaTime < Mathf.Epsilon) return rot;
-        // account for double-cover
-        var Dot = Quaternion.Dot(rot, target);
-        var Multi = Dot > 0f ? 1f : -1f;
-        target.x *= Multi;
-        target.y *= Multi;
-        target.z *= Multi;
-        target.w *= Multi;
-        // smooth damp (nlerp approx)
-        var Result = new Vector4(
-            Mathf.SmoothDamp(rot.x, target.x, ref deriv.x, time),
-            Mathf.SmoothDamp(rot.y, target.y, ref deriv.y, time),
-            Mathf.SmoothDamp(rot.z, target.z, ref deriv.z, time),
-            Mathf.SmoothDamp(rot.w, target.w, ref deriv.w, time)
-        ).normalized;
-
-        // ensure deriv is tangent
-        var derivError = Vector4.Project(new Vector4(deriv.x, deriv.y, deriv.z, deriv.w), Result);
-        deriv.x -= derivError.x;
-        deriv.y -= derivError.y;
-        deriv.z -= derivError.z;
-        deriv.w -= derivError.w;
-
-        return new Quaternion(Result.x, Result.y, Result.z, Result.w);
-    }
 }

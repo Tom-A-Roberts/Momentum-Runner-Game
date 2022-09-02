@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class GrapplingRope : MonoBehaviour
+public class GrapplingRope : NetworkBehaviour
 {
     public GrappleGun GrappleGun;
     public int quality = 500;

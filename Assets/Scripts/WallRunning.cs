@@ -2,8 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class WallRunning : MonoBehaviour
+public class WallRunning : NetworkBehaviour
 {
     [Header("Wallrunning")]
     public LayerMask whatIsWall;
@@ -51,6 +52,14 @@ public class WallRunning : MonoBehaviour
     public bool IsWallRunning => isWallRunning;
 
     private float currentStickingForce;
+
+    public override void OnNetworkSpawn()
+    {
+        if (!IsOwner)
+        {
+            Destroy(this);
+        }
+    }
 
     // Start is called before the first frame update
     private void Start()

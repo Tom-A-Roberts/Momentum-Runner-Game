@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+using Unity.Netcode;
 
 public class LevelController : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class LevelController : MonoBehaviour
 
     public Rigidbody playerBody;
     public Rigidbody playerFeet;
+
+    private Transform spawnPoint;
 
     private Vector3 bodyStartPosition;
     private Quaternion bodyStartRotation;
@@ -21,6 +24,13 @@ public class LevelController : MonoBehaviour
 
     void Start()
     {
+        spawnPoint = GameObject.FindGameObjectWithTag("SpawnPoint").transform;
+
+        bodyFeetOffset = playerBody.transform.position - playerFeet.transform.position;
+
+        Vector3 spawnOffset = new Vector3(Random.value * 5 - 2.5f, 0, Random.value * 5 - 2.5f);
+        playerBody.transform.position = spawnPoint.transform.position + spawnOffset;
+        playerFeet.transform.position = spawnPoint.transform.position - bodyFeetOffset + spawnOffset;
 
         bodyStartPosition = playerBody.transform.position;
         bodyStartRotation = playerBody.transform.rotation;
@@ -29,7 +39,7 @@ public class LevelController : MonoBehaviour
 
         bodySpawnPosition = bodyStartPosition;
         feetSpawnPosition = feetStartPosition;
-        bodyFeetOffset = bodyStartPosition - feetStartPosition;
+        
 
         UnityEngine.Rendering.Volume sceneVolume = GameObject.FindObjectOfType<UnityEngine.Rendering.Volume>();
         if(sceneVolume != null && SobelEnabled)
@@ -43,6 +53,8 @@ public class LevelController : MonoBehaviour
             }
             
         }
+        playerBody.position = bodyStartPosition;
+        playerFeet.position = feetStartPosition;
     }
 
     void Update()

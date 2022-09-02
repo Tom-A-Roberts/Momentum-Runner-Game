@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(Camera))]
-public class CameraController : MonoBehaviour
+public class CameraController : NetworkBehaviour
 {
     public GameObject body;
 

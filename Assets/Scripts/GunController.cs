@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class GunController : MonoBehaviour
+public class GunController : NetworkBehaviour
 {
     [Header("Related Objects")]
     public Transform gunTop;
@@ -36,6 +37,14 @@ public class GunController : MonoBehaviour
     private float cooldownProgress = 0;
     private Vector3 originalGunAngle;
     private Vector3 originalSlidePosition;
+
+    public override void OnNetworkSpawn()
+    {
+        if (!IsOwner)
+        {
+            Destroy(this);
+        }
+    }
 
     private void Start()
     {

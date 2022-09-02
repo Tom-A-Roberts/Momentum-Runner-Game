@@ -20,10 +20,13 @@ public class Speedometer : MonoBehaviour
             {
                 Debug.LogWarning("NO PLAYER FOUND! Speedometer won't work.");
             }
-            bodyToTrack = player.GetComponent<Rigidbody>();
-            if (bodyToTrack == null)
+            else
             {
-                Debug.LogWarning("NO RIGID BODY ON PLAYER FOUND! Speedometer won't work.");
+                bodyToTrack = player.GetComponent<Rigidbody>();
+                if (bodyToTrack == null)
+                {
+                    Debug.LogWarning("NO RIGID BODY ON PLAYER FOUND! Speedometer won't work.");
+                }
             }
         }
     }

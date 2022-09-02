@@ -2,9 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [Header("Known Objects")]
     public Transform mainCamera;
@@ -67,6 +68,13 @@ public class PlayerController : MonoBehaviour
 
     private bool jumpKeyPressed = false;
 
+    public override void OnNetworkSpawn()
+    {
+        if (!IsOwner)
+        {
+            Destroy(this);
+        }
+    }
     void Start()
     {
         bodyRigidBody = GetComponent<Rigidbody>();
