@@ -31,32 +31,61 @@ public class PlayerNetworking : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (IsOwner)
         {
             _netState.Value = new PlayerNetworkData()
             {
-                Position = bodyRigidbody.transform.position,
-                Rotation = bodyRigidbody.transform.rotation.eulerAngles,
+                Position = bodyRigidbody.position,
+                Rotation = bodyRigidbody.rotation.eulerAngles,
                 Velocity = bodyRigidbody.velocity,
             };
         }
         else
         {
             // Some suuuper basic interpolation:
-            bodyRigidbody.transform.position = Vector3.SmoothDamp(bodyRigidbody.transform.position, _netState.Value.Position, ref _vel, _cheapInterpolationTime);
-            feetRigidbody.transform.position = bodyRigidbody.transform.position - myLevelController.bodyFeetOffset;
 
-            bodyRigidbody.transform.rotation = Quaternion.Euler(
+            bodyRigidbody.position = Vector3.SmoothDamp(bodyRigidbody.position, _netState.Value.Position, ref _vel, _cheapInterpolationTime);
+            feetRigidbody.position = bodyRigidbody.position - myLevelController.bodyFeetOffset;
+
+            bodyRigidbody.rotation = Quaternion.Euler(
                 0,
-                Mathf.SmoothDampAngle(bodyRigidbody.transform.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVel, _cheapInterpolationTime),
+                Mathf.SmoothDampAngle(bodyRigidbody.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVel, _cheapInterpolationTime),
                 0);
             myCamera.transform.rotation = bodyRigidbody.transform.rotation;
+
+
             // Keep velocities in sync (Might be a bad idea!)
-            //bodyRigidbody.velocity = _netState.Value.Velocity;
-            //feetRigidbody.velocity = _netState.Value.Velocity;
+            bodyRigidbody.velocity = _netState.Value.Velocity;
+            feetRigidbody.velocity = _netState.Value.Velocity;
 
         }
     }
+    //[ServerRpc]
+    //public void ShootServerRPC()
+    //{
+    //    ShootClientRPC();
+    //}
+    //public void ShootStart()
+    //{
+    //    ShootServerRPC();
+
+    //    LocalShoot();
+        
+    //}
+    //[ClientRpc]
+    //public void ShootClientRPC()
+    //{
+    //    if (!IsOwner)
+    //    {
+
+    //        // Do shooting
+    //    }
+    //}
+    //public void LocalShoot()
+    //{
+
+    //}
 
 
     public override void OnNetworkSpawn()
@@ -64,8 +93,8 @@ public class PlayerNetworking : NetworkBehaviour
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)
         {
-            bodyRigidbody.isKinematic = true;
-            feetRigidbody.isKinematic = true;
+            //bodyRigidbody.isKinematic = true;
+            //feetRigidbody.isKinematic = true;
 
 
 
@@ -90,6 +119,7 @@ public class PlayerNetworking : NetworkBehaviour
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
             grappleGun.GetComponent<GrappleGun>().isGrappleOwner = false;
+
         }
         else
         {
