@@ -104,9 +104,6 @@ public class PlayerNetworking : NetworkBehaviour
             Destroy(myCamera.GetComponent<AudioListener>());
             Destroy(myCamera.GetComponent<Camera>());
 
-
-            grappleGun.layer = 0;
-            shootingGun.layer = 0;
             // Make the body grapplable...
             bodyRigidbody.gameObject.layer = 6;
 

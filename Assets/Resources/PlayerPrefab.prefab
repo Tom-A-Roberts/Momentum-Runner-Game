@@ -1859,6 +1859,49 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
   m_PrefabInstance: {fileID: 1338478346}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4776867449128100049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148211561051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf0ec8a2fdcb8c48a756a7eb95064c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parts:
+  - {fileID: 8511118858924919524}
+  - {fileID: 3517353297735217185}
+  - {fileID: 3528374443703692011}
+  - {fileID: 8487575467694889043}
+  - {fileID: 8265054099157910419}
+--- !u!1 &3517353297735217185 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3517353296757653291, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3528374443703692011 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3528374442642236897, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8265054099157910419 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -958317936811570023, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8487575467694889043 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8487575468889970521, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8511118858924919524 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -712253176700566034, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4316027075111195045
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1986,6 +2029,25 @@ MonoBehaviour:
   muzzleFlashParticlePrefab: {fileID: 1548731787465841113, guid: 14a375f0b95638a479fd733831292beb, type: 3}
   bulletHoleDecalPrefab: {fileID: 5283180142859109130, guid: 64bd2bd14a346084ea6636f4b2fcfb4d, type: 3}
   muzzleLight: {fileID: 459832530}
+--- !u!114 &4766397081509980209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973566921931336948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf0ec8a2fdcb8c48a756a7eb95064c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parts:
+  - {fileID: 4087842859593792869}
+--- !u!1 &4087842859593792869 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 243041194690276544, guid: 0d127773f32d01e47afd735fb4986dd1, type: 3}
+  m_PrefabInstance: {fileID: 4316027075111195045}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4354737557993813582 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d127773f32d01e47afd735fb4986dd1, type: 3}

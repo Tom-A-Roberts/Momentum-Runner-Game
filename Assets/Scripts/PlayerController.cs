@@ -70,6 +70,15 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        MultiplayerModel[] modelsToHide = mainCamera.GetComponentsInChildren<MultiplayerModel>();
+
+        // OR: make sure remote players weapons aren't showing through objects
+        foreach(MultiplayerModel model in modelsToHide)
+        {
+            Debug.Log(model.name);
+            model.NetworkInitialize(IsOwner);
+        }
+
         if (!IsOwner)
         {
             Destroy(this);
