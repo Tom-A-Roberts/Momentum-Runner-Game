@@ -88,15 +88,16 @@ public class PlayerController : NetworkBehaviour
             model.NetworkInitialize(IsOwner);
         }
 
+        // OR: has to be outside of if/else due to fixed update being run once before this is deleted
+        bodyRigidBody = GetComponent<Rigidbody>();
+        wallRunning = GetComponent<WallRunning>();
+
         if (!IsOwner)
         {
             Destroy(this);
         }
         else
         {
-            bodyRigidBody = GetComponent<Rigidbody>();
-            wallRunning = GetComponent<WallRunning>();
-
             DashUIScript dashUI = FindObjectOfType<DashUIScript>();
             Speedometer speedometer = FindObjectOfType<Speedometer>();
 
@@ -119,7 +120,6 @@ public class PlayerController : NetworkBehaviour
         else movementSpeed = WalkingSpeed;
         #endregion
 
-
         #region AIR DASH LOGIC
         if (Input.GetKeyDown(KeyCode.Q) && airDashCooldownProgress <= 0) //if the player is in the air, hasnt already dashed, and presses q
         {
@@ -128,17 +128,14 @@ public class PlayerController : NetworkBehaviour
             // Start air dash cooldown
             airDashCooldownProgress = 1;
         }
-        #endregion
-
-
-        
+        #endregion     
     }
 
     private void FixedUpdate()
     {
         transform.localRotation = Quaternion.identity * Quaternion.Euler(0, mainCamera.transform.localEulerAngles.y, 0);
 
-        Tuple<float, float> axisValues = GetMovementAxis();               
+        Tuple<float, float> axisValues = GetMovementAxis();         
 
         processMotion(axisValues.Item1, axisValues.Item2);
 
@@ -216,72 +213,69 @@ public class PlayerController : NetworkBehaviour
 
     void processMotion(float xInput, float yInput)
     {
-        if (bodyRigidBody)
+        // Check if there's motion input
+        if (xInput != 0 || yInput != 0)
         {
-            // Check if there's motion input
-            if (xInput != 0 || yInput != 0)
+            Vector2 input = new Vector2(xInput, yInput).normalized;
+
+            // Calculate what directions the inputs mean in worldcoordinate terms
+            Vector3 verticalInputWorldDirection = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * input.y;
+            Vector3 horizontalInputWorldDirection = new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z).normalized * input.x;
+
+            // The direction that the player wishes to go in
+            Vector3 wishDirection = (verticalInputWorldDirection + horizontalInputWorldDirection).normalized;
+
+            // 90 degrees to the wish velocity
+            Vector3 wishVelocitySideways = Quaternion.Euler(0, 90, 0) * wishDirection;
+
+            // Current velocity without the y speed included
+            Vector3 currentPlanarVelocity = new Vector3(bodyRigidBody.velocity.x, 0, bodyRigidBody.velocity.z);
+
+            // Unwanted velocity that is sideways to the wish direction
+            Vector3 sidewaysVelocity = Vector3.Project(currentPlanarVelocity, wishVelocitySideways);
+
+            float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
+
+            // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
+            if (forwardsSpeed < 0)
             {
-                Vector2 input = new Vector2(xInput, yInput).normalized;
+                float activeCancellationPower = CancellationPower;
+                if (!PlayerHasAirControl) activeCancellationPower /= 8;
 
-                // Calculate what directions the inputs mean in worldcoordinate terms
-                Vector3 verticalInputWorldDirection = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * input.y;
-                Vector3 horizontalInputWorldDirection = new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z).normalized * input.x;
+                bodyRigidBody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
+            }
+            else if (forwardsSpeed < movementSpeed && (GroundDetector.IsOnGround || PlayerHasAirControl))
+            {
+                // How much required acceleration there is to reach the intended speed (walkingspeed).
+                float requiredAcc = (movementSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
 
-                // The direction that the player wishes to go in
-                Vector3 wishDirection = (verticalInputWorldDirection + horizontalInputWorldDirection).normalized;
-
-                // 90 degrees to the wish velocity
-                Vector3 wishVelocitySideways = Quaternion.Euler(0, 90, 0) * wishDirection;
-
-                // Current velocity without the y speed included
-                Vector3 currentPlanarVelocity = new Vector3(bodyRigidBody.velocity.x, 0, bodyRigidBody.velocity.z);
-
-                // Unwanted velocity that is sideways to the wish direction
-                Vector3 sidewaysVelocity = Vector3.Project(currentPlanarVelocity, wishVelocitySideways);
-
-                float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
-
-                // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
-                if (forwardsSpeed < 0)
-                {
-                    float activeCancellationPower = CancellationPower;
-                    if (!PlayerHasAirControl) activeCancellationPower /= 8;
-
-                    bodyRigidBody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
-                }
-                else if (forwardsSpeed < movementSpeed && (GroundDetector.IsOnGround || PlayerHasAirControl))
-                {
-                    // How much required acceleration there is to reach the intended speed (walkingspeed).
-                    float requiredAcc = (movementSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
-
-                    bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
-                }
-
-                bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
-
+                bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
             }
 
-            if (xInput == 0 && yInput == 0 && GroundDetector.IsOnGround)
-            {
-                bodyRigidBody.drag = DragWhenNoKeysPressed;
-            }
-            else
-            {
-                bodyRigidBody.drag = 0.005f;
-            }
+            bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
 
-            if (!GroundDetector.IsOnGround)
-            {
-                bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight, ForceMode.Acceleration);
-                audioManager.UpdateRunningIntensity(0);
-            }
-            else
-            {
-                audioManager.UpdateRunningIntensity(bodyRigidBody.velocity.magnitude / 25f);
-            }
-
-            audioManager.UpdateWindIntensity((bodyRigidBody.velocity.magnitude - 25f) / 70f);
         }
+
+        if (xInput == 0 && yInput == 0 && GroundDetector.IsOnGround)
+        {
+            bodyRigidBody.drag = DragWhenNoKeysPressed;
+        }
+        else
+        {
+            bodyRigidBody.drag = 0.005f;
+        }
+
+        if (!GroundDetector.IsOnGround)
+        {
+            bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight, ForceMode.Acceleration);
+            audioManager.UpdateRunningIntensity(0);
+        }
+        else
+        {
+            audioManager.UpdateRunningIntensity(bodyRigidBody.velocity.magnitude / 25f);
+        }
+
+        audioManager.UpdateWindIntensity((bodyRigidBody.velocity.magnitude - 25f) / 70f);        
     }
 
     void processAirDashMotion()
