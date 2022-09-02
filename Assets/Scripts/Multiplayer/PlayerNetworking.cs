@@ -7,7 +7,8 @@ public class PlayerNetworking : NetworkBehaviour
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
     private Vector3 _vel;
-    private float _rotVel;
+    private float _rotVelX;
+    private float _rotVelY;
 
     public LevelController myLevelController;
     public GameObject myCamera;
@@ -37,7 +38,7 @@ public class PlayerNetworking : NetworkBehaviour
             _netState.Value = new PlayerNetworkData()
             {
                 Position = bodyRigidbody.position,
-                Rotation = bodyRigidbody.rotation.eulerAngles,
+                Rotation = new Vector3(myCamera.transform.rotation.eulerAngles.x , bodyRigidbody.rotation.eulerAngles.y, 0),
                 Velocity = bodyRigidbody.velocity,
             };
         }
@@ -50,10 +51,13 @@ public class PlayerNetworking : NetworkBehaviour
 
             bodyRigidbody.rotation = Quaternion.Euler(
                 0,
-                Mathf.SmoothDampAngle(bodyRigidbody.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVel, _cheapInterpolationTime),
+                Mathf.SmoothDampAngle(bodyRigidbody.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVelY, _cheapInterpolationTime),
                 0);
-            myCamera.transform.rotation = bodyRigidbody.transform.rotation;
 
+            myCamera.transform.rotation = Quaternion.Euler(
+                Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.x, _netState.Value.Rotation.x, ref _rotVelX, _cheapInterpolationTime),
+                bodyRigidbody.rotation.eulerAngles.y,
+                0);
 
             // Keep velocities in sync (Might be a bad idea!)
             bodyRigidbody.velocity = _netState.Value.Velocity;
@@ -137,7 +141,7 @@ public class PlayerNetworking : NetworkBehaviour
         /// Use shorts to save on network bandwidth
         /// </summary>
         private short _xVel, _yVel, _zVel;
-        private short _yRot;
+        private short _xRot, _yRot;
 
         /// <summary>
         /// Gets/Sets position
@@ -167,8 +171,12 @@ public class PlayerNetworking : NetworkBehaviour
         /// </summary>
         internal Vector3 Rotation
         {
-            get => new Vector3(0, _yRot, 0);
-            set => _yRot = (short)value.y;
+            get => new Vector3(_xRot, _yRot, 0);
+            set
+            {
+                _xRot = (short)value.x;
+                _yRot = (short)value.y;
+            }
         }
 
         /// <summary>
@@ -182,6 +190,7 @@ public class PlayerNetworking : NetworkBehaviour
             serializer.SerializeValue(ref _xVel);
             serializer.SerializeValue(ref _yVel);
             serializer.SerializeValue(ref _zVel);
+            serializer.SerializeValue(ref _xRot);
             serializer.SerializeValue(ref _yRot);
         }
     }
