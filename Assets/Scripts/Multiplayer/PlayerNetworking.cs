@@ -88,6 +88,8 @@ public class PlayerNetworking : NetworkBehaviour
             }
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
+
+            grappleGun.GetComponent<GrappleGun>().isGrappleOwner = false;
         }
         else
         {

@@ -17,6 +17,9 @@ public class GrappleGun : NetworkBehaviour
     /// </summary>
     public float GrappleLookAtPower = 0.4f;
     public float lookAtSmoothSpeed = 0.05f;
+     
+    [System.NonSerialized] public bool isGrappleOwner = true;
+
 
     public GrapplingRope grapplingRope;
     private ConfigurableJoint Rope;
@@ -36,7 +39,7 @@ public class GrappleGun : NetworkBehaviour
     void Update()
     {
         // Check if grapple gun is being controlled by the owner. If yes, then engage grapple
-        if (IsOwner)
+        if (isGrappleOwner)
         {
             if (Input.GetButton("Grapple") && !grappleConnected)
             {
