@@ -12,6 +12,8 @@ public class GrappleGun : NetworkBehaviour
     public float MaxGrappleLength = 20f;
     public float GrappleForce = 10f;
 
+    public PlayerAudioManager audioManager;
+
     /// <summary>
     /// How much the grapple gun moves when trying to face the grapple point
     /// </summary>
@@ -25,6 +27,8 @@ public class GrappleGun : NetworkBehaviour
     private ConfigurableJoint Rope;
     public CollisionDetector GroundDetector;
     public PlayerController PlayerController;
+    public Rigidbody playerRigidbody;
+
     public GameObject grappleGunModel;
 
     private bool grappleConnected = false;
@@ -34,7 +38,10 @@ public class GrappleGun : NetworkBehaviour
 
     private Vector3 targD;
 
-
+    private void Start()
+    {
+        playerRigidbody = PlayerController.gameObject.GetComponent<Rigidbody>();
+    }
     // Update is called once per frame
     void Update()
     {
@@ -71,10 +78,23 @@ public class GrappleGun : NetworkBehaviour
             Vector3 lookForwards = combinedLook.normalized * GrappleLookAtPower + forwardPlanar * (1- GrappleLookAtPower);
             lookForwards = -lookForwards.normalized;
             targD = lookForwards;
+
+
+            float ropeDist = (connectionPoint - playerCentreOfMass.position).magnitude;
+            if(ropeDist > connectedDistance - 0.1f)
+            {
+                audioManager.UpdateGrappleSwingingIntensity(playerRigidbody.velocity.magnitude / 25f);
+            }
+            else
+            {
+                audioManager.UpdateGrappleSwingingIntensity(0);
+            }
         }
         else
         {
             targD = -transform.forward;
+
+            audioManager.UpdateGrappleSwingingIntensity(0);
         }
 
         Quaternion rotGoal = Quaternion.LookRotation(targD, Vector3.up);
@@ -128,6 +148,8 @@ public class GrappleGun : NetworkBehaviour
             grappleConnected = true;
 
             grapplingRope.Extend(connectionPoint);
+
+            audioManager.GrappleStart();
         }
     }
 
@@ -139,6 +161,8 @@ public class GrappleGun : NetworkBehaviour
 
         Destroy(Rope);
         grappleConnected = false;
+
+        audioManager.GrappleEnd();
     }
 
     void ApplyGrappleForce()

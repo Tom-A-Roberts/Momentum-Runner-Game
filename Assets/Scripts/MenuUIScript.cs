@@ -5,11 +5,30 @@ using UnityEngine.SceneManagement;
 
 public class MenuUIScript : MonoBehaviour
 {
+    public AudioClip clickSoundEffect;
     public GameObject MainMenuPanel;
     public GameObject SettingsPanel;
     public GameObject GameModePanel;
     public GameObject LevelSelectPanel;
     public bool isMultiplayer;
+
+    private AudioSource myAudioSource;
+
+
+    public void Start()
+    {
+        myAudioSource = GameObject.FindObjectOfType<AudioSource>();
+
+    }
+
+    public void ButtonClicked()
+    {
+        
+        if (myAudioSource != null)
+        {
+            myAudioSource.PlayOneShot(clickSoundEffect);
+        }
+    }
 
     public void EnableGamePanel()
     {
@@ -31,18 +50,22 @@ public class MenuUIScript : MonoBehaviour
     public void DisableGamePanel()
     {
         GameModePanel.SetActive(false);
+        ButtonClicked();
     }
     public void DisableMainPanel()
     {
         MainMenuPanel.SetActive(false);
+        ButtonClicked();
     }
     public void DisableSettingsPanel()
     {   
         SettingsPanel.SetActive(false);
+        ButtonClicked();
     }
     public void DisableLevelSelect()
     {
         LevelSelectPanel.SetActive(false);
+        ButtonClicked();
     }
 
     public void LoadExampleLevel()

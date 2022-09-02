@@ -7,6 +7,7 @@ using Unity.Netcode;
 public class WallRunning : NetworkBehaviour
 {
     [Header("Wallrunning")]
+    public PlayerAudioManager playerAudioManager;
     public LayerMask whatIsWall;
     public LayerMask whatIsGround;
     public float wallRunForce;
@@ -21,6 +22,7 @@ public class WallRunning : NetworkBehaviour
     public float detachAngleTimer = 0.7f;
     private float currentTargetTime;
     private float angleTimer;
+
 
     [Tooltip("0= weightless, 1= as weighty as normal")]
     [Range(0f, 1f)]
@@ -110,6 +112,10 @@ public class WallRunning : NetworkBehaviour
         {
             WallRunningMovement();
         }
+        else
+        {
+            playerAudioManager.UpdateWallRunningIntensity(0);
+        }
     }
 
     private void StartWallRun()
@@ -169,6 +175,9 @@ public class WallRunning : NetworkBehaviour
         {
             rb.AddForce(transform.up * -y_speed * verticalDownFrictionalCoefficient, ForceMode.Acceleration);
         }
+
+        Vector3 wallVelocity = Vector3.ProjectOnPlane(rb.velocity, wallNormal);
+        playerAudioManager.UpdateWallRunningIntensity(wallVelocity.magnitude / 20f);
     }
 
     private void StopWallRun()

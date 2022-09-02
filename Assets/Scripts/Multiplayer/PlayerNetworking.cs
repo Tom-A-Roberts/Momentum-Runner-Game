@@ -16,6 +16,7 @@ public class PlayerNetworking : NetworkBehaviour
     public Rigidbody bodyRigidbody;
     public Rigidbody feetRigidbody;
     public Transform multiplayerRepresentation;
+    //public AudioSource myAudioSource;
 
     /// <summary>
     /// How smoothed out a multiplayer player's movement should be. Higher = smoother
@@ -119,7 +120,7 @@ public class PlayerNetworking : NetworkBehaviour
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
             grappleGun.GetComponent<GrappleGun>().isGrappleOwner = false;
-
+            //myAudioSource.Stop();
         }
         else
         {

@@ -7,8 +7,18 @@ using Unity.Netcode;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : NetworkBehaviour
 {
+    //[Header("Audio")]
+    //public GameObject audioSourceGameObject;
+    //public AudioClip rollingLoop;
+    //public AudioClip jump;
+    //public AudioClip land;
+    
+
     [Header("Known Objects")]
     public Transform mainCamera;
+    public PlayerAudioManager audioManager;
+
+
     public CollisionDetector GroundDetector;
     private Rigidbody bodyRigidBody;
     private WallRunning wallRunning;
@@ -105,6 +115,8 @@ public class PlayerController : NetworkBehaviour
         }
         #endregion
 
+
+        
     }
 
     private void FixedUpdate()
@@ -160,6 +172,8 @@ public class PlayerController : NetworkBehaviour
 
             // unstick and 'kick off' wall
             wallRunning.Unstick();
+
+            audioManager.Jump();
 
 
             if (wallRunning.IsWallRunning)
@@ -242,7 +256,14 @@ public class PlayerController : NetworkBehaviour
         if (!GroundDetector.IsOnGround)
         {
             bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight, ForceMode.Acceleration);
+            audioManager.UpdateRunningIntensity(0);
         }
+        else
+        {
+            audioManager.UpdateRunningIntensity(bodyRigidBody.velocity.magnitude / 25f);
+        }
+
+        audioManager.UpdateWindIntensity((bodyRigidBody.velocity.magnitude - 25f) / 70f);
 
     }
 

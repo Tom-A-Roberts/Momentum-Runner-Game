@@ -702,9 +702,11 @@ GameObject:
   - component: {fileID: 4316027073834798315}
   - component: {fileID: 4316027073834798314}
   - component: {fileID: 4316027073834798101}
+  - component: {fileID: 8008624713252837793}
   - component: {fileID: 4316027073834798312}
   - component: {fileID: 5791849260967413827}
   - component: {fileID: 2818968324491326075}
+  - component: {fileID: 816622556064969811}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -780,6 +782,42 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4316027073834798100}
   m_Enabled: 1
+--- !u!114 &8008624713252837793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4316027073834798100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af7e8db80f336344fb688c7468a6f57e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startVolume: 1
+  rollingSoundSmoothAmount: 0.1
+  wallRollingSoundSmoothAmount: 0.15
+  windSoundSmoothAmount: 0.15
+  grappleSoundSmoothAmount: 0.1
+  wallRollingPitchChange: 0.75
+  rollingPitchChange: 0.75
+  windPitchChange: 0.6
+  grapplePitchChange: 0.2
+  wallRollingPitch: 1
+  rollingPitch: 1.7
+  grapplePitch: 1
+  JumpVolume: 0.1
+  ambiance: {fileID: 8300000, guid: 66a666fff64d3674189fc66fc47a2c75, type: 3}
+  rollingLoop: {fileID: 8300000, guid: 1404084e1cb1ebe428070dacddeecbe0, type: 3}
+  wallRollingLoop: {fileID: 8300000, guid: f1aa193822064904294eaa295cecee7b, type: 3}
+  grapplingSwingingLoop: {fileID: 8300000, guid: 324d0980ec067b042990b2b6e2dae9fb, type: 3}
+  grapplingStart: {fileID: 8300000, guid: 9028312e487565149aeb5b781eefab2c, type: 3}
+  grapplingEnd: {fileID: 8300000, guid: 4dcce5dfceb478f438f624155aea841e, type: 3}
+  jump: {fileID: 8300000, guid: ce11922b077d5d549abb3e05b2a0806e, type: 3}
+  land: {fileID: 8300000, guid: 40d0b314db6267046ac1ddf616d7a20c, type: 3}
+  wind: {fileID: 8300000, guid: c4206ced1c7aa6242947aa266338c546, type: 3}
+  shoot: {fileID: 0}
+  airdash: {fileID: 0}
 --- !u!114 &4316027073834798312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -937,6 +975,102 @@ MonoBehaviour:
       enableFptlForForwardOpaque: 0
       enableBigTilePrepass: 0
       isFptlEnabled: 0
+--- !u!82 &816622556064969811
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4316027073834798100}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &4316027073947639292
 GameObject:
   m_ObjectHideFlags: 0
@@ -1119,6 +1253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 4316027073834798315}
+  audioManager: {fileID: 8008624713252837793}
   GroundDetector: {fileID: 1371572323}
   WalkingSpeed: 8
   SprintMultiplier: 1.5
@@ -1326,6 +1461,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c252e76bd9b3a49bc3e336113fccb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerAudioManager: {fileID: 8008624713252837793}
   whatIsWall:
     serializedVersion: 2
     m_Bits: 64
@@ -1420,7 +1556,7 @@ MonoBehaviour:
   bodyRigidbody: {fileID: 4316027074644905781}
   feetRigidbody: {fileID: 4316027073947639282}
   multiplayerRepresentation: {fileID: 2473533998632247775}
-  _cheapInterpolationTime: 0.05
+  _cheapInterpolationTime: 0.08
 --- !u!114 &-7007361797976376309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1637,11 +1773,13 @@ MonoBehaviour:
   RopeRenderer: {fileID: 5224529714271308080}
   MaxGrappleLength: 20
   GrappleForce: 10
+  audioManager: {fileID: 8008624713252837793}
   GrappleLookAtPower: 0.4
   lookAtSmoothSpeed: 0.05
   grapplingRope: {fileID: 1777984287}
   GroundDetector: {fileID: 1371572323}
   PlayerController: {fileID: 4316027074644905738}
+  playerRigidbody: {fileID: 0}
   grappleGunModel: {fileID: 919132148211561051}
 --- !u!1001 &1338478346
 PrefabInstance:
