@@ -9,12 +9,17 @@ public class PlayerTestor : NetworkBehaviour
     public float CancellationPower = 1;
     public float Acceleration = 0.8f;
     public float SidewaysDeceleration = 1;
+    public float sprintMultiplier = 2f;
     // Start is called before the first frame update
 
+    private float speedTracker = 1;
+
     private Rigidbody myRigidbody;
+    private Vector2 input;
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody>();
+        speedTracker = Speed;
     }
 
     public override void OnNetworkSpawn()
@@ -29,13 +34,27 @@ public class PlayerTestor : NetworkBehaviour
     void Update()
     {
 
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+        input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
 
-        if(input != Vector2.zero)
+
+
+    }
+    void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            speedTracker = Speed * sprintMultiplier;
+        }
+        else
+        {
+            speedTracker = Speed;
+        }
+
+        if (input != Vector2.zero)
         {
             // Calculate what directions the inputs mean in worldcoordinate terms
-            Vector3 verticalInputWorldDirection = Vector3.forward * input.y;
-            Vector3 horizontalInputWorldDirection = Vector3.right * input.x;
+            Vector3 verticalInputWorldDirection = (Vector3.forward - Vector3.right).normalized * input.y;
+            Vector3 horizontalInputWorldDirection = (Vector3.forward + Vector3.right).normalized * input.x;
 
             // The direction that the player wishes to go in
             Vector3 wishDirection = (verticalInputWorldDirection + horizontalInputWorldDirection).normalized;
@@ -58,17 +77,20 @@ public class PlayerTestor : NetworkBehaviour
 
                 myRigidbody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
             }
-            else if (forwardsSpeed < Speed)
+            else if (forwardsSpeed < speedTracker)
             {
                 // How much required acceleration there is to reach the intended speed (walkingspeed).
-                float requiredAcc = (Speed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
+                float requiredAcc = (speedTracker - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
 
                 myRigidbody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
             }
 
             myRigidbody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
+
         }
-
-
     }
+
+
+
+
 }

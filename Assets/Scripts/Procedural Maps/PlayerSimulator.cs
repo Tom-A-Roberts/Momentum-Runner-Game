@@ -295,7 +295,6 @@ public class PlayerSimulator : MonoBehaviour
     /// </summary>
     public class Wallrunning : Action
     {
-        private bool leftSide = false;
         private Vector3 wallDirection;
         private Vector3 firstPosition;
         public Wallrunning(string name, PlayerSimulator playerSimulatorInstance, int actionID, float averageDuration) : base(name, playerSimulatorInstance, actionID, averageDuration)
@@ -306,12 +305,10 @@ public class PlayerSimulator : MonoBehaviour
             base.Start();
             if (Vector3.Dot(playerSimulator.sidewaysDirection, playerSimulator.velocity) < 0)
             {
-                leftSide = true;
                 wallDirection = -playerSimulator.sidewaysDirection.normalized;
             }
             else
             {
-                leftSide = false;
                 wallDirection = playerSimulator.sidewaysDirection.normalized;
             }
             firstPosition = playerSimulator.transform.position;

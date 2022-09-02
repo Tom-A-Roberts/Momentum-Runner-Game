@@ -9,7 +9,7 @@ public class MenuUIScript : MonoBehaviour
     public GameObject SettingsPanel;
     public GameObject GameModePanel;
     public GameObject LevelSelectPanel;
-    bool isMultiplayer;
+    public bool isMultiplayer;
 
     public void EnableGamePanel()
     {

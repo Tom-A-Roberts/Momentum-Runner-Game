@@ -19,8 +19,6 @@ public class LevelController : MonoBehaviour
     public Vector3 feetSpawnPosition;
     public Vector3 bodyFeetOffset;
 
-    private bool resetRequired = false;
-
     void Start()
     {
 
@@ -68,8 +66,6 @@ public class LevelController : MonoBehaviour
     }
     public void PlayerDeath()
     {
-        resetRequired = true;
-        resetRequired = false;
         playerBody.transform.position = bodyStartPosition;
         playerBody.transform.rotation = bodyStartRotation;
         playerFeet.transform.position = feetStartPosition;
