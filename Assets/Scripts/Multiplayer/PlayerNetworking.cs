@@ -11,6 +11,7 @@ public class PlayerNetworking : NetworkBehaviour
     private float _rotVelY;
     private float _rotVelZ;
 
+    public float wallRunTiltMultiplier = 1.2f;
     public LevelController myLevelController;
     public GameObject myCamera;
     public GameObject grappleGun;
@@ -55,7 +56,7 @@ public class PlayerNetworking : NetworkBehaviour
 
             myCamera.transform.rotation = Quaternion.Euler(Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.x, _netState.Value.Rotation.x, ref _rotVelX, _cheapInterpolationTime),
                 Mathf.SmoothDampAngle(bodyRigidbody.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVelY, _cheapInterpolationTime),
-                Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.z, _netState.Value.Rotation.z, ref _rotVelZ, _cheapInterpolationTime));  
+                Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.z, _netState.Value.Rotation.z * wallRunTiltMultiplier, ref _rotVelZ, _cheapInterpolationTime));  
             bodyRigidbody.rotation = Quaternion.Euler(0, myCamera.transform.eulerAngles.y, myCamera.transform.eulerAngles.z);           
 
             // Keep velocities in sync (Might be a bad idea!)
