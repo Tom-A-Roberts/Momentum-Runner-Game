@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 45e5958c8dd31b24d9e7a6da3daee680
+guid: 38d13f802f68cf34faa8dd46a64d4f5b
 ModelImporter:
   serializedVersion: 22103
   internalIDToNameTable: []
@@ -7,13 +7,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Blue Glow
-    second: {fileID: 2100000, guid: 885d493ac815f344ab21322ebe1e54e2, type: 2}
+      name: DarkGunMetal
+    second: {fileID: 2100000, guid: 9a08ac1b8ec13ed4e9419ae563d18e23, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Blue Glow.003
-    second: {fileID: 2100000, guid: 460086f6feab5094a859bedf96dffd57, type: 2}
+      name: EmissiveRed
+    second: {fileID: 2100000, guid: a4989736c7c2bd345b940a92ebc6a612, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -22,28 +22,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: GunMetal.003
-    second: {fileID: 2100000, guid: 6d53015c2be5d6547b9398d1b0a27fa4, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Orange Glow
-    second: {fileID: 2100000, guid: 0cd8194fc0b226a499cdfe9ea609c9ee, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Orange Glow.003
-    second: {fileID: 2100000, guid: 6b0bbcae8433eb14293237a11804cc1a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: PaintedMetal
-    second: {fileID: 2100000, guid: 3600198ce5941e24aa42808519efafdf, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: PaintedMetal.003
-    second: {fileID: 2100000, guid: 3600198ce5941e24aa42808519efafdf, type: 2}
+      name: PaintedRedMetal
+    second: {fileID: 2100000, guid: 41a91a828ee35b24b82a70caa52fa2bb, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

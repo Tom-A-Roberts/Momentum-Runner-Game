@@ -8,7 +8,7 @@ public class GunController : NetworkBehaviour
     [Header("Related Objects")]
     public Transform gunTop;
     public Transform muzzlePoint;
-    
+    public PlayerAudioManager audioManager;
 
     [Header("Gameplay Settings")]
     [Tooltip("How long in seconds between times you can shoot")]
@@ -27,16 +27,26 @@ public class GunController : NetworkBehaviour
     [Header("Effects Settings")]
     public Color lineColor;
     public Shader lineShader;
+    public Material lineMat;
     public GameObject groundHitParticlePrefab;
     public GameObject muzzleFlashParticlePrefab;
     public GameObject bulletHoleDecalPrefab;
     public LightFlashController muzzleLight;
+    public float glowIncreaseMultiplier = 1f;
 
+    private Renderer myRend;
+    private Material myMat;
+
+    private Color emissiveColour;
     private float animationProgress = 1;
     private bool animationActive = false;
     private float cooldownProgress = 0;
     private Vector3 originalGunAngle;
     private Vector3 originalSlidePosition;
+
+    private float hOriginal;
+    private float sOriginal;
+    private float vOriginal;
 
     public override void OnNetworkSpawn()
     {
@@ -52,6 +62,18 @@ public class GunController : NetworkBehaviour
         originalSlidePosition = gunTop.localPosition;
         animationProgress = 1;
         SetGunTransformBasedOnProgress(animationProgress);
+
+        myRend = GetComponent<Renderer>();
+        foreach (Material material in myRend.materials)
+        {
+            Color testColour = material.GetColor("_EmissiveColor");
+            if (testColour.r > 0 || testColour.g > 0 || testColour.b > 0)
+            {
+                emissiveColour = testColour;
+                myMat = material;
+            }
+        }
+        Color.RGBToHSV(emissiveColour, out hOriginal, out sOriginal, out vOriginal);
     }
 
     void Update()
@@ -97,6 +119,12 @@ public class GunController : NetworkBehaviour
         //float slidebackResult = ((Mathf.Pow(progress - 1, 2) + Mathf.Pow(progress - 1, 15))) / 0.6357f;
         transform.localEulerAngles = new Vector3(originalGunAngle.x - angleresult * kickbackAngle, originalGunAngle.y, originalGunAngle.z);
         gunTop.localPosition = new Vector3(originalSlidePosition.x, originalSlidePosition.y, originalSlidePosition.z - slidebackDistance* slidebackResult);
+
+        float glowMultiplier = 1 + (1-progress) * glowIncreaseMultiplier;
+        float currentHueChange = (1-progress) * -0.025f;
+        if (myMat != null)
+            myMat.SetColor("_EmissiveColor", Color.HSVToRGB(hOriginal + currentHueChange, sOriginal, vOriginal) * glowMultiplier);
+
     }
 
     void Shoot()
@@ -114,7 +142,10 @@ public class GunController : NetworkBehaviour
         myLine.AddComponent<BulletFadeOut>();
 
         var lr = myLine.GetComponent<LineRenderer>();
-        lr.material = new Material(lineShader);
+        //lr.material = new Material(lineShader);
+        lr.material = lineMat;
+
+
 
         lr.startColor = lineColor;
         lr.endColor = lineColor;
@@ -126,7 +157,8 @@ public class GunController : NetworkBehaviour
         lr.material.SetColor("_Color", new Color(1f, 1f, 1f, 0.5f));
 
 
-        lr.startWidth = 0.003f;
+        lr.startWidth = 0.001f;
+        //lr.startWidth = 0.000f;
         lr.endWidth = 0.03f;
         lr.SetPosition(0, muzzlePoint.position);
         if (hit)
@@ -147,6 +179,7 @@ public class GunController : NetworkBehaviour
         {
             lr.SetPosition(1, Camera.main.transform.position + shootDirection * 100f);
         }
+        audioManager.Shoot();
         GameObject muzzle_particle = Instantiate(muzzleFlashParticlePrefab, muzzlePoint.position, muzzlePoint.rotation);//
         muzzle_particle.transform.parent = muzzlePoint.transform;
         //muzzleLight.Flash();

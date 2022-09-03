@@ -1,49 +1,9 @@
 fileFormatVersion: 2
-guid: 45e5958c8dd31b24d9e7a6da3daee680
+guid: 38845b801893420428c4b3e822ee82c2
 ModelImporter:
   serializedVersion: 22103
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Blue Glow
-    second: {fileID: 2100000, guid: 885d493ac815f344ab21322ebe1e54e2, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Blue Glow.003
-    second: {fileID: 2100000, guid: 460086f6feab5094a859bedf96dffd57, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: GunMetal
-    second: {fileID: 2100000, guid: 6d53015c2be5d6547b9398d1b0a27fa4, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: GunMetal.003
-    second: {fileID: 2100000, guid: 6d53015c2be5d6547b9398d1b0a27fa4, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Orange Glow
-    second: {fileID: 2100000, guid: 0cd8194fc0b226a499cdfe9ea609c9ee, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Orange Glow.003
-    second: {fileID: 2100000, guid: 6b0bbcae8433eb14293237a11804cc1a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: PaintedMetal
-    second: {fileID: 2100000, guid: 3600198ce5941e24aa42808519efafdf, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: PaintedMetal.003
-    second: {fileID: 2100000, guid: 3600198ce5941e24aa42808519efafdf, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -75,7 +35,7 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 0.1
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -129,7 +89,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.1
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

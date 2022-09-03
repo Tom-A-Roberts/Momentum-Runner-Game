@@ -20,6 +20,7 @@ public class PlayerAudioManager : NetworkBehaviour
     public float rollingPitch = 0f;
     public float grapplePitch = 1f;
     public float JumpVolume = 0.2f;
+    public float ShootVolume = 0.3f;
     public float grappleSwingVolume = 0.3f;
     public AudioClip ambiance;
     public AudioClip rollingLoop;
@@ -39,6 +40,7 @@ public class PlayerAudioManager : NetworkBehaviour
     private AudioSource wallRollingSource;
     private AudioSource windSource;
     private AudioSource grapplingSwingingSource;
+    private AudioSource shootingSource;
 
     private float rollingTargetIntensity;
     private float rollingCurrentIntensity;
@@ -93,6 +95,9 @@ public class PlayerAudioManager : NetworkBehaviour
         grapplingSwingingSource.loop = true;
         grapplingSwingingSource.volume = 0f;
         grapplingSwingingSource.Play();
+
+        shootingSource = gameObject.AddComponent<AudioSource>();
+        shootingSource.clip = shoot;
     }
 
 
@@ -144,8 +149,11 @@ public class PlayerAudioManager : NetworkBehaviour
 
     public void Shoot()
     {
-        if (mainAudioSource != null)
-            mainAudioSource.PlayOneShot(shoot, 0.3f * startVolume);
+        const float pitchChange = 0.13f;
+        const float volumeChange = 0.05f;
+        shootingSource.pitch = 1 + (Random.value * pitchChange) - (pitchChange / 2);
+        shootingSource.volume = (ShootVolume * (1+ (Random.value * volumeChange) - (volumeChange / 2))) * startVolume;
+        shootingSource.Play();
     }
     public void AirDash()
     {

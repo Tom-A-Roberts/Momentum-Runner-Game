@@ -76,8 +76,8 @@ public class GlowFlashObject : MonoBehaviour
 
             if (!increaseGlow && myMat != null)
                 myMat.SetColor("_EmissiveColor", Color.HSVToRGB(hOriginal + currentHueChange, sOriginal, vOriginal) * glowMultiplier);
-            
         }
+
         if (increaseGlow)
         {
             glowState += Time.deltaTime / glowIncreaseTime;
