@@ -99,7 +99,7 @@ public class PlayerNetworking : NetworkBehaviour
             //bodyRigidbody.isKinematic = true;
             //feetRigidbody.isKinematic = true;
 
-
+            
 
             // Remove camera
             Destroy(myCamera.GetComponent<CameraController>());
@@ -120,6 +120,8 @@ public class PlayerNetworking : NetworkBehaviour
 
             grappleGun.GetComponent<GrappleGun>().isGrappleOwner = false;
             //myAudioSource.Stop();
+
+            gameObject.name = "Player" + OwnerClientId.ToString() + " (Remote)";
         }
         else
         {
@@ -128,6 +130,8 @@ public class PlayerNetworking : NetworkBehaviour
             //    GameObject spawnCam = Camera.main.gameObject;
             //    Destroy(spawnCam);
             //}
+
+            gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
         }
     }
 
