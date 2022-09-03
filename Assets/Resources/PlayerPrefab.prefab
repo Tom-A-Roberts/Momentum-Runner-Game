@@ -571,11 +571,11 @@ MonoBehaviour:
   wallRollingPitchChange: 0.75
   rollingPitchChange: 0.75
   windPitchChange: 0.6
-  grapplePitchChange: 0.1
+  grapplePitchChange: 0.06
   wallRollingPitch: 1
   rollingPitch: 1.7
   grapplePitch: 0.75
-  JumpVolume: 0.08
+  JumpVolume: 0.1
   ShootVolume: 0.5
   grappleSwingVolume: 0.07
   ambiance: {fileID: 8300000, guid: 66a666fff64d3674189fc66fc47a2c75, type: 3}
@@ -1896,7 +1896,7 @@ MonoBehaviour:
   muzzlePoint: {fileID: 1461484504120033369}
   audioManager: {fileID: 8008624713252837793}
   shootCooldown: 0.5
-  innacuracy: 0.003
+  innacuracy: 0
   animationDuration: 0.8
   kickbackAngle: 20
   slidebackDistance: 0.16
