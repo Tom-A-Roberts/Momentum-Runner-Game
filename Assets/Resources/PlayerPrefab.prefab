@@ -806,7 +806,7 @@ MonoBehaviour:
   wallRollingPitch: 1
   rollingPitch: 1.7
   grapplePitch: 1
-  JumpVolume: 0.1
+  JumpVolume: 0.07
   ambiance: {fileID: 8300000, guid: 66a666fff64d3674189fc66fc47a2c75, type: 3}
   rollingLoop: {fileID: 8300000, guid: 1404084e1cb1ebe428070dacddeecbe0, type: 3}
   wallRollingLoop: {fileID: 8300000, guid: f1aa193822064904294eaa295cecee7b, type: 3}

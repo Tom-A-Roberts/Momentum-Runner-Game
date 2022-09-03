@@ -43,7 +43,7 @@ public class PlayerNetworking : NetworkBehaviour
                 Position = bodyRigidbody.position,
                 // OR: camera rotation used because locally it has the wallrunning rotation applied
                 // ...definitely not a janky way of animating this differently locally and remotely
-                Rotation = myCamera.transform.rotation.eulerAngles, 
+                Rotation = myCamera.transform.rotation.eulerAngles,
                 Velocity = bodyRigidbody.velocity,
             };
         }
