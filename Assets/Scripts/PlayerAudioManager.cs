@@ -33,6 +33,7 @@ public class PlayerAudioManager : NetworkBehaviour
     public AudioClip wind;
     public AudioClip shoot;
     public AudioClip airdash;
+    public AudioClip airJump;
     // Start is called before the first frame update
 
     private AudioSource ambianceSource;
@@ -140,6 +141,11 @@ public class PlayerAudioManager : NetworkBehaviour
     {
         if (mainAudioSource != null)
             mainAudioSource.PlayOneShot(jump, (Random.value * (JumpVolume * 0.1f) + JumpVolume) * startVolume);
+    }
+    public void AirJump()
+    {
+        if (mainAudioSource != null)
+            mainAudioSource.PlayOneShot(airJump, (Random.value * (JumpVolume * 0.1f) + JumpVolume) * startVolume);
     }
     public void Land(float power)
     {

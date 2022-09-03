@@ -185,7 +185,16 @@ public class PlayerController : NetworkBehaviour
             // unstick and 'kick off' wall
             wallRunning.Unstick();
 
-            audioManager.Jump();
+            if(remainingJumps == 1)
+            {
+                audioManager.AirJump();
+            }
+            else
+            {
+                audioManager.Jump();
+            }
+            
+            
 
 
             if (wallRunning.IsWallRunning)

@@ -584,11 +584,12 @@ MonoBehaviour:
   grapplingSwingingLoop: {fileID: 8300000, guid: 636e133e6f24bf647b7ce4de5ca3cd6d, type: 3}
   grapplingStart: {fileID: 8300000, guid: 9028312e487565149aeb5b781eefab2c, type: 3}
   grapplingEnd: {fileID: 8300000, guid: 4dcce5dfceb478f438f624155aea841e, type: 3}
-  jump: {fileID: 8300000, guid: ce11922b077d5d549abb3e05b2a0806e, type: 3}
+  jump: {fileID: 8300000, guid: 4506c4cb8e59db649a10a2b9004eed25, type: 3}
   land: {fileID: 8300000, guid: 40d0b314db6267046ac1ddf616d7a20c, type: 3}
   wind: {fileID: 8300000, guid: c4206ced1c7aa6242947aa266338c546, type: 3}
   shoot: {fileID: 8300000, guid: 406b6185bc3b3e44abc2de1e23abcdfa, type: 3}
   airdash: {fileID: 0}
+  airJump: {fileID: 8300000, guid: ce11922b077d5d549abb3e05b2a0806e, type: 3}
 --- !u!114 &4316027073834798312
 MonoBehaviour:
   m_ObjectHideFlags: 0
