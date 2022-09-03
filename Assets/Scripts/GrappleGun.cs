@@ -83,11 +83,11 @@ public class GrappleGun : NetworkBehaviour
             float ropeDist = (connectionPoint - playerCentreOfMass.position).magnitude;
             if(ropeDist > connectedDistance - 0.1f)
             {
-                audioManager.UpdateGrappleSwingingIntensity(playerRigidbody.velocity.magnitude / 25f);
+                audioManager.UpdateGrappleSwingingIntensity((playerRigidbody.velocity.magnitude / 25f) + 0.2f);
             }
             else
             {
-                audioManager.UpdateGrappleSwingingIntensity(0);
+                audioManager.UpdateGrappleSwingingIntensity(0.2f);
             }
         }
         else

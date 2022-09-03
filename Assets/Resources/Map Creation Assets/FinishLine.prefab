@@ -5033,7 +5033,7 @@ Transform:
   - {fileID: 6058252901285009390}
   - {fileID: 168776641}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1849163437499129836
 GameObject:
@@ -5047,6 +5047,9 @@ GameObject:
   - component: {fileID: 1280435197517423}
   - component: {fileID: 6205281477916330474}
   - component: {fileID: 4761767019543147442}
+  - component: {fileID: 8971390287332892620}
+  - component: {fileID: 1069140309570181821}
+  - component: {fileID: 1494728000395205078}
   m_Layer: 0
   m_Name: Teleporter
   m_TagString: TriggerDeath
@@ -5133,6 +5136,45 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 7672556197880047681, guid: 0de517b52bbb15243b7ae9caffc69aa0, type: 3}
+--- !u!65 &8971390287332892620
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849163437499129836}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 9.01, y: 10.9, z: 0.5}
+  m_Center: {x: -0.0052478313, y: 0, z: 0}
+--- !u!65 &1069140309570181821
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849163437499129836}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.02, y: 5.19, z: 0.5}
+  m_Center: {x: 5.48, y: 0, z: 0}
+--- !u!65 &1494728000395205078
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849163437499129836}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.02, y: 5.19, z: 0.5}
+  m_Center: {x: -5.49, y: 0, z: 0}
 --- !u!1 &4264035459533853628
 GameObject:
   m_ObjectHideFlags: 0

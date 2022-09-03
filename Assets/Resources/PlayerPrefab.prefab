@@ -798,7 +798,7 @@ MonoBehaviour:
   rollingSoundSmoothAmount: 0.1
   wallRollingSoundSmoothAmount: 0.15
   windSoundSmoothAmount: 0.15
-  grappleSoundSmoothAmount: 0.1
+  grappleSoundSmoothAmount: 0.17
   wallRollingPitchChange: 0.75
   rollingPitchChange: 0.75
   windPitchChange: 0.6
@@ -806,11 +806,12 @@ MonoBehaviour:
   wallRollingPitch: 1
   rollingPitch: 1.7
   grapplePitch: 1
-  JumpVolume: 0.07
+  JumpVolume: 0.08
+  grappleSwingVolume: 0.15
   ambiance: {fileID: 8300000, guid: 66a666fff64d3674189fc66fc47a2c75, type: 3}
   rollingLoop: {fileID: 8300000, guid: 1404084e1cb1ebe428070dacddeecbe0, type: 3}
   wallRollingLoop: {fileID: 8300000, guid: f1aa193822064904294eaa295cecee7b, type: 3}
-  grapplingSwingingLoop: {fileID: 8300000, guid: 324d0980ec067b042990b2b6e2dae9fb, type: 3}
+  grapplingSwingingLoop: {fileID: 8300000, guid: 636e133e6f24bf647b7ce4de5ca3cd6d, type: 3}
   grapplingStart: {fileID: 8300000, guid: 9028312e487565149aeb5b781eefab2c, type: 3}
   grapplingEnd: {fileID: 8300000, guid: 4dcce5dfceb478f438f624155aea841e, type: 3}
   jump: {fileID: 8300000, guid: ce11922b077d5d549abb3e05b2a0806e, type: 3}
@@ -1549,6 +1550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 884aac00e318e124e84a2498b2d3280b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallRunTiltMultiplier: 1.2
   myLevelController: {fileID: 153934500}
   myCamera: {fileID: 4316027073834798100}
   grappleGun: {fileID: 8853182101087441441}

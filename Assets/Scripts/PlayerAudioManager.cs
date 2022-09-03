@@ -20,6 +20,7 @@ public class PlayerAudioManager : NetworkBehaviour
     public float rollingPitch = 0f;
     public float grapplePitch = 1f;
     public float JumpVolume = 0.2f;
+    public float grappleSwingVolume = 0.3f;
     public AudioClip ambiance;
     public AudioClip rollingLoop;
     public AudioClip wallRollingLoop;
@@ -126,13 +127,14 @@ public class PlayerAudioManager : NetworkBehaviour
 
 
     public override void OnNetworkSpawn()
-    {        
+    {
+
     }
 
     public void Jump()
     {
         if (mainAudioSource != null)
-            mainAudioSource.PlayOneShot(jump, (Random.value * 0.05f + JumpVolume) * startVolume);
+            mainAudioSource.PlayOneShot(jump, (Random.value * (JumpVolume * 0.1f) + JumpVolume) * startVolume);
     }
     public void Land(float power)
     {
@@ -177,7 +179,7 @@ public class PlayerAudioManager : NetworkBehaviour
         rollingSource.volume = Mathf.Clamp01(rollingCurrentIntensity + (wallRollingCurrentIntensity / 8f)) * startVolume * 0.5f;
         rollingSource.pitch = rollingPitch + (Mathf.Clamp01(rollingCurrentIntensity) * rollingPitchChange) - (rollingPitchChange / 2);
 
-        grapplingSwingingSource.volume = Mathf.Clamp01(grappleCurrentIntensity) * startVolume * 0.6f;
+        grapplingSwingingSource.volume = Mathf.Clamp01(grappleCurrentIntensity) * startVolume * grappleSwingVolume;
         grapplingSwingingSource.pitch = grapplePitch + (Mathf.Clamp01(grappleCurrentIntensity) * grapplePitchChange) - (grapplePitchChange / 2);
 
 
