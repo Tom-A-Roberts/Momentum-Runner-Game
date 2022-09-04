@@ -44,7 +44,7 @@ public class GlowFlashObject : MonoBehaviour
     {
         if(grappleTracker != null)
         {
-            if (grappleTracker.IsGrappling())
+            if (grappleTracker.grappleConnected)
             {
                 IncreaseGlow();
             }

@@ -31,7 +31,8 @@ public class GrapplingRope : NetworkBehaviour
 
     private void Awake()
     {
-        lr = GrappleGun.RopeRenderer;
+        if (!TryGetComponent<LineRenderer>(out lr))        
+            Debug.LogError("No LineRenderer found!");       
 
         spring = new Spring();
         spring.SetTarget(0);
