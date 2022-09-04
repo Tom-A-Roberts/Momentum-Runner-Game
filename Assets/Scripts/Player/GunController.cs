@@ -6,6 +6,7 @@ using Unity.Netcode;
 public class GunController : MonoBehaviour
 {
     [Header("Related Objects")]
+    public GameObject gunModel;
     public Transform gunTop;
     public Transform muzzlePoint;
     public PlayerAudioManager audioManager;
@@ -49,14 +50,6 @@ public class GunController : MonoBehaviour
     private float sOriginal;
     private float vOriginal;
 
-    //public override void OnNetworkSpawn()
-    //{
-    //    if (!IsOwner)
-    //    {
-    //        Destroy(this);
-    //    }
-    //}
-
     private void Start()
     {
         originalGunAngle = transform.localEulerAngles;
@@ -64,7 +57,7 @@ public class GunController : MonoBehaviour
         animationProgress = 1;
         SetGunTransformBasedOnProgress(animationProgress);
 
-        myRend = GetComponent<Renderer>();
+        myRend = gunModel.GetComponent<Renderer>();
         foreach (Material material in myRend.materials)
         {
             Color testColour = material.GetColor("_EmissiveColor");
@@ -100,12 +93,9 @@ public class GunController : MonoBehaviour
         
         if (Input.GetButton("Shoot") && cooldownProgress <= 0)
         {
-
-
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;
 
-            //Shoot(shootStart, shootDirection);
             playerNetworking.ShootStart(shootStart, shootDirection);
         }
     }
@@ -120,7 +110,6 @@ public class GunController : MonoBehaviour
             slidebackResult = ((Mathf.Pow(halfProgress - 1, 2) + Mathf.Pow(halfProgress - 1, 51))) / 0.8418f;
         }
 
-        //float slidebackResult = ((Mathf.Pow(progress - 1, 2) + Mathf.Pow(progress - 1, 15))) / 0.6357f;
         transform.localEulerAngles = new Vector3(originalGunAngle.x - angleresult * kickbackAngle, originalGunAngle.y, originalGunAngle.z);
         gunTop.localPosition = new Vector3(originalSlidePosition.x, originalSlidePosition.y, originalSlidePosition.z - slidebackDistance* slidebackResult);
 
@@ -139,10 +128,8 @@ public class GunController : MonoBehaviour
     public GameObject Shoot(Vector3 startPos, Vector3 shootDirection)
     {
         // Add random spread
-        //var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
         RaycastHit hitRaycastReferenceObj;
         GameObject hitGameObject = null;
-        //bool hit = Physics.Raycast(Camera.main.transform.position + Camera.main.transform.forward, shootDirection, out hitObj, 100.0f);
         bool hit = Physics.Raycast(startPos, shootDirection, out hitRaycastReferenceObj, 100.0f);
 
         GameObject myLine = new GameObject();
@@ -151,7 +138,6 @@ public class GunController : MonoBehaviour
         myLine.AddComponent<BulletFadeOut>();
 
         var lr = myLine.GetComponent<LineRenderer>();
-        //lr.material = new Material(lineShader);
         lr.material = lineMat;
 
         lr.startColor = lineColor;
@@ -163,9 +149,7 @@ public class GunController : MonoBehaviour
         }
         lr.material.SetColor("_Color", new Color(1f, 1f, 1f, 0.5f));
 
-
         lr.startWidth = 0.001f;
-        //lr.startWidth = 0.000f;
         lr.endWidth = 0.03f;
         lr.SetPosition(0, muzzlePoint.position);
         if (hit)
@@ -175,22 +159,10 @@ public class GunController : MonoBehaviour
             {
                 hitObject.TargetHit();
             }
-            //if(hitRaycastReferenceObj.collider.gameObject.tag == "Player")
-            //{
-            //    Transform prefabParent = hitRaycastReferenceObj.collider.transform.root;
-            //    if (prefabParent != null)
-            //    {
-            //        LevelController levelController;
-            //        if (prefabParent.TryGetComponent<LevelController>(out levelController))
-            //        {
-            //            playerNetworking.TryShootPlayer(levelController);
-            //        }
-            //    }
-            //}
+
             hitGameObject = hitRaycastReferenceObj.collider.gameObject;
 
             lr.SetPosition(1, hitRaycastReferenceObj.point);
-
 
             GameObject ground_particle = Instantiate(groundHitParticlePrefab, hitRaycastReferenceObj.point, Quaternion.FromToRotation(Vector3.forward, hitRaycastReferenceObj.normal));
             GameObject ground_decal = Instantiate(bulletHoleDecalPrefab, hitRaycastReferenceObj.point, Quaternion.FromToRotation(Vector3.forward, hitRaycastReferenceObj.normal));
@@ -202,7 +174,6 @@ public class GunController : MonoBehaviour
         audioManager.Shoot();
         GameObject muzzle_particle = Instantiate(muzzleFlashParticlePrefab, muzzlePoint.position, muzzlePoint.rotation);//
         muzzle_particle.transform.parent = muzzlePoint.transform;
-        //muzzleLight.Flash();
 
         // Start gun animation
         animationActive = true;

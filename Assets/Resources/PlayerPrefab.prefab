@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 398409108887630333}
   - component: {fileID: 3614338176502070872}
   - component: {fileID: 1570703100729690770}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GrappleGunModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 161626121218669125}
   - component: {fileID: 4391235710423120943}
   - component: {fileID: 8069841258875432103}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: l_r
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,7 +322,7 @@ GameObject:
   - component: {fileID: 1961338021447854121}
   - component: {fileID: 5477162030589496908}
   - component: {fileID: 5892756027198779157}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: u_l
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -404,7 +404,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1461484504120033369}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -808,7 +808,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9112686551321005626}
-  - {fileID: 8526933095786709449}
+  - {fileID: 985796925838526119}
   m_Father: {fileID: 4316027075412832467}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 11.706, y: 0, z: 0}
@@ -1638,7 +1638,7 @@ MonoBehaviour:
   myLevelController: {fileID: 153934500}
   myCamera: {fileID: 4316027073834798100}
   grappleGun: {fileID: 8853182101087441441}
-  shootingGun: {fileID: 9015662013461027699}
+  shootingGun: {fileID: 5661523781473890172}
   bodyRigidbody: {fileID: 4316027074644905781}
   feetRigidbody: {fileID: 4316027073947639282}
   multiplayerRepresentation: {fileID: 2473533998632247775}
@@ -1742,6 +1742,69 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5661523781473890172
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 985796925838526119}
+  - component: {fileID: 442954331972060455}
+  m_Layer: 0
+  m_Name: Shooting Gun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &985796925838526119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5661523781473890172}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8526933095786709449}
+  m_Father: {fileID: 4316027073834798315}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &442954331972060455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5661523781473890172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82d90a8d7e874e94a98c4a7eb2a972e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunModel: {fileID: 9015662013461027699}
+  gunTop: {fileID: 5758086762302845120}
+  muzzlePoint: {fileID: 1461484504120033369}
+  audioManager: {fileID: 8008624713252837793}
+  playerNetworking: {fileID: 1445570255}
+  shootCooldown: 0.5
+  innacuracy: 0
+  animationDuration: 0.8
+  kickbackAngle: 20
+  slidebackDistance: 0.16
+  lineColor: {r: 1, g: 0, b: 0, a: 0.8156863}
+  lineShader: {fileID: 207, guid: 0000000000000000f000000000000000, type: 0}
+  lineMat: {fileID: 2100000, guid: a4989736c7c2bd345b940a92ebc6a612, type: 2}
+  groundHitParticlePrefab: {fileID: 5155380658188059227, guid: 56be379ae260e5747b140d2ebfb352b7, type: 3}
+  muzzleFlashParticlePrefab: {fileID: 1548731787465841113, guid: 14a375f0b95638a479fd733831292beb, type: 3}
+  bulletHoleDecalPrefab: {fileID: 5283180142859109130, guid: 64bd2bd14a346084ea6636f4b2fcfb4d, type: 3}
+  muzzleLight: {fileID: 0}
+  glowIncreaseMultiplier: 2
 --- !u!1 &5907310645102594988
 GameObject:
   m_ObjectHideFlags: 0
@@ -1819,7 +1882,7 @@ GameObject:
   - component: {fileID: 8307132591556369783}
   - component: {fileID: 8839653709457794645}
   - component: {fileID: 6643897694686341660}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: u_r
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1903,7 +1966,7 @@ GameObject:
   - component: {fileID: 2797805575275021848}
   - component: {fileID: 80033932282842851}
   - component: {fileID: 165069746631486303}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Rotary_Section
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1986,7 +2049,7 @@ GameObject:
   - component: {fileID: 3242214354831097369}
   - component: {fileID: 7026846666652347924}
   - component: {fileID: 6658831136946577342}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: b_l
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2104,27 +2167,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d57d33ef101f74d80fc7146a7a326f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerCamera: {fileID: 4316027073834798314}
+  PlayerController: {fileID: 4316027074644905738}
+  audioManager: {fileID: 8008624713252837793}
   GunEndPosition: {fileID: 5170917926509469355}
   playerCentreOfMass: {fileID: 4316027074644905776}
-  PlayerCamera: {fileID: 4316027073834798314}
-  RopeRenderer: {fileID: 5224529714271308080}
+  grappleGunModel: {fileID: 919132148211561051}
+  grapplingRope: {fileID: 1777984287}
   MaxGrappleLength: 20
   GrappleForce: 10
-  audioManager: {fileID: 8008624713252837793}
   GrappleLookAtPower: 0.4
   lookAtSmoothSpeed: 0.05
-  grapplingRope: {fileID: 1777984287}
-  GroundDetector: {fileID: 1371572323}
-  PlayerController: {fileID: 4316027074644905738}
-  playerRigidbody: {fileID: 0}
-  grappleGunModel: {fileID: 919132148211561051}
 --- !u!1001 &8205410105980544546
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 2
-    m_TransformParent: {fileID: 4316027073834798315}
+    m_TransformParent: {fileID: 985796925838526119}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
       propertyPath: m_RootOrder
@@ -2148,19 +2208,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.275
+      value: -0.27500004
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.429
+      value: 0.42900002
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9984348
+      value: 0.9984347
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0559296
+      value: -0.055929597
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
       propertyPath: m_LocalRotation.y
@@ -2186,9 +2246,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: GunExport
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 2572724711153914803, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
       propertyPath: m_Name
       value: Top
+      objectReference: {fileID: 0}
+    - target: {fileID: 2572724711153914803, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects:
@@ -2201,6 +2269,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4483241497414489826, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
   m_PrefabInstance: {fileID: 8205410105980544546}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5938944412140451217 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2572724711153914803, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
+  m_PrefabInstance: {fileID: 8205410105980544546}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8526933095786709449 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
@@ -2211,7 +2284,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 38d13f802f68cf34faa8dd46a64d4f5b, type: 3}
   m_PrefabInstance: {fileID: 8205410105980544546}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8685474602043086577
+--- !u!114 &7597306389252323850
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2220,23 +2293,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 9015662013461027699}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82d90a8d7e874e94a98c4a7eb2a972e8, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cf0ec8a2fdcb8c48a756a7eb95064c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gunTop: {fileID: 5758086762302845120}
-  muzzlePoint: {fileID: 1461484504120033369}
-  audioManager: {fileID: 8008624713252837793}
-  playerNetworking: {fileID: 1445570255}
-  shootCooldown: 0.5
-  innacuracy: 0
-  animationDuration: 0.8
-  kickbackAngle: 20
-  slidebackDistance: 0.16
-  lineColor: {r: 1, g: 0, b: 0, a: 0.8156863}
-  lineShader: {fileID: 207, guid: 0000000000000000f000000000000000, type: 0}
-  lineMat: {fileID: 2100000, guid: a4989736c7c2bd345b940a92ebc6a612, type: 2}
-  groundHitParticlePrefab: {fileID: 5155380658188059227, guid: 56be379ae260e5747b140d2ebfb352b7, type: 3}
-  muzzleFlashParticlePrefab: {fileID: 1548731787465841113, guid: 14a375f0b95638a479fd733831292beb, type: 3}
-  bulletHoleDecalPrefab: {fileID: 5283180142859109130, guid: 64bd2bd14a346084ea6636f4b2fcfb4d, type: 3}
-  muzzleLight: {fileID: 0}
-  glowIncreaseMultiplier: 2
+  parts:
+  - {fileID: 5938944412140451217}
