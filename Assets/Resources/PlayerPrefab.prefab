@@ -889,7 +889,7 @@ MonoBehaviour:
   wallRollingPitch: 1
   rollingPitch: 1.7
   grapplePitch: 0.75
-  JumpVolume: 0.07
+  JumpVolume: 0.06
   ShootVolume: 0.5
   grappleSwingVolume: 0.07
   ambiance: {fileID: 8300000, guid: 66a666fff64d3674189fc66fc47a2c75, type: 3}
