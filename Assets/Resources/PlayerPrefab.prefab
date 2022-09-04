@@ -1794,6 +1794,10 @@ MonoBehaviour:
   playerNetworking: {fileID: 1445570255}
   shootCooldown: 0.5
   innacuracy: 0
+  aimAssistAngle: 4
+  optimalAimAssistDistance: 15
+  maximumAimAssistDistance: 50
+  raycastDistance: 100
   animationDuration: 0.8
   kickbackAngle: 20
   slidebackDistance: 0.16
