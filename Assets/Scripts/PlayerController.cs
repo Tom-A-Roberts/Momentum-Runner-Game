@@ -133,6 +133,7 @@ public class PlayerController : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (bodyRigidBody) {
         transform.localRotation = Quaternion.identity * Quaternion.Euler(0, mainCamera.transform.localEulerAngles.y, 0);
 
         Tuple<float, float> axisValues = GetMovementAxis();         
@@ -193,9 +194,6 @@ public class PlayerController : NetworkBehaviour
             {
                 audioManager.Jump();
             }
-            
-            
-
 
             if (wallRunning.IsWallRunning)
             {
@@ -205,6 +203,7 @@ public class PlayerController : NetworkBehaviour
                
                 bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
                 bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
+
             }
 
             remainingJumps--;
@@ -216,12 +215,15 @@ public class PlayerController : NetworkBehaviour
             //Debug.Log("jumped");
             jumpKeyPressed = false;
         }
-        #endregion
+            #endregion
+
+        }
     }
 
 
     void processMotion(float xInput, float yInput)
     {
+        
         // Check if there's motion input
         if (xInput != 0 || yInput != 0)
         {
@@ -262,7 +264,6 @@ public class PlayerController : NetworkBehaviour
             }
 
             bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
-
         }
 
         if (xInput == 0 && yInput == 0 && GroundDetector.IsOnGround)

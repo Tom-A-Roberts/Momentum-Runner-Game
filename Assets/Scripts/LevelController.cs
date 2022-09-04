@@ -85,4 +85,24 @@ public class LevelController : MonoBehaviour
 
         playerBody.velocity = Vector3.zero;
     }
+
+    //public void BeenShotByOwner()
+    //{
+    //    Debug.Log("I've (" + gameObject.name + ") been shot by the owner player");
+    //}
+    ///// <summary>
+    ///// Sent by server on CORRECT hit
+    ///// </summary>
+    //public void BeenShotByRemote()
+    //{
+    //    Debug.Log("I've (" + gameObject.name + ") been shot by a remote player");
+    //}
+
+    public void ProcessPotentialHit(int playerHitID)
+    {
+        if (playerHitID != -1)
+            Debug.Log("I think I ('" + this.gameObject.name + "') just shot player ID: " + playerHitID.ToString());
+    }
+
+
 }

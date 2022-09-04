@@ -1324,7 +1324,7 @@ MonoBehaviour:
   myLevelController: {fileID: 153934500}
   myCamera: {fileID: 4316027073834798100}
   grappleGun: {fileID: 8853182101087441441}
-  shootingGun: {fileID: 0}
+  shootingGun: {fileID: 9015662013461027699}
   bodyRigidbody: {fileID: 4316027074644905781}
   feetRigidbody: {fileID: 4316027073947639282}
   multiplayerRepresentation: {fileID: 2473533998632247775}
@@ -1782,11 +1782,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parts:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8196228427928403799}
+  - {fileID: 5583324746691632376}
+  - {fileID: 1366909633191722703}
+  - {fileID: 7044816534579393598}
+  - {fileID: 1920496367651855943}
+  - {fileID: 6065400081515489537}
+--- !u!1 &1366909633191722703 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7856462402534755899, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1920496367651855943 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1920496366498779469, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5583324746691632376 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -3640047288825129998, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6065400081515489537 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6065400080194381323, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7044816534579393598 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7044816535539465012, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8196228427928403799 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1027143610020728739, guid: 45e5958c8dd31b24d9e7a6da3daee680, type: 3}
+  m_PrefabInstance: {fileID: 1338478346}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8205410105980544546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1895,6 +1926,7 @@ MonoBehaviour:
   gunTop: {fileID: 5758086762302845120}
   muzzlePoint: {fileID: 1461484504120033369}
   audioManager: {fileID: 8008624713252837793}
+  playerNetworking: {fileID: 1445570255}
   shootCooldown: 0.5
   innacuracy: 0
   animationDuration: 0.8

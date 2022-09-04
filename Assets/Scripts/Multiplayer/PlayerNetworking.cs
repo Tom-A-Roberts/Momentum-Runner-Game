@@ -18,6 +18,8 @@ public class PlayerNetworking : NetworkBehaviour
     public Rigidbody bodyRigidbody;
     public Rigidbody feetRigidbody;
     public Transform multiplayerRepresentation;
+
+    private GunController myGunController;
     //public AudioSource myAudioSource;
 
     /// <summary>
@@ -28,7 +30,7 @@ public class PlayerNetworking : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        myGunController = shootingGun.GetComponent<GunController>();
     }
 
     // Update is called once per frame
@@ -63,30 +65,77 @@ public class PlayerNetworking : NetworkBehaviour
             feetRigidbody.velocity = _netState.Value.Velocity;
         }
     }
-    //[ServerRpc]
-    //public void ShootServerRPC()
-    //{
-    //    ShootClientRPC();
-    //}
-    //public void ShootStart()
-    //{
-    //    ShootServerRPC();
 
-    //    LocalShoot();
-        
-    //}
-    //[ClientRpc]
-    //public void ShootClientRPC()
-    //{
-    //    if (!IsOwner)
-    //    {
 
-    //        // Do shooting
-    //    }
-    //}
-    //public void LocalShoot()
-    //{
+    public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
+    {
+        if (IsOwner)
+        {
+            ShootServerRPC(shootStartPosition, shootDirection);
 
+            if (!IsServer)
+                LocalShoot(shootStartPosition, shootDirection);
+        }
+
+    }
+
+    [ServerRpc]
+    public void ShootServerRPC(Vector3 shootStartPosition, Vector3 shootDirection)
+    {
+        GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
+        int hitID = CheckForShotHit(hitObj);
+        //myLevelController.ProcessPotentialHit(hitID);
+
+        ShootClientRPC(shootStartPosition, shootDirection, hitID);
+    }
+
+    [ClientRpc]
+    public void ShootClientRPC(Vector3 shootStartPosition, Vector3 shootDirection, int playerHitID)
+    {
+        if (!IsOwner)
+        {
+            LocalShoot(shootStartPosition, shootDirection);
+            //if(!IsServer)
+                
+        }
+        myLevelController.ProcessPotentialHit(playerHitID);
+    }
+    public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection)
+    {
+        GameObject hitObj = myGunController.Shoot(shootStartPosition, shootDirection);
+        return hitObj;
+    }
+
+
+    /// <summary>
+    /// </summary>
+    /// <param name="rayHitObject">The gameobject that was hit by the shoot raycast</param>
+    /// <returns>IF the ray hit a network player, returns OwnerClientID. ELSE, return -1</returns>
+    public int CheckForShotHit(GameObject rayHitObject)
+    {
+        int playerHitID = -1;
+        if (rayHitObject != null)
+        {
+            Transform prefabParent = rayHitObject.transform.root;
+            if (prefabParent != null)
+            {
+                PlayerNetworking shotPlayerNetworkingScript;
+                if (prefabParent.TryGetComponent<PlayerNetworking>(out shotPlayerNetworkingScript))
+                {
+                    playerHitID = (int)shotPlayerNetworkingScript.OwnerClientId;
+
+                }
+            }
+        }
+        return playerHitID;
+    }
+
+
+
+
+    //public void TryShootPlayer(LevelController levelControllerShot)
+    //{
+    //    Debug.Log("I think I ('" + this.gameObject.name + "') just shot: " + levelControllerShot.gameObject.name);
     //}
 
 
