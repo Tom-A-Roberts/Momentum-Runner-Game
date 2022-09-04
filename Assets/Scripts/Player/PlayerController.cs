@@ -132,93 +132,92 @@ public class PlayerController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (bodyRigidBody) {
-        transform.localRotation = Quaternion.identity * Quaternion.Euler(0, mainCamera.transform.localEulerAngles.y, 0);
-
-        Tuple<float, float> axisValues = GetMovementAxis();         
-
-        processMotion(axisValues.Item1, axisValues.Item2);
-
-        if(airDashProgress > 0)
+        if (bodyRigidBody)
         {
-            processAirDashMotion();
-        }
-        if (airDashCooldownProgress > 0)
-        {
-            airDashCooldownProgress -=  Time.fixedDeltaTime / DashCooldown;
-            if (airDashCooldownProgress < 0)
-                airDashCooldownProgress = 0;
-        }
+            transform.localRotation = Quaternion.identity * Quaternion.Euler(0, mainCamera.transform.localEulerAngles.y, 0);
 
+            Tuple<float, float> axisValues = GetMovementAxis();
 
-        #region JUMPING LOGIC
-        if (remainingJumps != JumpCount)
-        {
-            if (GroundDetector.IsOnGroundCoyote)
-                remainingJumps = JumpCount;
-        }
-        else
-        {
-            if (!GroundDetector.IsOnGroundCoyote)            
-                remainingJumps = JumpCount - 1;
-        }
+            processMotion(axisValues.Item1, axisValues.Item2);
 
-        if (remainingJumps > 0 && jumpKeyPressed)
-        {
-            
-            yVelocity = bodyRigidBody.velocity.y;
-
-            // don't apply as much force if beginning the jump
-            float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
-
-            currentJumpForce = (Mathf.Lerp(MinJumpForce, JumpForce, airLerp));
-
-            if (!GroundDetector.IsOnGroundCoyote) currentJumpForce *= AirJumpMultiplier; //apply air jump multiplier if in air
-
-            if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
-
-            bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
-
-            // force end coyote time due to jump
-            GroundDetector.EndCoyoteTime();
-
-            // unstick and 'kick off' wall
-            wallRunning.Unstick();
-
-            if(remainingJumps == 1)
+            if (airDashProgress > 0)
             {
-                audioManager.AirJump();
+                processAirDashMotion();
+            }
+            if (airDashCooldownProgress > 0)
+            {
+                airDashCooldownProgress -= Time.fixedDeltaTime / DashCooldown;
+                if (airDashCooldownProgress < 0)
+                    airDashCooldownProgress = 0;
+            }
+
+            #region JUMPING LOGIC
+            if (remainingJumps != JumpCount)
+            {
+                if (GroundDetector.IsOnGroundCoyote)
+                    remainingJumps = JumpCount;
             }
             else
             {
-                audioManager.Jump();
+                if (!GroundDetector.IsOnGroundCoyote)
+                    remainingJumps = JumpCount - 1;
             }
 
-            if (wallRunning.IsWallRunning)
+            if (remainingJumps > 0 && jumpKeyPressed)
             {
-                float dot = Vector3.Dot(transform.forward, wallNormal);
-                float wallKickRatio = (1f - dot) / 2f; // kick hardest when facing into wall
-                float wallBoostRatio = 1f - Mathf.Abs(dot); // boost hardest when facing along direction of the wall
-               
-                bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
-                bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
 
+                yVelocity = bodyRigidBody.velocity.y;
+
+                // don't apply as much force if beginning the jump
+                float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
+
+                currentJumpForce = (Mathf.Lerp(MinJumpForce, JumpForce, airLerp));
+
+                if (!GroundDetector.IsOnGroundCoyote) currentJumpForce *= AirJumpMultiplier; //apply air jump multiplier if in air
+
+                if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
+
+                bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
+
+                // force end coyote time due to jump
+                GroundDetector.EndCoyoteTime();
+
+                // unstick and 'kick off' wall
+                wallRunning.Unstick();
+
+                if (remainingJumps == 1)
+                {
+                    audioManager.AirJump();
+                }
+                else
+                {
+                    audioManager.Jump();
+                }
+
+                if (wallRunning.IsWallRunning)
+                {
+                    float dot = Vector3.Dot(transform.forward, wallNormal);
+                    float wallKickRatio = (1f - dot) / 2f; // kick hardest when facing into wall
+                    float wallBoostRatio = 1f - Mathf.Abs(dot); // boost hardest when facing along direction of the wall
+
+                    bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
+                    bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
+
+                }
+
+                remainingJumps--;
             }
 
-            remainingJumps--;
-        }
-
-        // Reset jump key pressed
-        if (jumpKeyPressed)
-        {
-            //Debug.Log("jumped");
-            jumpKeyPressed = false;
-        }
+            // Reset jump key pressed
+            if (jumpKeyPressed)
+            {
+                //Debug.Log("jumped");
+                jumpKeyPressed = false;
+            }
             #endregion
 
         }
     }
-
 
     void processMotion(float xInput, float yInput)
     {
