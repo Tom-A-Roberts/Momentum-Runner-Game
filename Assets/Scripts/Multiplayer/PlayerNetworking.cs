@@ -35,8 +35,7 @@ public class PlayerNetworking : NetworkBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        
+    {        
         if (IsOwner)
         {
             _netState.Value = new PlayerNetworkData()
@@ -66,7 +65,6 @@ public class PlayerNetworking : NetworkBehaviour
         }
     }
 
-
     public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
     {
         if (IsOwner)
@@ -76,7 +74,6 @@ public class PlayerNetworking : NetworkBehaviour
             if (!IsServer)
                 LocalShoot(shootStartPosition, shootDirection);
         }
-
     }
 
     [ServerRpc]
@@ -84,7 +81,6 @@ public class PlayerNetworking : NetworkBehaviour
     {
         GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
         int hitID = CheckForShotHit(hitObj);
-        //myLevelController.ProcessPotentialHit(hitID);
 
         ShootClientRPC(shootStartPosition, shootDirection, hitID);
     }
@@ -94,18 +90,16 @@ public class PlayerNetworking : NetworkBehaviour
     {
         if (!IsOwner)
         {
-            LocalShoot(shootStartPosition, shootDirection);
-            //if(!IsServer)
-                
+            LocalShoot(shootStartPosition, shootDirection);               
         }
         myLevelController.ProcessPotentialHit(playerHitID);
     }
+
     public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection)
     {
         GameObject hitObj = myGunController.Shoot(shootStartPosition, shootDirection);
         return hitObj;
     }
-
 
     /// <summary>
     /// </summary>
@@ -130,15 +124,6 @@ public class PlayerNetworking : NetworkBehaviour
         return playerHitID;
     }
 
-
-
-
-    //public void TryShootPlayer(LevelController levelControllerShot)
-    //{
-    //    Debug.Log("I think I ('" + this.gameObject.name + "') just shot: " + levelControllerShot.gameObject.name);
-    //}
-
-
     public override void OnNetworkSpawn()
     {
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
@@ -146,9 +131,7 @@ public class PlayerNetworking : NetworkBehaviour
         {
             //bodyRigidbody.isKinematic = true;
             //feetRigidbody.isKinematic = true;
-
-            
-
+           
             // Remove camera
             Destroy(myCamera.GetComponent<CameraController>());
             Destroy(myCamera.GetComponent<UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData>());
@@ -167,7 +150,6 @@ public class PlayerNetworking : NetworkBehaviour
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
             grappleGun.GetComponent<GrappleGun>().isGrappleOwner = false;
-            //myAudioSource.Stop();
 
             gameObject.name = "Player" + OwnerClientId.ToString() + " (Remote)";
         }
@@ -182,8 +164,6 @@ public class PlayerNetworking : NetworkBehaviour
             gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
         }
     }
-
-
 
     struct PlayerNetworkData : INetworkSerializable
     {
@@ -207,6 +187,7 @@ public class PlayerNetworking : NetworkBehaviour
                 _z = value.z;
             }
         }
+
         internal Vector3 Velocity
         {
             get => new Vector3(_xVel, _yVel, _zVel);
@@ -217,6 +198,7 @@ public class PlayerNetworking : NetworkBehaviour
                 _zVel = (short)value.z;
             }
         }
+
         /// <summary>
         /// Gets/Sets rotation
         /// </summary>
@@ -247,5 +229,4 @@ public class PlayerNetworking : NetworkBehaviour
             serializer.SerializeValue(ref _zRot);
         }
     }
-
 }

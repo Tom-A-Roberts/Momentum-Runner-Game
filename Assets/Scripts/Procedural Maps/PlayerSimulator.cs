@@ -499,10 +499,10 @@ public class PlayerSimulator : MonoBehaviour
         actions = new Action[4];
         actionChanceModifiers = new float[4];
 
-        Falling falling = new("falling", this, actionID: 0, averageDuration: 1f);
-        Running running = new("running", this, actionID: 1, averageDuration: 0.6f);
-        Wallrunning wallrunning = new("wallrunning", this, actionID: 2, averageDuration: 1f);
-        Grappling grappling = new("grappling", this, actionID: 3, averageDuration: 2f);
+        Falling falling = new Falling("falling", this, actionID: 0, averageDuration: 1f);
+        Running running = new Running("running", this, actionID: 1, averageDuration: 0.6f);
+        Wallrunning wallrunning = new Wallrunning("wallrunning", this, actionID: 2, averageDuration: 1f);
+        Grappling grappling = new Grappling("grappling", this, actionID: 3, averageDuration: 2f);
 
         running.Start();
 
