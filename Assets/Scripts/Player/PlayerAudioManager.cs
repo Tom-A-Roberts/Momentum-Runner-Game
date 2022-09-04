@@ -16,6 +16,8 @@ public class PlayerAudioManager : NetworkBehaviour
     public float rollingPitchChange = 1f;
     public float windPitchChange = 0.6f;
     public float grapplePitchChange = 0.2f;
+    public float JumpPitchChange = 0.2f;
+    public float JumpPitch = 1.2f;
     public float wallRollingPitch = -1f;
     public float rollingPitch = 0f;
     public float grapplePitch = 1f;
@@ -42,6 +44,7 @@ public class PlayerAudioManager : NetworkBehaviour
     private AudioSource windSource;
     private AudioSource grapplingSwingingSource;
     private AudioSource shootingSource;
+    private AudioSource jumpingSource;
 
     private float rollingTargetIntensity;
     private float rollingCurrentIntensity;
@@ -99,6 +102,9 @@ public class PlayerAudioManager : NetworkBehaviour
 
         shootingSource = gameObject.AddComponent<AudioSource>();
         shootingSource.clip = shoot;
+
+        jumpingSource = gameObject.AddComponent<AudioSource>();
+        jumpingSource.clip = jump;
     }
 
 
@@ -139,13 +145,17 @@ public class PlayerAudioManager : NetworkBehaviour
 
     public void Jump()
     {
-        if (mainAudioSource != null)
-            mainAudioSource.PlayOneShot(jump, (Random.value * (JumpVolume * 0.1f) + JumpVolume) * startVolume);
+        jumpingSource.pitch = JumpPitch + (Random.value * JumpPitchChange) - (JumpPitchChange / 2);
+        jumpingSource.volume = (Random.value * (JumpVolume * 0.1f) + JumpVolume) * startVolume;
+
+        jumpingSource.Play();
+
     }
     public void AirJump()
     {
-        if (mainAudioSource != null)
-            mainAudioSource.PlayOneShot(airJump, (Random.value * (JumpVolume * 0.1f) + JumpVolume) * startVolume);
+        Jump();
+        //if (mainAudioSource != null)
+        //    mainAudioSource.PlayOneShot(airJump, (Random.value * (JumpVolume * 0.1f) + JumpVolume) * startVolume);
     }
     public void Land(float power)
     {
