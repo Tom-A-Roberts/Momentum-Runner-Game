@@ -20,6 +20,7 @@ public class PlayerNetworking : NetworkBehaviour
     public Transform multiplayerRepresentation;
 
     private GunController myGunController;
+    private GrappleGun myGrappleGun;
     //public AudioSource myAudioSource;
 
     /// <summary>
@@ -126,8 +127,47 @@ public class PlayerNetworking : NetworkBehaviour
     }
     #endregion
 
+    #region GRAPPLING
+    public void UpdateGrappleState(bool grappleConnecting, Vector3 connectedPosition)
+    {
+        GrappleServerRPC(grappleConnecting, connectedPosition);
+
+        LocalGrapple(grappleConnecting, ISconnectedPosition);
+    }
+
+    [ServerRpc]
+    public void GrappleServerRPC(bool grappleConnecting, Vector3 connectedPosition)
+    {
+        GrappleClientRPC(grappleConnecting, connectedPosition);
+    }
+
+    [ClientRpc]
+    public void GrappleClientRPC(bool grappleConnecting, Vector3 connectedPosition)
+    {
+        if (!IsOwner)
+        {
+            LocalGrapple(grappleConnecting, connectedPosition);
+        }
+    }
+
+    public void LocalGrapple(bool grappleConnecting, Vector3 connectedPosition)
+    {
+        if (grappleConnecting)
+        {
+            myGrappleGun.AnimateExtend(connectedPosition);
+        }
+        else
+        {
+            myGrappleGun.AnimateRetract();
+        }
+
+    }
+    #endregion
+
     public override void OnNetworkSpawn()
     {
+        myGrappleGun = grappleGun.GetComponent<GrappleGun>();
+
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)
         {
@@ -151,7 +191,7 @@ public class PlayerNetworking : NetworkBehaviour
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
-            grappleGun.GetComponent<GrappleGun>().isGrappleOwner = false;
+            myGrappleGun.isGrappleOwner = false;
 
             gameObject.name = "Player" + OwnerClientId.ToString() + " (Remote)";
         }

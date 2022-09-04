@@ -102,8 +102,10 @@ public class GrappleGun : MonoBehaviour
 
             // animate extend on server
 
+            PlayerNetworking.UpdateGrappleState(true, connectedPoint);
+
             // animate extend on client immediately
-            AnimateExtend(connectedPoint);
+            //AnimateExtend(connectedPoint);
             UpdateGlow(hit);
 
             grappleConnected = true;
@@ -136,7 +138,7 @@ public class GrappleGun : MonoBehaviour
         ropeJoing.massScale = 0.5f;
     }
 
-    private void AnimateExtend(Vector3 grapplePosition)
+    public void AnimateExtend(Vector3 grapplePosition)
     {
         GrapplingRope.Extend(grapplePosition);
         AudioManager.GrappleStart();
@@ -149,14 +151,14 @@ public class GrappleGun : MonoBehaviour
         Destroy(ropeJoing);
 
         // animate retract on server
+        PlayerNetworking.UpdateGrappleState(false, Vector3.zero);
 
         // animate retract on client immediately
-        AnimateRetract();
 
         grappleConnected = false;
     }
 
-    private void AnimateRetract()
+    public void AnimateRetract()
     {
         GrapplingRope.Retract();
         AudioManager.GrappleEnd();
