@@ -1,5 +1,8 @@
 fileFormatVersion: 2
 guid: e8dcb941d13c0e14b80088cd7d471902
+labels:
+- Prop
+- Road
 ModelImporter:
   serializedVersion: 22103
   internalIDToNameTable: []
@@ -89,7 +92,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.0085
+    globalScale: 0.85
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

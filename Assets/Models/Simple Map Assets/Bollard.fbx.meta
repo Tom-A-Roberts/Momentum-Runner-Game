@@ -1,5 +1,8 @@
 fileFormatVersion: 2
 guid: b365e669d3afd0a47b3241f9493781d9
+labels:
+- Prop
+- Road
 ModelImporter:
   serializedVersion: 22103
   internalIDToNameTable: []

@@ -12,7 +12,7 @@ public class CheckpointScript : MonoBehaviour
 
         if (parent != null)
         {
-            LevelController playerLevelScript = other.gameObject.transform.parent.GetComponent<LevelController>();
+            LevelLogicManager playerLevelScript = other.gameObject.transform.parent.GetComponent<LevelLogicManager>();
             if (playerLevelScript != null)
             {
                 playerLevelScript.bodySpawnPosition = transform.position;

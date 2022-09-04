@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 38d13f802f68cf34faa8dd46a64d4f5b
+labels:
+- Weapon
 ModelImporter:
   serializedVersion: 22103
   internalIDToNameTable: []

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CollisionDetector : MonoBehaviour
 {
-    public LevelController levelController;
+    public LevelLogicManager levelController;
     public float coyoteTime = 0.5f;
     private bool m_IsOnGround;
     private bool m_IsOnGroundCoyote;

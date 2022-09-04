@@ -1,5 +1,8 @@
 fileFormatVersion: 2
 guid: 0d127773f32d01e47afd735fb4986dd1
+labels:
+- Character
+- Weapon
 ModelImporter:
   serializedVersion: 22103
   internalIDToNameTable: []
@@ -89,7 +92,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1.55
+    globalScale: 155
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

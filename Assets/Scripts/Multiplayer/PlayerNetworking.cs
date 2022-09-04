@@ -11,7 +11,7 @@ public class PlayerNetworking : NetworkBehaviour
     private float _rotVelY;
     private float _rotVelZ;
 
-    public LevelController myLevelController;
+    public LevelLogicManager myLevelController;
     public GameObject myCamera;
     public GameObject grappleGun;
     public GameObject shootingGun;

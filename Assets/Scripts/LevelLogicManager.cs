@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using Unity.Netcode;
 
-public class LevelController : MonoBehaviour
+public class LevelLogicManager : MonoBehaviour
 {
     public bool SobelEnabled = true;
 
