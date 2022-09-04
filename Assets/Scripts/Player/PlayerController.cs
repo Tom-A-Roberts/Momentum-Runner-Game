@@ -18,7 +18,6 @@ public class PlayerController : NetworkBehaviour
     public Transform mainCamera;
     public PlayerAudioManager audioManager;
 
-
     public CollisionDetector GroundDetector;
     private Rigidbody bodyRigidBody;
     private WallRunning wallRunning;
@@ -80,7 +79,7 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        MultiplayerModel[] modelsToHide = mainCamera.GetComponentsInChildren<MultiplayerModel>();
+        MultiplayerModel[] modelsToHide = GetComponentsInChildren<MultiplayerModel>();
 
         // OR: make sure remote players weapons aren't showing through objects
         foreach(MultiplayerModel model in modelsToHide)
