@@ -65,6 +65,7 @@ public class PlayerNetworking : NetworkBehaviour
         }
     }
 
+    #region SHOOTING
     public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
     {
         if (IsOwner)
@@ -123,6 +124,7 @@ public class PlayerNetworking : NetworkBehaviour
         }
         return playerHitID;
     }
+    #endregion
 
     public override void OnNetworkSpawn()
     {

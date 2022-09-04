@@ -52,7 +52,7 @@ public class GunController : MonoBehaviour
 
     private void Start()
     {
-        originalGunAngle = transform.localEulerAngles;
+        originalGunAngle = gunModel.transform.localEulerAngles;
         originalSlidePosition = gunTop.localPosition;
         animationProgress = 1;
         SetGunTransformBasedOnProgress(animationProgress);
@@ -110,7 +110,7 @@ public class GunController : MonoBehaviour
             slidebackResult = ((Mathf.Pow(halfProgress - 1, 2) + Mathf.Pow(halfProgress - 1, 51))) / 0.8418f;
         }
 
-        transform.localEulerAngles = new Vector3(originalGunAngle.x - angleresult * kickbackAngle, originalGunAngle.y, originalGunAngle.z);
+        gunModel.transform.localEulerAngles = new Vector3(originalGunAngle.x - angleresult * kickbackAngle, originalGunAngle.y, originalGunAngle.z);
         gunTop.localPosition = new Vector3(originalSlidePosition.x, originalSlidePosition.y, originalSlidePosition.z - slidebackDistance* slidebackResult);
 
         float glowMultiplier = 1 + (1-progress) * glowIncreaseMultiplier;

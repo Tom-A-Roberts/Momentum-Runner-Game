@@ -4,25 +4,27 @@ using UnityEngine;
 
 public class GrappleGun : MonoBehaviour
 {
-    [Header("Known System Objects")]
+    [Header("Known Player Objects")]
     [Tooltip("(Local Player Only) This players camera")]
     public Camera PlayerCamera;
     [Tooltip("(Local Player Only) Script responsible for controlling this players movement")]
     public PlayerController PlayerController;
     [Tooltip("(Local and Remote Player) The audio manager of this scripts owning player")]
-    public PlayerAudioManager audioManager;
+    public PlayerAudioManager AudioManager;
+    [Tooltip("(Local and Remote Player) This players networking script")]
+    public PlayerNetworking PlayerNetworking;
 
     [Header("Transforms")]
     [Tooltip("(Visual Only) Point that the rope visual is fired from")]
     public Transform GunEndPosition;
     [Tooltip("(Physics Only) Point that the rope joint will start from")]
-    public Transform playerCentreOfMass;
+    public Transform PlayerCentreOfMass;
 
     [Header("Visuals")]
     [Tooltip("(Visual Only) Model representing the grappling gun")]
-    public GameObject grappleGunModel;
+    public GameObject GrappleGunModel;
     [Tooltip("(Visual Only) Script responsible for handling the visuals of the rope")]
-    public GrapplingRope grapplingRope;
+    public GrapplingRope GrapplingRope;
 
     [Header("Gameplay Settings")]
     [Tooltip("(Local Player Only) Maximum distance a grapple can be initiated from")]
@@ -34,7 +36,7 @@ public class GrappleGun : MonoBehaviour
     [Tooltip("(Visual Only) How much the grapple gun moves when trying to face the grapple point")]
     public float GrappleLookAtPower = 0.4f; 
     [Tooltip("(Visual Only) How fast the grapple gun looks at the grapple point")]
-    public float lookAtSmoothSpeed = 0.05f;
+    public float LookAtSmoothSpeed = 0.05f;
 
     /// <summary>
     /// Is this GrappleGun owned by this clients player?
@@ -46,7 +48,7 @@ public class GrappleGun : MonoBehaviour
     /// </summary>
     [System.NonSerialized] public bool grappleConnected = false;
     
-    private ConfigurableJoint Rope;    
+    private ConfigurableJoint ropeJoing;    
     private Rigidbody playerRigidbody;
 
     private Vector3 connectedPoint;
@@ -58,7 +60,7 @@ public class GrappleGun : MonoBehaviour
         playerRigidbody = PlayerController.gameObject.GetComponent<Rigidbody>();
     }
 
-    void Update()
+    private void Update()
     {
         ProcessGrappleInput();
 
@@ -87,7 +89,7 @@ public class GrappleGun : MonoBehaviour
         }
     }
 
-    void TryConnectGrapple()
+    private void TryConnectGrapple()
     {
         // OR: currently not verified by server
         RaycastHit hit;
@@ -110,13 +112,13 @@ public class GrappleGun : MonoBehaviour
 
     private void SetupJoint(Vector3 point, float distance)
     {
-        Rope = playerCentreOfMass.gameObject.AddComponent<ConfigurableJoint>();
-        Rope.autoConfigureConnectedAnchor = false;
-        Rope.connectedAnchor = point;
+        ropeJoing = PlayerCentreOfMass.gameObject.AddComponent<ConfigurableJoint>();
+        ropeJoing.autoConfigureConnectedAnchor = false;
+        ropeJoing.connectedAnchor = point;
 
-        Rope.xMotion = ConfigurableJointMotion.Limited;
-        Rope.yMotion = ConfigurableJointMotion.Limited;
-        Rope.zMotion = ConfigurableJointMotion.Limited;
+        ropeJoing.xMotion = ConfigurableJointMotion.Limited;
+        ropeJoing.yMotion = ConfigurableJointMotion.Limited;
+        ropeJoing.zMotion = ConfigurableJointMotion.Limited;
 
         // make a springy limit
         //SoftJointLimitSpring linearLimitSpring = Rope.linearLimitSpring;
@@ -124,27 +126,27 @@ public class GrappleGun : MonoBehaviour
         //Rope.linearLimitSpring = linearLimitSpring;
 
         // make a limit
-        SoftJointLimit limit = Rope.linearLimit;
+        SoftJointLimit limit = ropeJoing.linearLimit;
         limit.limit = distance;
         limit.contactDistance = 0.05f;
-        Rope.linearLimit = limit;
+        ropeJoing.linearLimit = limit;
 
-        Rope.enablePreprocessing = true;
+        ropeJoing.enablePreprocessing = true;
 
-        Rope.massScale = 0.5f;
+        ropeJoing.massScale = 0.5f;
     }
 
     private void AnimateExtend(Vector3 grapplePosition)
     {
-        grapplingRope.Extend(grapplePosition);
-        audioManager.GrappleStart();
+        GrapplingRope.Extend(grapplePosition);
+        AudioManager.GrappleStart();
     }
 
-    void DisconnectGrapple()
+    private void DisconnectGrapple()
     {
         connectedDistance = 0;
 
-        Destroy(Rope);
+        Destroy(ropeJoing);
 
         // animate retract on server
 
@@ -156,20 +158,20 @@ public class GrappleGun : MonoBehaviour
 
     private void AnimateRetract()
     {
-        grapplingRope.Retract();
-        audioManager.GrappleEnd();
+        GrapplingRope.Retract();
+        AudioManager.GrappleEnd();
     }
 
     /// <summary>
     /// (Local Only) Applies some force to player when grappling to make it feel better
     /// </summary>
-    void ApplyGrappleForce()
+    private void ApplyGrappleForce()
     {
         if (grappleConnected && isGrappleOwner)
         {
-            Vector3 ropeVec = connectedPoint - playerCentreOfMass.position;
+            Vector3 ropeVec = connectedPoint - PlayerCentreOfMass.position;
 
-            Vector3 forceDir = Vector3.Cross(playerCentreOfMass.right, ropeVec).normalized;
+            Vector3 forceDir = Vector3.Cross(PlayerCentreOfMass.right, ropeVec).normalized;
 
             PlayerController.AddForce(GrappleForce, forceDir, ForceMode.Force);
         }
@@ -191,7 +193,7 @@ public class GrappleGun : MonoBehaviour
 
         if (grappleConnected)
         {
-            Vector3 lookDirection = connectedPoint - grappleGunModel.transform.position;
+            Vector3 lookDirection = connectedPoint - GrappleGunModel.transform.position;
             Vector3 forwardPlanar = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
             Vector3 rightPlanar = Vector3.Cross(forwardPlanar, Vector3.up).normalized;
 
@@ -216,26 +218,26 @@ public class GrappleGun : MonoBehaviour
         }
 
         Quaternion rotGoal = Quaternion.LookRotation(targD, Vector3.up);
-        grappleGunModel.transform.rotation = Quaternion.Slerp(grappleGunModel.transform.rotation, rotGoal, lookAtSmoothSpeed);
+        GrappleGunModel.transform.rotation = Quaternion.Slerp(GrappleGunModel.transform.rotation, rotGoal, LookAtSmoothSpeed);
     }
 
     private void UpdateGrappleAudio()
     {
         if (grappleConnected)
         {
-            float ropeDist = (connectedPoint - playerCentreOfMass.position).magnitude;
+            float ropeDist = (connectedPoint - PlayerCentreOfMass.position).magnitude;
             if (ropeDist > connectedDistance - 0.1f)
             {
-                audioManager.UpdateGrappleSwingingIntensity((playerRigidbody.velocity.magnitude / 35f) + 0.4f);
+                AudioManager.UpdateGrappleSwingingIntensity((playerRigidbody.velocity.magnitude / 35f) + 0.4f);
             }
             else
             {
-                audioManager.UpdateGrappleSwingingIntensity(0.4f);
+                AudioManager.UpdateGrappleSwingingIntensity(0.4f);
             }
         }
         else
         {
-            audioManager.UpdateGrappleSwingingIntensity(0);
+            AudioManager.UpdateGrappleSwingingIntensity(0);
         }
     }
 }

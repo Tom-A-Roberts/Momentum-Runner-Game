@@ -2167,15 +2167,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerCamera: {fileID: 4316027073834798314}
   PlayerController: {fileID: 4316027074644905738}
-  audioManager: {fileID: 8008624713252837793}
+  AudioManager: {fileID: 8008624713252837793}
+  PlayerNetworking: {fileID: 1445570255}
   GunEndPosition: {fileID: 5170917926509469355}
-  playerCentreOfMass: {fileID: 4316027074644905776}
-  grappleGunModel: {fileID: 919132148211561051}
-  grapplingRope: {fileID: 1777984287}
+  PlayerCentreOfMass: {fileID: 4316027074644905776}
+  GrappleGunModel: {fileID: 919132148211561051}
+  GrapplingRope: {fileID: 1777984287}
   MaxGrappleLength: 20
   GrappleForce: 10
   GrappleLookAtPower: 0.4
-  lookAtSmoothSpeed: 0.05
+  LookAtSmoothSpeed: 0.05
 --- !u!1001 &8205410105980544546
 PrefabInstance:
   m_ObjectHideFlags: 0
