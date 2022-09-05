@@ -6,6 +6,11 @@ public class PlayerNetworking : NetworkBehaviour
 {
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
+    /// <summary>
+    /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
+    /// </summary>
+    public static Dictionary<ulong, GameObject> ConnectedPlayers;
+
     private Vector3 _vel;
     private float _rotVelX;
     private float _rotVelY;
@@ -169,6 +174,15 @@ public class PlayerNetworking : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if(ConnectedPlayers == null || (IsOwner && IsHost)) //  
+        {
+            ConnectedPlayers = new Dictionary<ulong, GameObject>();
+        }
+        if (ConnectedPlayers.ContainsKey(OwnerClientId)){
+            Debug.LogWarning("I am player " + OwnerClientId.ToString() + " but there is already such a player in the ConnectedPlayers dictionary!");
+        }
+        ConnectedPlayers[OwnerClientId] = this.gameObject;
+        Debug.Log("Player "+ OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
         myGrappleGun = grappleGun.GetComponent<GrappleGun>();
         myGrappleGun.isGrappleOwner = IsOwner;
 
@@ -210,6 +224,30 @@ public class PlayerNetworking : NetworkBehaviour
 
             gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
         }
+    }
+
+    /// <summary>
+    /// A helper function to debug any issues with the ConnectedPlayers list/dict.
+    /// </summary>
+    public static void PrintPlayerList()
+    {
+        string outStr = "";
+        foreach (ulong playerID in ConnectedPlayers.Keys)
+        {
+            if(ConnectedPlayers[playerID])
+                outStr += playerID.ToString() + "=" + ConnectedPlayers[playerID].name + ", ";
+            else
+                outStr += playerID.ToString() + "=NULL, ";
+        }
+        Debug.Log(outStr);
+    }
+
+    public override void OnDestroy()
+    {
+        ConnectedPlayers.Remove(OwnerClientId);
+        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+
+        base.OnDestroy();
     }
 
     struct PlayerNetworkData : INetworkSerializable
