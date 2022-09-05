@@ -6993,7 +6993,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d57d33ef101f74d80fc7146a7a326f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCamera: {fileID: 4316027073834798314}
+  PlayerCamera: {fileID: 4316027073834798100}
   PlayerController: {fileID: 4316027074644905738}
   AudioManager: {fileID: 8008624713252837793}
   playerNetworking: {fileID: 1445570255}
