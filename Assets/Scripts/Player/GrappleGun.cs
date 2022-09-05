@@ -38,6 +38,7 @@ public class GrappleGun : MonoBehaviour
     [Tooltip("(Visual Only) How fast the grapple gun looks at the grapple point")]
     public float LookAtSmoothSpeed = 0.05f;
 
+
     /// <summary>
     /// Is this GrappleGun owned by this clients player?
     /// </summary>
@@ -54,6 +55,39 @@ public class GrappleGun : MonoBehaviour
     private Vector3 connectedPoint;
     private float connectedDistance;
 
+    /// <summary>
+    /// Can add to this in the future, e.g which gameobject was hit.
+    /// This saves having to send the rayhit about which is not good practice
+    /// </summary>
+    private struct GrappleablePointInfo
+    {
+        /// <summary>
+        /// Whether the grapple ray test found a target
+        /// </summary>
+        public bool targetFound;
+        /// <summary>
+        /// Where the grapple ray test point is
+        /// </summary>
+        public Vector3 grapplePoint;
+        /// <summary>
+        /// Distance from raygun end to the grapplePoint
+        /// </summary>
+        public float grappleDistance;
+
+        /// <summary>
+        /// Empty info collection for when you don't grapple to anything
+        /// </summary>
+        public static GrappleablePointInfo Empty
+        {
+            get => new GrappleablePointInfo()
+            {
+                targetFound = false,
+                grapplePoint = Vector3.zero,
+                grappleDistance = 0,
+            };
+        }
+    }
+
     private void Start()
     {
         // OR: what happens if the PlayerController has been destroyed on a remote player already?
@@ -62,7 +96,12 @@ public class GrappleGun : MonoBehaviour
 
     private void Update()
     {
-        ProcessGrappleInput();
+        GrappleablePointInfo raypointInfo;
+        if (!grappleConnected)
+            raypointInfo = TestForGrappleablePoint();
+        else
+            raypointInfo = GrappleablePointInfo.Empty;
+        ProcessGrappleInput(raypointInfo);
 
         UpdateGunLookAt();
         UpdateGrappleAudio();
@@ -73,14 +112,14 @@ public class GrappleGun : MonoBehaviour
         ApplyGrappleForce();
     }
 
-    private void ProcessGrappleInput()
+    private void ProcessGrappleInput(GrappleablePointInfo raypointInfo)
     {
         // Check if grapple gun is being controlled by the owner. If yes, then process local player input
         if (isGrappleOwner)
         {
-            if (Input.GetButton("Grapple") && !grappleConnected)
+            if (Input.GetButton("Grapple") && !grappleConnected && raypointInfo.targetFound)
             {
-                TryConnectGrapple();
+                ConnectGrapple(raypointInfo);
             }
             else if (!Input.GetButton("Grapple") && grappleConnected)
             {
@@ -89,25 +128,40 @@ public class GrappleGun : MonoBehaviour
         }
     }
 
-    private void TryConnectGrapple()
+    private void ConnectGrapple(GrappleablePointInfo raypointInfo)
     {
         // OR: currently not verified by server
+
+        connectedPoint = raypointInfo.grapplePoint;
+        connectedDistance = raypointInfo.grappleDistance;
+
+        SetupJoint(connectedPoint, connectedDistance);
+
+        // animate extend on server
+
+        PlayerNetworking.UpdateGrappleState(true, connectedPoint);
+
+        // animate extend on client immediately
+        //AnimateExtend(connectedPoint);
+
+        grappleConnected = true;
+    }
+
+    private GrappleablePointInfo TestForGrappleablePoint()
+    {
         RaycastHit hit;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
-            connectedPoint = hit.point;
-            connectedDistance = hit.distance;
-
-            SetupJoint(connectedPoint, connectedDistance);
-
-            // animate extend on server
-
-            PlayerNetworking.UpdateGrappleState(true, connectedPoint);
-
-            // animate extend on client immediately
-            //AnimateExtend(connectedPoint);
-
-            grappleConnected = true;
+            return new GrappleablePointInfo()
+            {
+                targetFound = true,
+                grapplePoint = hit.point,
+                grappleDistance = hit.distance,
+            };
+        }
+        else
+        {
+            return GrappleablePointInfo.Empty;
         }
     }
 
