@@ -106,7 +106,6 @@ public class GrappleGun : MonoBehaviour
 
             // animate extend on client immediately
             //AnimateExtend(connectedPoint);
-            UpdateGlow(hit);
 
             grappleConnected = true;
         }
@@ -141,6 +140,9 @@ public class GrappleGun : MonoBehaviour
     public void AnimateExtend(Vector3 grapplePosition)
     {
         GrapplingRope.Extend(grapplePosition);
+
+        UpdateGlow(grapplePosition);
+
         AudioManager.GrappleStart();
     }
 
@@ -179,13 +181,18 @@ public class GrappleGun : MonoBehaviour
         }
     }
 
-    private void UpdateGlow(RaycastHit hit)
+    private void UpdateGlow(Vector3 point)
     {
-        // See if the object has the glow effect enabled. if so, make it glow and let it know
-        // that this script is what is grappled to it
-        GlowFlashObject connectedGlowObject = hit.collider.gameObject.GetComponent<GlowFlashObject>();
-        if (connectedGlowObject != null)
-            connectedGlowObject.GrappleStarted(referenceInitiator: this);
+        Collider[] colliders = Physics.OverlapSphere(point, 0.1f);
+
+        // See if the objects have the glow effect enabled. if so, make them glow and let them know
+        // that this script has grappled to them
+        GlowFlashObject connectedGlowObject;
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            if (colliders[i].gameObject.TryGetComponent(out connectedGlowObject))
+                connectedGlowObject.GrappleStarted(referenceInitiator: this);
+        }
     }
 
     private void UpdateGunLookAt()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class GrapplingRope : NetworkBehaviour
+public class GrapplingRope : MonoBehaviour
 {
     public GrappleGun GrappleGun;
     public int quality = 500;
@@ -31,7 +31,7 @@ public class GrapplingRope : NetworkBehaviour
 
     private void Awake()
     {
-        if (!TryGetComponent<LineRenderer>(out lr))        
+        if (!TryGetComponent(out lr))        
             Debug.LogError("No LineRenderer found!");       
 
         spring = new Spring();

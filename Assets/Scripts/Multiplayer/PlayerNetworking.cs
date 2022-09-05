@@ -21,6 +21,7 @@ public class PlayerNetworking : NetworkBehaviour
 
     private GunController myGunController;
     private GrappleGun myGrappleGun;
+    private PlayerController myPlayerController;
     //public AudioSource myAudioSource;
 
     /// <summary>
@@ -132,7 +133,7 @@ public class PlayerNetworking : NetworkBehaviour
     {
         GrappleServerRPC(grappleConnecting, connectedPosition);
 
-        LocalGrapple(grappleConnecting, ISconnectedPosition);
+        LocalGrapple(grappleConnecting, connectedPosition);
     }
 
     [ServerRpc]
@@ -152,6 +153,8 @@ public class PlayerNetworking : NetworkBehaviour
 
     public void LocalGrapple(bool grappleConnecting, Vector3 connectedPosition)
     {
+        myGrappleGun.grappleConnected = grappleConnecting;
+
         if (grappleConnecting)
         {
             myGrappleGun.AnimateExtend(connectedPosition);
@@ -167,6 +170,10 @@ public class PlayerNetworking : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         myGrappleGun = grappleGun.GetComponent<GrappleGun>();
+        myGrappleGun.isGrappleOwner = IsOwner;
+
+        myPlayerController = GetComponentInChildren<PlayerController>();
+        myPlayerController.NetworkInitialize(IsOwner);
 
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)
@@ -190,8 +197,6 @@ public class PlayerNetworking : NetworkBehaviour
             }
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
-
-            myGrappleGun.isGrappleOwner = false;
 
             gameObject.name = "Player" + OwnerClientId.ToString() + " (Remote)";
         }
