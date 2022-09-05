@@ -194,10 +194,10 @@ public class PlayerAudioManager : NetworkBehaviour
         if (mainAudioSource != null)
             mainAudioSource.PlayOneShot(overheatedGun, 0.3f * startVolume);
     }
-    public void GunCoolingEffect()
+    public void GunCoolingEffect(float intensity)
     {
         if (mainAudioSource != null)
-            mainAudioSource.PlayOneShot(gunCoolingEffect, 0.3f * startVolume);
+            mainAudioSource.PlayOneShot(gunCoolingEffect, 0.4f * startVolume * intensity);
     }
 
     public void Update()

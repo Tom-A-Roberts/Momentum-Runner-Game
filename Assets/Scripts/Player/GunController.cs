@@ -222,7 +222,7 @@ public class GunController : MonoBehaviour
         public void ReloadHiss()
         {
             if (audioManager)
-                audioManager.GunCoolingEffect();
+                audioManager.GunCoolingEffect(heatLevel);
             // Play cooling hiss sound
         }
     }
