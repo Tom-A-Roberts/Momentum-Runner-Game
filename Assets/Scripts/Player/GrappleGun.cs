@@ -12,7 +12,7 @@ public class GrappleGun : MonoBehaviour
     [Tooltip("(Local and Remote Player) The audio manager of this scripts owning player")]
     public PlayerAudioManager AudioManager;
     [Tooltip("(Local and Remote Player) This players networking script")]
-    public PlayerNetworking PlayerNetworking;
+    public PlayerNetworking playerNetworking;
 
     [Header("Transforms")]
     [Tooltip("(Visual Only) Point that the rope visual is fired from")]
@@ -31,6 +31,8 @@ public class GrappleGun : MonoBehaviour
     public float MaxGrappleLength = 20f;
     [Tooltip("(Local Player Only) Force applied to player when grappling")]
     public float GrappleForce = 10f;
+    [Tooltip("(Local Player Only) The spherecast radius to check, when the player misses a grapple target")]
+    public float AimAssistRadius = 1f;
 
     [Header("Gun LookAt Settings")]
     [Tooltip("(Visual Only) How much the grapple gun moves when trying to face the grapple point")]
@@ -51,6 +53,7 @@ public class GrappleGun : MonoBehaviour
     
     private ConfigurableJoint ropeJoing;    
     private Rigidbody playerRigidbody;
+    private GrappleCrosshair onScreenGrappleCrosshair;
 
     private Vector3 connectedPoint;
     private float connectedDistance;
@@ -59,7 +62,7 @@ public class GrappleGun : MonoBehaviour
     /// Can add to this in the future, e.g which gameobject was hit.
     /// This saves having to send the rayhit about which is not good practice
     /// </summary>
-    private struct GrappleablePointInfo
+    public struct GrappleablePointInfo
     {
         /// <summary>
         /// Whether the grapple ray test found a target
@@ -92,6 +95,9 @@ public class GrappleGun : MonoBehaviour
     {
         // OR: what happens if the PlayerController has been destroyed on a remote player already?
         playerRigidbody = PlayerController.gameObject.GetComponent<Rigidbody>();
+
+        if (playerNetworking.IsOwner)
+            onScreenGrappleCrosshair = GrappleCrosshair.Instance;
     }
 
     private void Update()
@@ -102,6 +108,10 @@ public class GrappleGun : MonoBehaviour
         else
             raypointInfo = GrappleablePointInfo.Empty;
         ProcessGrappleInput(raypointInfo);
+
+        // Show grapplepoint on UI
+        if (onScreenGrappleCrosshair != null)
+            onScreenGrappleCrosshair.UpdateGrappleLocation(raypointInfo);
 
         UpdateGunLookAt();
         UpdateGrappleAudio();
@@ -139,7 +149,7 @@ public class GrappleGun : MonoBehaviour
 
         // animate extend on server
 
-        PlayerNetworking.UpdateGrappleState(true, connectedPoint);
+        playerNetworking.UpdateGrappleState(true, connectedPoint);
 
         // animate extend on client immediately
         //AnimateExtend(connectedPoint);
@@ -150,6 +160,8 @@ public class GrappleGun : MonoBehaviour
     private GrappleablePointInfo TestForGrappleablePoint()
     {
         RaycastHit hit;
+        // Don't spherecast immediately in front of the player
+        const float initialSpherecastDeadzone = 5;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
             return new GrappleablePointInfo()
@@ -159,10 +171,21 @@ public class GrappleGun : MonoBehaviour
                 grappleDistance = hit.distance,
             };
         }
-        else
+        else 
         {
-            return GrappleablePointInfo.Empty;
+            Vector3 spherecastStart = PlayerCamera.transform.position + playerRigidbody.transform.forward * initialSpherecastDeadzone;
+            float spherecastLength = MaxGrappleLength - AimAssistRadius - initialSpherecastDeadzone;
+            if (Physics.SphereCast(spherecastStart, AimAssistRadius, PlayerCamera.transform.forward, out hit, spherecastLength, LayerMask.GetMask("Terrain")))
+            {
+                return new GrappleablePointInfo()
+                {
+                    targetFound = true,
+                    grapplePoint = hit.point,
+                    grappleDistance = Vector3.Distance(hit.point, PlayerCamera.transform.position),
+                };
+            }
         }
+        return GrappleablePointInfo.Empty;
     }
 
     private void SetupJoint(Vector3 point, float distance)
@@ -207,7 +230,7 @@ public class GrappleGun : MonoBehaviour
         Destroy(ropeJoing);
 
         // animate retract on server
-        PlayerNetworking.UpdateGrappleState(false, Vector3.zero);
+        playerNetworking.UpdateGrappleState(false, Vector3.zero);
 
         // animate retract on client immediately
 
