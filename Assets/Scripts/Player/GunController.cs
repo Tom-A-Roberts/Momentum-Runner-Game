@@ -174,8 +174,8 @@ public class GunController : MonoBehaviour
                     if (distance < optimalAimAssistDistance)
                     {
                         angleMultiplier = Mathf.Clamp01(distance / optimalAimAssistDistance);
-                        if (angleMultiplier < 0.2f)
-                            angleMultiplier = 0.2f;
+                        if (angleMultiplier < 0.5f)
+                            angleMultiplier = 0.5f;
                     }
 
                     // Linearly decrease the aim assist angle after the optimal distance

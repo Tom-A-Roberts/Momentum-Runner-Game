@@ -137,7 +137,7 @@ public class PlayerNetworking : NetworkBehaviour
     {
         GrappleServerRPC(grappleConnecting, connectedPosition);
 
-        LocalGrapple(grappleConnecting, ISconnectedPosition);
+        LocalGrapple(grappleConnecting, connectedPosition);
     }
 
     [ServerRpc]
@@ -171,6 +171,7 @@ public class PlayerNetworking : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        
         if(ConnectedPlayers == null || (IsOwner && IsHost)) //  
         {
             ConnectedPlayers = new Dictionary<ulong, GameObject>();
