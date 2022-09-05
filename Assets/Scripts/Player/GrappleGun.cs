@@ -161,7 +161,7 @@ public class GrappleGun : MonoBehaviour
     {
         RaycastHit hit;
         // Don't spherecast immediately in front of the player
-        const float initialSpherecastDeadzone = 2;
+        const float initialSpherecastDeadzone = 3;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
             return new GrappleablePointInfo()
