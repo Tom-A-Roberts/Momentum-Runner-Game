@@ -14,10 +14,23 @@ public class GunController : MonoBehaviour
     public PlayerNetworking playerNetworking;
 
     [Header("Gameplay Settings")]
-    [Tooltip("How long in seconds between times you can shoot")]
-    public float shootCooldown = 0.5f;
+    [Tooltip("How long in seconds between times you can shoot, checked on the clientside")]
+    public float shootCooldownClientside = 0.5f;
+    [Tooltip("How long in seconds between times you can shoot, checked by the server")]
+    public float shootCooldownServerside = 0.45f;
+
     [Tooltip("Innacuracy of gun. 0 is perfect, 0.25 means 45-degrees of variation, 1 means 360-degrees.")]
     public float innacuracy = 0.01f;
+
+    [Tooltip("How much heat each shot builds up")]
+    public float heatPerShot = 0.1f;
+
+    [Tooltip("Time before starting the cooling/reloading sequence")]
+    public float heatReloadingWaitTime = 2f;
+
+    [Tooltip("How quickly should a full cool take (in seconds)")]
+    public float heatReloadCoolingSpeed = 3f;
+
 
     [Header("Aim Assist Settings")]
     [Tooltip("Aiming within this amount of degrees to an enemy will snap your aim to them")]
@@ -44,8 +57,11 @@ public class GunController : MonoBehaviour
     public GameObject groundHitParticlePrefab;
     public GameObject muzzleFlashParticlePrefab;
     public GameObject bulletHoleDecalPrefab;
-    public LightFlashController muzzleLight;
+    public ParticleSystem steamParticles;
     public float glowIncreaseMultiplier = 1f;
+
+    public HeatCoolingGunState myGunState;
+    
 
     private Renderer myRend;
     private Material myMat;
@@ -61,8 +77,12 @@ public class GunController : MonoBehaviour
     private float sOriginal;
     private float vOriginal;
 
+
     public class HeatCoolingGunState
     {
+        // How much heat each shot builds up
+        public readonly float heatPerShot;
+
         // How long you must wait between shots (in serverside time)
         public readonly float shootCooldownTime;
 
@@ -72,12 +92,16 @@ public class GunController : MonoBehaviour
         // How quickly should a full cool take (in seconds)
         public readonly float heatReloadCoolingSpeed;
 
-        // How much heat each shot builds up
-        public readonly float heatPerShot;
+
+        public HeatDisplayUI heatDisplay;
+        public PlayerAudioManager audioManager;
+        public ParticleSystem steamParticles;
 
         private float heatLevel = 0;
         private bool isOverheated;
+        private float waitTimeProgress;
         private float singleShotCooldownProgress;
+
 
         /// <summary>
         /// Tests whether you can shoot currently or not
@@ -93,29 +117,116 @@ public class GunController : MonoBehaviour
         /// <param name="_heatReloadCoolingSpeed">How quickly should a full cool take (in seconds)</param>
         public HeatCoolingGunState(float _heatPerShot = 0.1f, float _shootCooldownTime = 0.45f, float _heatReloadingWaitTime = 0.5f, float _heatReloadCoolingSpeed = 1f)
         {
-
+            heatPerShot = _heatPerShot;
+            shootCooldownTime = _shootCooldownTime;
+            heatReloadingWaitTime = _heatReloadingWaitTime;
+            heatReloadCoolingSpeed = _heatReloadCoolingSpeed;
         }
 
-        public void Update()
+        public void Update(float deltaTime)
         {
-            
+            if(waitTimeProgress > 0)
+            {
+                waitTimeProgress -= deltaTime / heatReloadingWaitTime;
+                if (waitTimeProgress <= 0)
+                {
+                    ReloadHiss();
+                    waitTimeProgress = 0;
+                }
+                    
+            }
+            if(waitTimeProgress == 0 && heatLevel > 0)
+            {
+                //if (heatLevel == 1)
+                //    ReloadHiss();
+
+                heatLevel -= deltaTime / heatReloadCoolingSpeed;
+                if (heatLevel < 0)
+                    heatLevel = 0;
+                UpdateUIAndEffects();
+            }
+
+            if (waitTimeProgress == 0 && isOverheated && heatLevel == 0)
+            {
+                isOverheated = false;
+                UpdateUIAndEffects();
+            }
+            if(singleShotCooldownProgress > 0)
+            {
+                singleShotCooldownProgress -= deltaTime / shootCooldownTime;
+                if (singleShotCooldownProgress < 0)
+                    singleShotCooldownProgress = 0;
+            }
+
+
         }
         public void Shoot()
         {
+            if (CanShoot)
+            {
+                singleShotCooldownProgress = 1;
+                waitTimeProgress = 1;
+                heatLevel += heatPerShot;
+                if(heatLevel >= 1)
+                {
+                    heatLevel = 1;
 
+                    isOverheated = true;
+                    LongOverheat();
+                }
+                UpdateUIAndEffects();
+            }
+            else
+            {
+                Debug.LogWarning("Tried to shoot but couldn't shoot! Please check you can shoot before invoking this function");
+            }
+            
         }
-        public void InitiateCooling()
-        {
 
+        public void UpdateUIAndEffects()
+        {
+            if (heatDisplay)
+            {
+                heatDisplay.SetHeatLevel(heatLevel, isOverheated);
+            }
+            if (steamParticles)
+            {
+                var emission = steamParticles.emission;
+                if(waitTimeProgress == 0 && heatLevel > 0)
+                    emission.rateOverTime = 50 * heatLevel;
+                else
+                    emission.rateOverTime = 0;
+            }
+            else
+            {
+
+            }
         }
-        public void UpdateUI(HeatDisplayUI currentUI)
-        {
 
+        public void LongOverheat()
+        {
+            if (audioManager)
+                audioManager.OverheatedGun();
+            // Play long overheat sound
+        }
+        public void ReloadHiss()
+        {
+            if (audioManager)
+                audioManager.GunCoolingEffect();
+            // Play cooling hiss sound
         }
     }
 
     private void Start()
     {
+        myGunState = new HeatCoolingGunState(_heatPerShot: heatPerShot, _shootCooldownTime: shootCooldownServerside, _heatReloadingWaitTime: heatReloadingWaitTime, _heatReloadCoolingSpeed: heatReloadCoolingSpeed);
+        if (playerNetworking.IsOwner)
+            myGunState.heatDisplay = HeatDisplayUI.Instance;
+        myGunState.audioManager = audioManager;
+        myGunState.steamParticles = steamParticles;
+        var emission = steamParticles.emission;
+        emission.rateOverTime = 0;
+
         originalGunAngle = gunModel.transform.localEulerAngles;
         originalSlidePosition = gunTop.localPosition;
         animationProgress = 1;
@@ -148,18 +259,21 @@ public class GunController : MonoBehaviour
         }
         if(clientsideCooldownProgress > 0)
         {
-            clientsideCooldownProgress -= Time.deltaTime / shootCooldown;
+            clientsideCooldownProgress -= Time.deltaTime / shootCooldownClientside;
             if(clientsideCooldownProgress < 0)
             {
                 clientsideCooldownProgress = 0;
             }
         }
-        
-        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0)
+
+        myGunState.Update(Time.deltaTime);
+
+        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && myGunState.CanShoot)
         {
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;
 
+            
             playerNetworking.ShootStart(shootStart, shootDirection);
         }
     }
@@ -187,13 +301,20 @@ public class GunController : MonoBehaviour
 
     public GameObject TryShoot(Vector3 startPos, Vector3 shootDirection)
     {
+        if (myGunState.CanShoot)
+        {
+            myGunState.Shoot();
 
+            RaycastHit hitRaycastReferenceObj;
+            bool hit;
+            Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
 
-        RaycastHit hitRaycastReferenceObj;
-        bool hit;
-        Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
-
-        return Shoot(startPos, shootDirectionAfterAimAssist, hit, hitRaycastReferenceObj);
+            return Shoot(startPos, shootDirectionAfterAimAssist, hit, hitRaycastReferenceObj);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /// <summary>

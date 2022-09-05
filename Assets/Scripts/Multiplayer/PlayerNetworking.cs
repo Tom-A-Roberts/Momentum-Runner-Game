@@ -223,6 +223,8 @@ public class PlayerNetworking : NetworkBehaviour
             //    Destroy(spawnCam);
             //}
 
+            
+
             gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
         }
     }

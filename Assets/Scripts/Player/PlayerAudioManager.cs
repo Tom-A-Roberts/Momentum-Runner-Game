@@ -36,6 +36,8 @@ public class PlayerAudioManager : NetworkBehaviour
     public AudioClip shoot;
     public AudioClip airdash;
     public AudioClip airJump;
+    public AudioClip overheatedGun;
+    public AudioClip gunCoolingEffect;
     // Start is called before the first frame update
 
     private AudioSource ambianceSource;
@@ -185,6 +187,17 @@ public class PlayerAudioManager : NetworkBehaviour
     {
         if (mainAudioSource != null)
             mainAudioSource.PlayOneShot(grapplingEnd, 0.3f * startVolume);
+    }
+
+    public void OverheatedGun()
+    {
+        if (mainAudioSource != null)
+            mainAudioSource.PlayOneShot(overheatedGun, 0.3f * startVolume);
+    }
+    public void GunCoolingEffect()
+    {
+        if (mainAudioSource != null)
+            mainAudioSource.PlayOneShot(gunCoolingEffect, 0.3f * startVolume);
     }
 
     public void Update()
