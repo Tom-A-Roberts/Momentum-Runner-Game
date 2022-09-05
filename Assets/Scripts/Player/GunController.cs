@@ -98,7 +98,8 @@ public class GunController : MonoBehaviour
         public ParticleSystem steamParticles;
 
         private float heatLevel = 0;
-        private bool isOverheated;
+        private bool isOverheatedServerside;
+        private bool isOverheatedClientside;
         private float waitTimeProgress;
         private float singleShotCooldownProgress;
 
@@ -106,9 +107,13 @@ public class GunController : MonoBehaviour
         /// <summary>
         /// Tests whether you can shoot currently or not
         /// </summary>
-        public bool CanShoot
+        public bool CanShootServerside
         {
-            get => (!isOverheated) && singleShotCooldownProgress == 0 && heatLevel != 1;
+            get => (!isOverheatedServerside) && singleShotCooldownProgress == 0 && heatLevel != 1;
+        }
+        public bool CanShootClientside
+        {
+            get => (!isOverheatedClientside) && singleShotCooldownProgress == 0 && heatLevel != 1;
         }
 
         /// <param name="_heatPerShot">How much heat each shot builds up</param>
@@ -146,12 +151,16 @@ public class GunController : MonoBehaviour
                 UpdateUIAndEffects();
             }
 
-            if (waitTimeProgress == 0 && isOverheated && heatLevel == 0)
+            if (waitTimeProgress == 0 && isOverheatedClientside && heatLevel == 0)
             {
-                isOverheated = false;
+                isOverheatedClientside = false;
                 UpdateUIAndEffects();
             }
-            if(singleShotCooldownProgress > 0)
+            if (waitTimeProgress == 0 && isOverheatedServerside && heatLevel < 0.2f)
+            {
+                isOverheatedServerside = false;
+            }
+            if (singleShotCooldownProgress > 0)
             {
                 singleShotCooldownProgress -= deltaTime / shootCooldownTime;
                 if (singleShotCooldownProgress < 0)
@@ -162,7 +171,7 @@ public class GunController : MonoBehaviour
         }
         public void Shoot()
         {
-            if (CanShoot)
+            if (CanShootServerside)
             {
                 singleShotCooldownProgress = 1;
                 waitTimeProgress = 1;
@@ -171,7 +180,8 @@ public class GunController : MonoBehaviour
                 {
                     heatLevel = 1;
 
-                    isOverheated = true;
+                    isOverheatedClientside = true;
+                    isOverheatedServerside = true;
                     LongOverheat();
                 }
                 UpdateUIAndEffects();
@@ -187,7 +197,7 @@ public class GunController : MonoBehaviour
         {
             if (heatDisplay)
             {
-                heatDisplay.SetHeatLevel(heatLevel, isOverheated);
+                heatDisplay.SetHeatLevel(heatLevel, isOverheatedClientside);
             }
             if (steamParticles)
             {
@@ -268,7 +278,8 @@ public class GunController : MonoBehaviour
 
         myGunState.Update(Time.deltaTime);
 
-        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && myGunState.CanShoot)
+        bool canShoot = (myGunState.CanShootClientside && playerNetworking.IsOwner) || (myGunState.CanShootServerside && !playerNetworking.IsOwner);
+        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && canShoot)
         {
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;
@@ -301,7 +312,7 @@ public class GunController : MonoBehaviour
 
     public GameObject TryShoot(Vector3 startPos, Vector3 shootDirection)
     {
-        if (myGunState.CanShoot)
+        if (myGunState.CanShootServerside)
         {
             myGunState.Shoot();
 
