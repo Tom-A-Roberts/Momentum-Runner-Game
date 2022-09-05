@@ -105,7 +105,7 @@ public class PlayerNetworking : NetworkBehaviour
 
     public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection)
     {
-        GameObject hitObj = myGunController.Shoot(shootStartPosition, shootDirection);
+        GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
         return hitObj;
     }
 

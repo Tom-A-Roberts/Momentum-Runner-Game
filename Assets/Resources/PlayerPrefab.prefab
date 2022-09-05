@@ -1790,6 +1790,7 @@ MonoBehaviour:
   gunModel: {fileID: 9015662013461027699}
   gunTop: {fileID: 5758086762302845120}
   muzzlePoint: {fileID: 1461484504120033369}
+  myCamera: {fileID: 4316027073834798315}
   audioManager: {fileID: 8008624713252837793}
   playerNetworking: {fileID: 1445570255}
   shootCooldown: 0.5

@@ -9,6 +9,7 @@ public class GunController : MonoBehaviour
     public GameObject gunModel;
     public Transform gunTop;
     public Transform muzzlePoint;
+    public Transform myCamera;
     public PlayerAudioManager audioManager;
     public PlayerNetworking playerNetworking;
 
@@ -52,13 +53,66 @@ public class GunController : MonoBehaviour
     private Color emissiveColour;
     private float animationProgress = 1;
     private bool animationActive = false;
-    private float cooldownProgress = 0;
+    private float clientsideCooldownProgress = 0;
     private Vector3 originalGunAngle;
     private Vector3 originalSlidePosition;
 
     private float hOriginal;
     private float sOriginal;
     private float vOriginal;
+
+    public class HeatCoolingGunState
+    {
+        // How long you must wait between shots (in serverside time)
+        public readonly float shootCooldownTime;
+
+        // Time before starting the cooling/reloading sequence
+        public readonly float heatReloadingWaitTime;
+
+        // How quickly should a full cool take (in seconds)
+        public readonly float heatReloadCoolingSpeed;
+
+        // How much heat each shot builds up
+        public readonly float heatPerShot;
+
+        private float heatLevel = 0;
+        private bool isOverheated;
+        private float singleShotCooldownProgress;
+
+        /// <summary>
+        /// Tests whether you can shoot currently or not
+        /// </summary>
+        public bool CanShoot
+        {
+            get => (!isOverheated) && singleShotCooldownProgress == 0 && heatLevel != 1;
+        }
+
+        /// <param name="_heatPerShot">How much heat each shot builds up</param>
+        /// <param name="_shootCooldownTime">How long you must wait between shots (in serverside time)</param>
+        /// <param name="_heatReloadingWaitTime">Time before starting the cooling/reloading sequence</param>
+        /// <param name="_heatReloadCoolingSpeed">How quickly should a full cool take (in seconds)</param>
+        public HeatCoolingGunState(float _heatPerShot = 0.1f, float _shootCooldownTime = 0.45f, float _heatReloadingWaitTime = 0.5f, float _heatReloadCoolingSpeed = 1f)
+        {
+
+        }
+
+        public void Update()
+        {
+            
+        }
+        public void Shoot()
+        {
+
+        }
+        public void InitiateCooling()
+        {
+
+        }
+        public void UpdateUI(HeatDisplayUI currentUI)
+        {
+
+        }
+    }
 
     private void Start()
     {
@@ -92,16 +146,16 @@ public class GunController : MonoBehaviour
             }
             SetGunTransformBasedOnProgress(animationProgress);
         }
-        if(cooldownProgress > 0)
+        if(clientsideCooldownProgress > 0)
         {
-            cooldownProgress -= Time.deltaTime / shootCooldown;
-            if(cooldownProgress < 0)
+            clientsideCooldownProgress -= Time.deltaTime / shootCooldown;
+            if(clientsideCooldownProgress < 0)
             {
-                cooldownProgress = 0;
+                clientsideCooldownProgress = 0;
             }
         }
         
-        if (Input.GetButton("Shoot") && cooldownProgress <= 0)
+        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0)
         {
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;
@@ -109,6 +163,8 @@ public class GunController : MonoBehaviour
             playerNetworking.ShootStart(shootStart, shootDirection);
         }
     }
+
+
 
     void SetGunTransformBasedOnProgress(float progress)
     {
@@ -127,6 +183,17 @@ public class GunController : MonoBehaviour
         float currentHueChange = (1-progress) * -0.025f;
         if (myMat != null)
             myMat.SetColor("_EmissiveColor", Color.HSVToRGB(hOriginal + currentHueChange, sOriginal, vOriginal) * glowMultiplier);
+    }
+
+    public GameObject TryShoot(Vector3 startPos, Vector3 shootDirection)
+    {
+
+
+        RaycastHit hitRaycastReferenceObj;
+        bool hit;
+        Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
+
+        return Shoot(startPos, shootDirectionAfterAimAssist, hit, hitRaycastReferenceObj);
     }
 
     /// <summary>
@@ -215,14 +282,14 @@ public class GunController : MonoBehaviour
     /// Animates shooting the gun from a particlar start position and direction
     /// </summary>
     /// <returns>The gameobject that was shot. Is null if nothing is shot</returns>
-    public GameObject Shoot(Vector3 startPos, Vector3 shootDirection)
+    public GameObject Shoot(Vector3 startPos, Vector3 shootDirection, bool hit, RaycastHit hitRaycastReferenceObj)
     {
 
         GameObject hitGameObject = null;
-        RaycastHit hitRaycastReferenceObj;
-        bool hit;
+        //RaycastHit hitRaycastReferenceObj;
+        //bool hit;
 
-        Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
+        //Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
 
         GameObject myLine = new GameObject();
         myLine.transform.position = muzzlePoint.position;
@@ -261,7 +328,7 @@ public class GunController : MonoBehaviour
         }
         else
         {
-            lr.SetPosition(1, Camera.main.transform.position + shootDirectionAfterAimAssist * raycastDistance);
+            lr.SetPosition(1, myCamera.position + shootDirection * raycastDistance);
         }
         audioManager.Shoot();
         GameObject muzzle_particle = Instantiate(muzzleFlashParticlePrefab, muzzlePoint.position, muzzlePoint.rotation);//
@@ -270,8 +337,9 @@ public class GunController : MonoBehaviour
         // Start gun animation
         animationActive = true;
         animationProgress = 0;
-        cooldownProgress = 1;
+        clientsideCooldownProgress = 1;
 
         return hitGameObject;
     }
+
 }

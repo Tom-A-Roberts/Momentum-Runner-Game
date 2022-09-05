@@ -46,6 +46,7 @@ Shader "Hidden/Shader/Sobel"
     // List of properties to control your post process effect
     float _Intensity;
     float _Thickness;
+    float _MaxDistance;
     float4 _Colour;
     float _DepthMultiplier;
     float _DepthBias;
@@ -86,6 +87,11 @@ Shader "Hidden/Shader/Sobel"
         float bottomLeft    = SampleCameraDepth(uv + float2(-offsetU, -offsetV));
         float bottom        = SampleCameraDepth(uv + float2(       0, -offsetV));
         float bottomRight   = SampleCameraDepth(uv + float2( offsetU, -offsetV));
+
+        //float min_corner = min(min(topLeft,topRight), min(bottomLeft,bottomRight));
+        //float min_middle = min(min(top,bottom), min(left,right));
+        //float min_final = min(centre,min(min_corner,min_middle));
+
 
         return Sobel_Scharr(abs(topLeft - centre),      abs(top - centre),       abs(topRight - centre),
                              abs(left - centre),                                  abs(right - centre),
@@ -160,14 +166,17 @@ Shader "Hidden/Shader/Sobel"
         float sobelDepth = SobelSampleDepth(input.texcoord.xy, offsetU, offsetV);
         sobelDepth = pow(abs(abs(saturate(sobelDepth)) * _DepthMultiplier), _DepthBias);
 
+
         // run the sobel sampling of the normals
         float sobelNormal = SobelSampleNormal(input.texcoord.xy, offsetU, offsetV);
         sobelNormal = pow(abs(abs(saturate(sobelNormal)) * _NormalMultiplier), _NormalBias);
 
-        float outlineIntensity = saturate(max(sobelDepth, sobelNormal));
+        float distanceFader = saturate(SampleCameraDepth(input.texcoord.xy) * 10 * _MaxDistance);
+
+        float outlineIntensity = saturate(max(sobelDepth, sobelNormal)) * distanceFader;
 
         // apply the sobel effect
-        float3 finalColor = lerp(sourceColor, (float3)_Colour, outlineIntensity * _Intensity);
+        float3 finalColor = lerp(sourceColor, (float3)_Colour, outlineIntensity * _Intensity)  ;
 
         //return float4(sobelNormal, sobelNormal, sobelNormal, 1);
         //return float4(sobelDepth, sobelDepth, sobelDepth, 1);

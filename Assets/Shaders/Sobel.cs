@@ -12,6 +12,9 @@ public sealed class Sobel : CustomPostProcessVolumeComponent, IPostProcessCompon
     [Tooltip("Controls the colour of the outline.")]
     public ColorParameter outlineColour = new ColorParameter(Color.black);
 
+    [Tooltip("Controls how far away the sobel will fall off")]
+    public FloatParameter maxDistance = new FloatParameter(100f);
+
     [Tooltip("Controls the thickness of the outline.")]
     public FloatParameter outlineThickness = new FloatParameter(1f);
 
@@ -51,6 +54,7 @@ public sealed class Sobel : CustomPostProcessVolumeComponent, IPostProcessCompon
 
         m_Material.SetFloat("_Intensity", intensity.value);
         m_Material.SetColor("_Colour", outlineColour.value);
+        m_Material.SetFloat("_MaxDistance", maxDistance.value);
         m_Material.SetFloat("_Thickness", outlineThickness.value);
         m_Material.SetFloat("_DepthMultiplier", depthMultiplier.value);
         m_Material.SetFloat("_DepthBias", depthBias.value);

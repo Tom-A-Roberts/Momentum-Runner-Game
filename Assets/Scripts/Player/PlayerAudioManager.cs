@@ -194,9 +194,6 @@ public class PlayerAudioManager : NetworkBehaviour
         windCurrentIntensity = Mathf.SmoothDamp(windCurrentIntensity, windTargetIntensity, ref windIntensityDif, windSoundSmoothAmount);
         grappleCurrentIntensity = Mathf.SmoothDamp(grappleCurrentIntensity, grappleTargetIntensity, ref grappleIntensityDif, grappleSoundSmoothAmount);
 
-        //const float wallRollingPitchChange = 0.03f;
-        //const float rollingPitchChange = 1;
-
         wallRollingSource.volume = Mathf.Clamp01(wallRollingCurrentIntensity) * startVolume * 0.13f;
         wallRollingSource.pitch = wallRollingPitch + (Mathf.Clamp01(wallRollingCurrentIntensity) * wallRollingPitchChange) - (wallRollingPitchChange / 2);
 
