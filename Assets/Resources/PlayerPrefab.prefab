@@ -7003,7 +7003,7 @@ MonoBehaviour:
   GrapplingRope: {fileID: 1777984287}
   MaxGrappleLength: 20
   GrappleForce: 10
-  AimAssistRadius: 0.5
+  AimAssistRadius: 0.6
   GrappleLookAtPower: 0.4
   LookAtSmoothSpeed: 0.05
 --- !u!1001 &8205410105980544546

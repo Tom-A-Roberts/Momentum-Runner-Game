@@ -6,7 +6,7 @@ public class GrappleGun : MonoBehaviour
 {
     [Header("Known Player Objects")]
     [Tooltip("(Local Player Only) This players camera")]
-    public Camera PlayerCamera;
+    public GameObject PlayerCamera;
     [Tooltip("(Local Player Only) Script responsible for controlling this players movement")]
     public PlayerController PlayerController;
     [Tooltip("(Local and Remote Player) The audio manager of this scripts owning player")]
