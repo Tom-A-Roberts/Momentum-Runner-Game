@@ -4,7 +4,7 @@
 
 
 <p align="left">
-  <img src="./InGameCapture.PNG" width="450" title="hover text">
+  <img src="./InGameCapture.PNG" width="550" title="hover text">
 </p>
 
 ## Introduction ⚡
