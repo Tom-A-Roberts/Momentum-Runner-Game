@@ -1355,7 +1355,7 @@ MonoBehaviour:
   JumpCount: 2
   AirJumpMultiplier: 1.5
   JumpLerpStart: 10
-  MaxWallKickoffForce: 50
+  MaxWallKickoffForce: 38
   MaxWallBoostForce: 5
   DashForce: 90
   DashForceActiveTime: 0.2
