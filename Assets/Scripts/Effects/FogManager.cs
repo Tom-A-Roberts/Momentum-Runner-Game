@@ -141,7 +141,7 @@ public class FogManager : MonoBehaviour
             clampedDistanceToFogwall = 0;
         const float sphericalFogwallClosingStartDistance = 5f;
         const float sphericalFogwallStartDepth = 80f;
-        const float smalledSphereSize = 1;
+        const float smalledSphereSize = 4;
 
         float sphericalDist01 = Mathf.Clamp(clampedDistanceToFogwall, 0, sphericalFogwallClosingStartDistance) / sphericalFogwallClosingStartDistance;
         float sphericalDistanceRemapped = Mathf.Clamp(sphericalDist01 * sphericalFogwallStartDepth, smalledSphereSize, sphericalFogwallStartDepth);
