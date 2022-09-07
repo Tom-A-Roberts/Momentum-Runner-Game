@@ -70,7 +70,7 @@ public class LevelLogicManager : MonoBehaviour
                 FogManager.Instance = fogger;
 
                 if (!fogger)
-                    Debug.LogError("No FogManager found!");
+                    Debug.LogWarning("No FogManager found!");
             }
 
             // if we get to this point and no FogManager then big sad 
