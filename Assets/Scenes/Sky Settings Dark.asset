@@ -373,7 +373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e26a18d3dc6f85e4894fb7bb90cf1776, type: 3}
   m_Name: Sobel
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   intensity:
     m_OverrideState: 1
     m_Value: 0.26

@@ -149,7 +149,7 @@ public class FogManager : MonoBehaviour
         float characterOffset = -distanceToFogWall;
         if (characterOffset < 0)
             characterOffset = 0;
-        sobelBarrier.transform.position = transform.position + transform.forward * (fogWallDepth * 2 + characterOffset);
+        sobelBarrier.transform.position = transform.position + transform.forward * (fogWallDepth * 2 + characterOffset + 10);
     }
 
     void SetSphericalFogDepth(float newDepth)
