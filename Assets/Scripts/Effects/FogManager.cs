@@ -16,7 +16,7 @@ public class FogManager : MonoBehaviour
     public GameObject sobelBarrier;
     public GameObject fogwallPlane;
     public GameObject sobelOverrideVolume;
-    
+    public GameObject fogParticles;
 
     public float DistanceToFogWall => distanceToFogWall;
 
@@ -68,14 +68,37 @@ public class FogManager : MonoBehaviour
     {
         if (instantiated)
         {
+            transform.position += transform.forward * 10 * Time.deltaTime;
+
+            fogwallPlane.transform.position = transform.position;
+            sobelOverrideVolume.transform.position = transform.position;
+
+
+            
+
             instantiatedSphericalFog.transform.position = playerBody.transform.position;
+
             distanceToFogWall = Vector3.Dot(transform.forward, transform.position - playerBody.transform.position);
 
             UpdateSphericalFog();
             UpdateSobelBarrier();
+            UpdateFogParticles();
             //UpdateSobel();
             //SetFogDistance(Vector3.Distance(playerBody.transform.position, transform.position));
         }
+    }
+
+    void UpdateFogParticles()
+    {
+
+        float characterOffset = -distanceToFogWall;
+        if (characterOffset < 0)
+            characterOffset = 0;
+
+        Vector3 newPos = transform.position + transform.forward * (characterOffset -1);
+        //newPos.y = playerBody.transform.position.y;
+        fogParticles.transform.position = newPos;
+
     }
 
     void UpdateSobel()
@@ -104,7 +127,7 @@ public class FogManager : MonoBehaviour
         float clampedDistanceToFogwall = distanceToFogWall;
         if (clampedDistanceToFogwall < 0)
             clampedDistanceToFogwall = 0;
-        const float sphericalFogwallClosingStartDistance = 40f;
+        const float sphericalFogwallClosingStartDistance = 5f;
         const float sphericalFogwallStartDepth = 80f;
         const float smalledSphereSize = 1;
 
