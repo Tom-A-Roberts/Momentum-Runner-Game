@@ -8,8 +8,10 @@ public class LevelLogicManager : MonoBehaviour
 {
     public bool SobelEnabled = true;
 
+    public PlayerNetworking playerNetworking;
     public Rigidbody playerBody;
     public Rigidbody playerFeet;
+    public Camera playerCamera;
 
     private Transform spawnPoint;
 
@@ -39,8 +41,8 @@ public class LevelLogicManager : MonoBehaviour
 
         bodySpawnPosition = bodyStartPosition;
         feetSpawnPosition = feetStartPosition;
-        
 
+        //Sobel sobelController = null;
         UnityEngine.Rendering.Volume sceneVolume = GameObject.FindObjectOfType<UnityEngine.Rendering.Volume>();
         if(sceneVolume != null && SobelEnabled)
         {
@@ -49,10 +51,33 @@ public class LevelLogicManager : MonoBehaviour
                 if (sceneVolume.profile.components[componentID].name.Contains("Sobel"))
                 {
                     sceneVolume.profile.components[componentID].active = true;
+                    //FogManager.Instance.sobelRenderer = sceneVolume.profile.components[componentID];
+                    //sobelController = (Sobel)sceneVolume.profile.components[componentID];
                 }
             }
-            
         }
+
+        if (playerNetworking.IsOwner)
+        {
+            if(FogManager.Instance != null)
+            {
+                Destroy(FogManager.Instance);
+            }
+            FogManager fogger= GameObject.FindObjectOfType<FogManager>();
+            if (fogger)
+            {
+                FogManager.Instance = fogger;
+            
+                FogManager.Instance.playerBody = playerBody.gameObject;
+                FogManager.Instance.playerCamera = playerCamera;
+                //if (sobelController)
+                //    FogManager.Instance.sobelRenderer = sobelController;
+                FogManager.Instance.Initialize();
+            }
+
+        }
+
+
         playerBody.position = bodyStartPosition;
         playerFeet.position = feetStartPosition;
     }
@@ -102,6 +127,8 @@ public class LevelLogicManager : MonoBehaviour
     {
         if (playerHitID != -1)
             Debug.Log("I think I ('" + this.gameObject.name + "') just shot player ID: " + playerHitID.ToString());
+
+        //playerNetworking.LeverFlicked();
     }
 
 

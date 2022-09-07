@@ -6,6 +6,7 @@ public class PlayerNetworking : NetworkBehaviour
 {
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
+
     /// <summary>
     /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
     /// </summary>
@@ -72,6 +73,31 @@ public class PlayerNetworking : NetworkBehaviour
         }
     }
 
+
+    //public void LeverFlicked()
+    //{
+    //    LevelFlickRequestServerRPC();
+    //    AnimateLeverClientRPC();
+    //}
+
+    //[ServerRpc]
+    //public void LevelFlickRequestServerRPC()
+    //{
+    //    // Check the player position
+    //    AnimateLeverClientRPC();
+    //}
+
+    //[ClientRpc]
+    //public void AnimateLeverClientRPC()
+    //{
+    //    if(!IsOwner)
+    //    {
+    //        // Makes new route appear to user
+    //    }
+    //}
+
+
+
     #region SHOOTING
     public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
     {
@@ -98,7 +124,7 @@ public class PlayerNetworking : NetworkBehaviour
     {
         if (!IsOwner)
         {
-            LocalShoot(shootStartPosition, shootDirection);               
+            LocalShoot(shootStartPosition, shootDirection);
         }
         myLevelController.ProcessPotentialHit(playerHitID);
     }
@@ -174,7 +200,6 @@ public class PlayerNetworking : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        
         if(ConnectedPlayers == null || (IsOwner && IsHost)) //  
         {
             ConnectedPlayers = new Dictionary<ulong, GameObject>();

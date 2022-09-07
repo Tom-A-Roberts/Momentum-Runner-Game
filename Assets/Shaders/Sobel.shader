@@ -49,6 +49,7 @@ Shader "Hidden/Shader/Sobel"
     float _MaxDistance;
     float4 _Colour;
     float _DepthMultiplier;
+    float _FadeOffset;
     float _DepthBias;
     float _NormalMultiplier;
     float _NormalBias;
@@ -174,9 +175,10 @@ Shader "Hidden/Shader/Sobel"
         float distanceFader = saturate(SampleCameraDepth(input.texcoord.xy) * 10 * _MaxDistance);
 
         float outlineIntensity = saturate(max(sobelDepth, sobelNormal)) * distanceFader;
+        float outlineIntensity2 = saturate(outlineIntensity - _FadeOffset);
 
         // apply the sobel effect
-        float3 finalColor = lerp(sourceColor, (float3)_Colour, outlineIntensity * _Intensity)  ;
+        float3 finalColor = lerp(sourceColor, (float3)_Colour, outlineIntensity2 * _Intensity)  ;
 
         //return float4(sobelNormal, sobelNormal, sobelNormal, 1);
         //return float4(sobelDepth, sobelDepth, sobelDepth, 1);

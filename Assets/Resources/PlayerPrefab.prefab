@@ -836,7 +836,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 1000
+  far clip plane: 400
   field of view: 66.6
   orthographic: 0
   orthographic size: 5
@@ -1620,8 +1620,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SobelEnabled: 1
+  playerNetworking: {fileID: 1445570255}
   playerBody: {fileID: 4316027074644905781}
   playerFeet: {fileID: 4316027073947639282}
+  playerCamera: {fileID: 4316027073834798314}
   bodySpawnPosition: {x: 0, y: 0, z: 0}
   feetSpawnPosition: {x: 0, y: 0, z: 0}
   bodyFeetOffset: {x: 0, y: 0, z: 0}
