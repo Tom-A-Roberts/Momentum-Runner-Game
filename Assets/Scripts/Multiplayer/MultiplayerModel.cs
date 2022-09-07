@@ -9,7 +9,7 @@ public class MultiplayerModel : MonoBehaviour
     {
         // OR: currently just stops remote player weapons from showing through objects
         // but could do more in the future e.g. loading different models for third person
-        int layer = GetLayer(isOwner);
+        int layer = GetMultiplayerLayer(isOwner);
 
         gameObject.layer = layer;
 
@@ -19,7 +19,7 @@ public class MultiplayerModel : MonoBehaviour
         }
     }
 
-    private int GetLayer(bool isOwner)
+    private int GetMultiplayerLayer(bool isOwner)
     {
         // OR: having the layers hardcoded is ok for now
         return (isOwner) ? LayerMask.NameToLayer("FirstPersonRendering") : LayerMask.NameToLayer("Default");
