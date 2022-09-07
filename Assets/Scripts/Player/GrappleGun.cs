@@ -161,7 +161,7 @@ public class GrappleGun : MonoBehaviour
     {
         RaycastHit hit;
         // Don't spherecast immediately in front of the player
-        const float initialSpherecastDeadzone = 3;
+        const float initialSpherecastDeadzone = 2;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
             return new GrappleablePointInfo()
@@ -174,8 +174,8 @@ public class GrappleGun : MonoBehaviour
         else 
         {
             Vector3 spherecastStart = PlayerCamera.transform.position + playerRigidbody.transform.forward * initialSpherecastDeadzone;
-            float spherecastLength = MaxGrappleLength - AimAssistRadius - initialSpherecastDeadzone;
-            if (Physics.SphereCast(spherecastStart, AimAssistRadius, PlayerCamera.transform.forward, out hit, spherecastLength, LayerMask.GetMask("Terrain")))
+            float spherecastLength = MaxGrappleLength - (AimAssistRadius/1) - initialSpherecastDeadzone;
+            if (Physics.SphereCast(spherecastStart, (AimAssistRadius/1), PlayerCamera.transform.forward, out hit, spherecastLength, LayerMask.GetMask("Terrain")))
             {
                 return new GrappleablePointInfo()
                 {
@@ -184,6 +184,19 @@ public class GrappleGun : MonoBehaviour
                     grappleDistance = Vector3.Distance(hit.point, PlayerCamera.transform.position),
                 };
             }
+            //else
+            //{
+            //    float spherecastLength2 = MaxGrappleLength - AimAssistRadius - initialSpherecastDeadzone;
+            //    if (Physics.SphereCast(spherecastStart, AimAssistRadius, PlayerCamera.transform.forward, out hit, spherecastLength2, LayerMask.GetMask("Terrain")))
+            //    {
+            //        return new GrappleablePointInfo()
+            //        {
+            //            targetFound = true,
+            //            grapplePoint = hit.point,
+            //            grappleDistance = Vector3.Distance(hit.point, PlayerCamera.transform.position),
+            //        };
+            //    }
+            //}
         }
         return GrappleablePointInfo.Empty;
     }
