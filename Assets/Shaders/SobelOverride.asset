@@ -37,7 +37,7 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 100
   fadeOffset:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 1
   outlineThickness:
     m_OverrideState: 0

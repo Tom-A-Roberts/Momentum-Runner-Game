@@ -50,12 +50,12 @@ public class FogManager : MonoBehaviour
         instantiatedSphericalFog = Instantiate(FogSpherePrefab, playerBody.transform.position, Quaternion.identity);
         sphericalFogRenderer = instantiatedSphericalFog.GetComponent<Renderer>(); 
         sphericalFogMeshRenderer = instantiatedSphericalFog.GetComponent<MeshRenderer>();
-        sobelBarrier.GetComponent<MeshRenderer>().enabled = true;
-        fogwallPlane.GetComponent<MeshRenderer>().enabled = true;
-        sobelOverrideVolume.GetComponent<BoxCollider>().enabled = true;
-        sobelOverrideVolume.GetComponent<Volume>().enabled = true;
+        //sobelBarrier.GetComponent<MeshRenderer>().enabled = true;
+        //fogwallPlane.GetComponent<MeshRenderer>().enabled = true;
+        //sobelOverrideVolume.GetComponent<BoxCollider>().enabled = true;
+        //sobelOverrideVolume.GetComponent<Volume>().enabled = true;
         //sobelOverriderComponent = sobelOverrideVolume.GetComponent<Volume>();
-        fogWallDepth = fogwallPlane.GetComponent<Renderer>().material.GetFloat("_Distance");
+        //fogWallDepth = fogwallPlane.GetComponent<Renderer>().material.GetFloat("_Distance");
         SetSphericalFogDepth(fogWallDepth);
         SetSphericalFogDistance(200f);
 
