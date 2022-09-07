@@ -63,9 +63,21 @@ public class FogManager : MonoBehaviour
 
     }
 
+    public void ResetFog()
+    {
+        instantiated = false;
+
+        Destroy(instantiatedSphericalFog);
+    }
+
     // Update is called once per frame
     void Update()
     {
+        if (!playerBody)
+        {
+            ResetFog();
+        }
+
         if (instantiated)
         {
             transform.position += transform.forward * 10 * Time.deltaTime;

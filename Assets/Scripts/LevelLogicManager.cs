@@ -59,24 +59,28 @@ public class LevelLogicManager : MonoBehaviour
 
         if (playerNetworking.IsOwner)
         {
-            if(FogManager.Instance != null)
+            if (FogManager.Instance)
             {
-                Destroy(FogManager.Instance);
+                FogManager.Instance.ResetFog();
             }
-            FogManager fogger= GameObject.FindObjectOfType<FogManager>();
-            if (fogger)
+            else
             {
+                FogManager fogger = FindObjectOfType<FogManager>();
+
                 FogManager.Instance = fogger;
-            
+
+                if (!fogger)
+                    Debug.LogError("No FogManager found!");
+            }
+
+            // if we get to this point and no FogManager then big sad 
+            if (FogManager.Instance)
+            {
                 FogManager.Instance.playerBody = playerBody.gameObject;
                 FogManager.Instance.playerCamera = playerCamera;
-                //if (sobelController)
-                //    FogManager.Instance.sobelRenderer = sobelController;
                 FogManager.Instance.Initialize();
             }
-
         }
-
 
         playerBody.position = bodyStartPosition;
         playerFeet.position = feetStartPosition;
