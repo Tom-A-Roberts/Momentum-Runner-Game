@@ -72,8 +72,8 @@ public class PlayerController : MonoBehaviour
     private float currentJumpForce;
     private float yVelocity;
     //private bool canDash;
+    private Vector3 BoostDirection;
     private float airDashProgress = 0;
-    private float airDashCooldownProgress = 0;
 
     private bool jumpKeyPressed = false;
 
@@ -117,16 +117,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift) && !IngameEscMenu.Instance.curserUnlocked) movementSpeed = WalkingSpeed * SprintMultiplier;
         else movementSpeed = WalkingSpeed;
         #endregion
-
-        #region AIR DASH LOGIC
-        if (Input.GetKeyDown(KeyCode.Q) && airDashCooldownProgress <= 0 && !IngameEscMenu.Instance.curserUnlocked) //if the player is in the air, hasnt already dashed, and presses q
-        {
-            // Start air dash
-            airDashProgress = 1;
-            // Start air dash cooldown
-            airDashCooldownProgress = 1;
-        }
-        #endregion     
+  
     }
 
     private void FixedUpdate()
@@ -137,16 +128,7 @@ public class PlayerController : MonoBehaviour
 
         processMotion(axisValues.Item1, axisValues.Item2);
 
-        if (airDashProgress > 0)
-        {
-            processAirDashMotion();
-        }
-        if (airDashCooldownProgress > 0)
-        {
-            airDashCooldownProgress -= Time.fixedDeltaTime / DashCooldown;
-            if (airDashCooldownProgress < 0)
-                airDashCooldownProgress = 0;
-        }
+        if(airDashProgress > 0) processAirDashMotion(BoostDirection);
 
         #region JUMPING LOGIC
         if (remainingJumps != JumpCount)
@@ -281,17 +263,9 @@ public class PlayerController : MonoBehaviour
         audioManager.UpdateWindIntensity((bodyRigidBody.velocity.magnitude - 25f) / 70f);        
     }
 
-    void processAirDashMotion()
+    public void BoostForce(Vector3 boost, ForceMode boostType)
     {
-        airDashProgress -= Time.fixedDeltaTime / DashForceActiveTime;
-        if (airDashProgress < 0)
-            airDashProgress = 0;
-
-        // Increase the dash force over time, as the dash happens
-        float currentDashForceAmount = DashForce * (1 - airDashProgress) * 2f;
-        currentDashForceAmount = DashForce;
-        bodyRigidBody.AddForce(transform.forward * currentDashForceAmount, ForceMode.Force); //add a forward horizontal force
-        bodyRigidBody.AddForce(new Vector3(0,bodyRigidBody.velocity.y * -1,0), ForceMode.Impulse);
+        bodyRigidBody.AddForce(boost, boostType);
     }
 
     public Tuple<float, float> GetMovementAxis()
