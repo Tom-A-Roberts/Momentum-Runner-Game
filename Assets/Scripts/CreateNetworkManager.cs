@@ -7,7 +7,7 @@ public class CreateNetworkManager : MonoBehaviour
 {
     public GameObject networkPrefabGameobject;
 
-    public bool startAsHost = false;
+    public bool startAsHostOrClient = false;
 
     void Awake()
     {
@@ -16,16 +16,24 @@ public class CreateNetworkManager : MonoBehaviour
             Instantiate(networkPrefabGameobject, Vector3.zero, Quaternion.identity);
             Debug.Log("Created new networkmanager");
 
-            if (startAsHost)
-            {
-                NetworkManager.Singleton.StartHost();
-            }
+
         }
             
     }
 
     void Start()
     {
+        if (MenuUIScript.startNetworkingOnSpawn && startAsHostOrClient)
+        {
+            if (MenuUIScript.joinAsClient)
+            {
 
+                NetworkManager.Singleton.StartClient();
+            }
+            else
+            {
+                NetworkManager.Singleton.StartHost();
+            }
+        }
     }
 }
