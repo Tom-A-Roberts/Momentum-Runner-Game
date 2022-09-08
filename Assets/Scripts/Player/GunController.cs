@@ -279,7 +279,7 @@ public class GunController : MonoBehaviour
         myGunState.Update(Time.deltaTime);
 
         bool canShoot = (myGunState.CanShootClientside && playerNetworking.IsOwner) || (myGunState.CanShootServerside && !playerNetworking.IsOwner);
-        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && canShoot)
+        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && canShoot && !IngameEscMenu.Instance.curserUnlocked)
         {
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;

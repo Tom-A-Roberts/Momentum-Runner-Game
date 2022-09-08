@@ -13,7 +13,7 @@ public class LevelLogicManager : MonoBehaviour
     public Rigidbody playerFeet;
     public Camera playerCamera;
 
-    private Transform spawnPoint;
+    //private Transform spawnPoint;
 
     private Vector3 bodyStartPosition;
     private Quaternion bodyStartRotation;
@@ -26,13 +26,19 @@ public class LevelLogicManager : MonoBehaviour
 
     void Start()
     {
-        spawnPoint = GameObject.FindGameObjectWithTag("SpawnPoint").transform;
-
+        GameObject spawnPointG = GameObject.FindGameObjectWithTag("SpawnPoint");
+        Vector3 spawnPosition = Vector3.zero;
+        if (spawnPointG == null)
+            Debug.LogWarning("No spawnpoint found! spawning player at 0,0,0");
+        else
+        {
+            spawnPosition = spawnPointG.transform.position;
+        }
         bodyFeetOffset = playerBody.transform.position - playerFeet.transform.position;
 
         Vector3 spawnOffset = new Vector3(Random.value * 5 - 2.5f, 0, Random.value * 5 - 2.5f);
-        playerBody.transform.position = spawnPoint.transform.position + spawnOffset;
-        playerFeet.transform.position = spawnPoint.transform.position - bodyFeetOffset + spawnOffset;
+        playerBody.transform.position = spawnPosition + spawnOffset;
+        playerFeet.transform.position = spawnPosition - bodyFeetOffset + spawnOffset;
 
         bodyStartPosition = playerBody.transform.position;
         bodyStartRotation = playerBody.transform.rotation;

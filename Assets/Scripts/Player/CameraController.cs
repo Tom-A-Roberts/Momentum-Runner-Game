@@ -35,7 +35,7 @@ public class CameraController : NetworkBehaviour
 		playerScript = body.GetComponent<PlayerController>();
 		playerRigidBody = body.GetComponent<Rigidbody>();
 		originalFOV = myCamera.fieldOfView;
-		Cursor.lockState = CursorLockMode.Locked; //Lock mouse cursor to screen
+		
 	}
 
     // Code thanks to: https://gist.github.com/KarlRamstedt/407d50725c7b6abeaf43aee802fdd88e
@@ -54,8 +54,11 @@ public class CameraController : NetworkBehaviour
 
 	void Update()
 	{
-		rotation.x += Input.GetAxis(xAxis) * sensitivity;
-		rotation.y += Input.GetAxis(yAxis) * sensitivity;
+        if (!IngameEscMenu.Instance.curserUnlocked)
+        {
+			rotation.x += Input.GetAxis(xAxis) * sensitivity;
+			rotation.y += Input.GetAxis(yAxis) * sensitivity;
+		}
 		rotation.y = Mathf.Clamp(rotation.y, -yRotationLimit, yRotationLimit);
 		var xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
 		var yQuat = Quaternion.AngleAxis(rotation.y, Vector3.left);

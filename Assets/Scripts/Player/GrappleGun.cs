@@ -125,7 +125,7 @@ public class GrappleGun : MonoBehaviour
     private void ProcessGrappleInput(GrappleablePointInfo raypointInfo)
     {
         // Check if grapple gun is being controlled by the owner. If yes, then process local player input
-        if (isGrappleOwner)
+        if (isGrappleOwner && !IngameEscMenu.Instance.curserUnlocked)
         {
             if (Input.GetButton("Grapple") && !grappleConnected && raypointInfo.targetFound)
             {

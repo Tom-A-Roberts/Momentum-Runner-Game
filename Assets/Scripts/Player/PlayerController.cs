@@ -107,19 +107,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !IngameEscMenu.Instance.curserUnlocked)
         {
             
             jumpKeyPressed = true;
         }     
 
         #region SPRINTING LOGIC
-        if (Input.GetKey(KeyCode.LeftShift)) movementSpeed = WalkingSpeed * SprintMultiplier;
+        if (Input.GetKey(KeyCode.LeftShift) && !IngameEscMenu.Instance.curserUnlocked) movementSpeed = WalkingSpeed * SprintMultiplier;
         else movementSpeed = WalkingSpeed;
         #endregion
 
         #region AIR DASH LOGIC
-        if (Input.GetKeyDown(KeyCode.Q) && airDashCooldownProgress <= 0) //if the player is in the air, hasnt already dashed, and presses q
+        if (Input.GetKeyDown(KeyCode.Q) && airDashCooldownProgress <= 0 && !IngameEscMenu.Instance.curserUnlocked) //if the player is in the air, hasnt already dashed, and presses q
         {
             // Start air dash
             airDashProgress = 1;
@@ -296,10 +296,17 @@ public class PlayerController : MonoBehaviour
 
     public Tuple<float, float> GetMovementAxis()
     {
-        float xInput = Input.GetAxisRaw("Horizontal");
-        float yInput = Input.GetAxisRaw("Vertical");
-
-        return Tuple.Create(xInput, yInput);
+        if (!IngameEscMenu.Instance.curserUnlocked)
+        {
+            float xInput = Input.GetAxisRaw("Horizontal");
+            float yInput = Input.GetAxisRaw("Vertical");
+            return Tuple.Create(xInput, yInput);
+        }
+        else
+        {
+            return Tuple.Create(0f, 0f);
+        }
+        
     }
 
     public void AddForce(float strength, Vector3 direction, ForceMode forceMode)
