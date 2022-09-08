@@ -116,14 +116,21 @@ public class MenuUIScript : NetworkBehaviour
     public void LoadExampleLevelAsHost()
     {
         joinAsClient = false;
-        //NetworkManager.Singleton.StartHost();
         startNetworkingOnSpawn = true;
 
         SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
         //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
+    }
+    public void LoadExampleLevel2AsHost()
+    {
+        joinAsClient = false;
+        startNetworkingOnSpawn = true;
 
+        SceneManager.LoadScene("LevelExample 2", LoadSceneMode.Single);
+        //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
     }
 
+    
     public void SingleplayerLevelSelect()
     {
         DisableGamePanel();

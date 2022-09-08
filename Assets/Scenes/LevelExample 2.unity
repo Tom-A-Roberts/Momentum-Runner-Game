@@ -47987,7 +47987,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570212, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14.91
+      value: 24.768
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570212, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -50359,6 +50359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkPrefabGameobject: {fileID: 4962475482032995732, guid: d5327554e5b05bd49b62fe6fda8317e1, type: 3}
+  startAsHostOrClient: 1
 --- !u!4 &1505461771
 Transform:
   m_ObjectHideFlags: 0
