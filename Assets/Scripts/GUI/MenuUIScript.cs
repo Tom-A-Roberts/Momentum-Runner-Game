@@ -32,6 +32,7 @@ public class MenuUIScript : NetworkBehaviour
     private string clientingPort;
 
     public static bool joinAsClient = false;
+    public static bool startNetworkingOnSpawn = true;
 
 
     public void Start()
@@ -116,9 +117,11 @@ public class MenuUIScript : NetworkBehaviour
     {
         joinAsClient = false;
         //NetworkManager.Singleton.StartHost();
+        startNetworkingOnSpawn = true;
 
         SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
         //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
+
     }
 
     public void SingleplayerLevelSelect()
@@ -130,6 +133,8 @@ public class MenuUIScript : NetworkBehaviour
         UnityTransport transportScript = UnityTransport.FindObjectOfType<UnityTransport>();
         transportScript.ConnectionData.Address = "127.0.0.1";
         transportScript.ConnectionData.Port = (ushort)7777;
+
+
     }
 
     public void HostNewServer()
@@ -161,6 +166,7 @@ public class MenuUIScript : NetworkBehaviour
         PlayerPrefs.Save();
 
         joinAsClient = true;
+        startNetworkingOnSpawn = false;
 
         NetworkManager.Singleton.StartClient();
 

@@ -23,10 +23,13 @@ public class CreateNetworkManager : MonoBehaviour
 
     void Start()
     {
-        if (startAsHostOrClient)
+        if (MenuUIScript.startNetworkingOnSpawn && startAsHostOrClient)
         {
-            if(MenuUIScript.joinAsClient)
+            if (MenuUIScript.joinAsClient)
+            {
+
                 NetworkManager.Singleton.StartClient();
+            }
             else
             {
                 NetworkManager.Singleton.StartHost();
