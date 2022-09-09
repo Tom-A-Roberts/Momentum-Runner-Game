@@ -51,6 +51,28 @@ public class MenuUIScript : NetworkBehaviour
         }
     }
 
+    public void QuitButton()
+    {
+        Debug.Log("game quit");
+        Application.Quit();
+    }
+
+    #region Settings Menu
+
+    public void MasterVolumeChanged()
+    {
+
+    }
+    public void MusicVolumeChanged()
+    {
+
+    }
+
+    #endregion
+
+
+    #region Panel management
+
     public void EnableGamePanel()
     {
         GameModePanel.SetActive(true);
@@ -86,13 +108,6 @@ public class MenuUIScript : NetworkBehaviour
         ButtonClicked();
     }
 
-
-
-
-    //public void MultiplayerLevelSelect()
-    //{
-    //    isMultiplayerHosting = true;
-    //}
     public void DisableLevelSelect()
     {
         LevelSelectPanel.SetActive(false);
@@ -104,11 +119,9 @@ public class MenuUIScript : NetworkBehaviour
         LevelSelectPanel.SetActive(true);
     }
 
-    public void QuitButton()
-    {
-        Debug.Log("game quit");
-        Application.Quit();
-    }
+    #endregion
+
+
 
     #region Server Hosting and Joining
 
