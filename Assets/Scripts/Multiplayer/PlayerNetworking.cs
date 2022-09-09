@@ -198,17 +198,40 @@ public class PlayerNetworking : NetworkBehaviour
     }
     #endregion
 
-    public override void OnNetworkSpawn()
+    private void PlayerConnect()
     {
-        if(ConnectedPlayers == null || (IsOwner && IsHost)) //  
+        if (ConnectedPlayers == null || (IsOwner && IsHost))
         {
             ConnectedPlayers = new Dictionary<ulong, GameObject>();
         }
-        if (ConnectedPlayers.ContainsKey(OwnerClientId)){
+
+        if (ConnectedPlayers.ContainsKey(OwnerClientId))
+        {
             Debug.LogWarning("I am player " + OwnerClientId.ToString() + " but there is already such a player in the ConnectedPlayers dictionary!");
         }
-        ConnectedPlayers[OwnerClientId] = this.gameObject;
-        Debug.Log("Player "+ OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+
+        Debug.Log(OwnerClientId);
+
+        ConnectedPlayers[OwnerClientId] = gameObject;
+        Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+    }
+
+    private void PlayerDisconnect()
+    {
+        ConnectedPlayers.Remove(OwnerClientId);
+        Debug.Log("Player " + playerID.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+
+        if (IsOwner)
+        {
+            // OR: if I am disconnected then send my player to main menu
+            IngameEscMenu.Instance.LoadMainMenu();
+        }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        PlayerConnect();
+
         myGrappleGun = grappleGun.GetComponent<GrappleGun>();
         myGrappleGun.isGrappleOwner = IsOwner;
 
@@ -272,8 +295,9 @@ public class PlayerNetworking : NetworkBehaviour
 
     public override void OnDestroy()
     {
-        ConnectedPlayers.Remove(OwnerClientId);
-        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        // OR: not a huge fan of disconnect being handled here
+        // player disconnect should probs be done in a seperate script 
+        PlayerDisconnect();
 
         base.OnDestroy();
     }
