@@ -219,7 +219,7 @@ public class PlayerNetworking : NetworkBehaviour
     private void PlayerDisconnect()
     {
         ConnectedPlayers.Remove(OwnerClientId);
-        Debug.Log("Player " + playerID.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
 
         if (IsOwner)
         {
