@@ -68,6 +68,9 @@ public class PlayerAudioManager : NetworkBehaviour
     {
         mainAudioSource = GetComponent<AudioSource>();
 
+        MenuUIScript.UpdateAudioStaticsFromPrefs();
+        startVolume = MenuUIScript.effectsVolume;
+
         if (IsOwner)
         {
             ambianceSource = gameObject.AddComponent<AudioSource>();

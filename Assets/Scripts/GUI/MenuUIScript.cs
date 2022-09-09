@@ -87,12 +87,26 @@ public class MenuUIScript : NetworkBehaviour
         PlayerPrefs.Save();
     }
 
-    private void UpdateAudioSlidersFromPrefs()
+    public static void UpdateAudioStaticsFromPrefs()
     {
         if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
         {
             musicVolume = PlayerPrefs.GetFloat("musicVolume");
             effectsVolume = PlayerPrefs.GetFloat("effectsVolume");
+        }
+        else
+        {
+            musicVolume = 1;
+            effectsVolume = 1;
+        }
+
+    }
+
+    private void UpdateAudioSlidersFromPrefs()
+    {
+        if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
+        {
+            UpdateAudioStaticsFromPrefs();
             effectsVolumeSlider.value = effectsVolume;
             musicVolumeSlider.value = musicVolume;
         }
