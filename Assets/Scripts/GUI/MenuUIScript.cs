@@ -45,6 +45,8 @@ public class MenuUIScript : NetworkBehaviour
 
     public void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
+
         myAudioSource = GameObject.FindObjectOfType<AudioSource>();
         effectsAudioSource = myAudioSource.gameObject.AddComponent<AudioSource>();
         effectsAudioSource.volume = 1;

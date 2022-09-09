@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using System;
 
 public class IngameEscMenu : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class IngameEscMenu : MonoBehaviour
         {
             Destroy(Instance);
         }
+
         Instance = this;
     }
 
@@ -31,7 +33,6 @@ public class IngameEscMenu : MonoBehaviour
         {
             Hide();
         }
-        
     }
 
     void Update()
@@ -48,6 +49,7 @@ public class IngameEscMenu : MonoBehaviour
         isEscMenuShowing = true;
         UnlockCursor();
     }
+
     public void Hide()
     {
         escapeMenuUIObject.SetActive(false);
@@ -55,16 +57,44 @@ public class IngameEscMenu : MonoBehaviour
         LockCursor();
     }
 
+    private delegate void OnNetworkShutdown();
+
     public void LoadMainMenu()
     {
-        NetworkManager.Singleton.Shutdown();
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
-        
+        StartCoroutine(NetworkShutdown(GoToMainMenu));
     }
+
+    private void GoToMainMenu()
+    {
+        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+    }
+
     public void QuitToDesktop()
     {
+        StartCoroutine(NetworkShutdown(QuitApplication));
+    }
+
+    private void QuitApplication()
+    {
+#if UNITY_EDITOR
         Debug.Log("game quit");
+        UnityEditor.EditorApplication.ExitPlaymode();
+#else
         Application.Quit();
+#endif
+    }   
+
+    // OR: Need to wait for NetworkManager to shutdown fully before we quit
+    private IEnumerator NetworkShutdown(OnNetworkShutdown OnShutdown)
+    {
+        NetworkManager netInstance = NetworkManager.Singleton;
+        
+        netInstance.Shutdown();
+
+        while (netInstance.ShutdownInProgress)
+            yield return null;
+
+        OnShutdown();
     }
 
     public static void LockCursor()
@@ -72,6 +102,7 @@ public class IngameEscMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Instance.curserUnlocked = false;
     }
+
     public static void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
