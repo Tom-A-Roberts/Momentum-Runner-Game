@@ -16,10 +16,13 @@ public class SpeedBoost : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        pc = other.gameObject.GetComponent<PlayerController>();
-        if (!pc) return;
+        if(other.gameObject.GetComponent<PlayerController>() == null)
+        {
+            return;
+        }
         else
         {
+            pc = other.gameObject.GetComponent<PlayerController>();
             speedBoostProgress = 1;
             rb = pc.gameObject.GetComponent<Rigidbody>();
         }
@@ -39,7 +42,7 @@ public class SpeedBoost : MonoBehaviour
                 verticalCompensationForce = new Vector3(0, rb.velocity.y * -1, 0);
                 ForceMode boostType = ForceMode.Force;
                 pc.BoostForce(boostVector, boostType);
-                pc.BoostForce(verticalCompensationForce, ForceMode.Impulse);
+                pc.BoostForce(verticalCompensationForce, ForceMode.Acceleration);
             }
         }
 
@@ -47,6 +50,8 @@ public class SpeedBoost : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         speedBoostProgress = 0;
+        timer = 0;
+        pc = null;
     }
 
     //new Vector3(0,bodyRigidBody.velocity.y * -1,0), ForceMode.Impulse
