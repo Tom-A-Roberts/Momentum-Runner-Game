@@ -210,8 +210,6 @@ public class PlayerNetworking : NetworkBehaviour
             Debug.LogWarning("I am player " + OwnerClientId.ToString() + " but there is already such a player in the ConnectedPlayers dictionary!");
         }
 
-        Debug.Log(OwnerClientId);
-
         ConnectedPlayers[OwnerClientId] = gameObject;
         Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
     }
