@@ -128,8 +128,6 @@ public class PlayerController : MonoBehaviour
 
         processMotion(axisValues.Item1, axisValues.Item2);
 
-        if(airDashProgress > 0) processAirDashMotion(BoostDirection);
-
         #region JUMPING LOGIC
         if (remainingJumps != JumpCount)
         {

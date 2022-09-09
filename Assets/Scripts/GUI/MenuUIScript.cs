@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using System.Text;
-
+using UnityEngine.UI;
 public class MenuUIScript : NetworkBehaviour
 {
     public AudioClip clickSoundEffect;
@@ -23,9 +23,14 @@ public class MenuUIScript : NetworkBehaviour
     public TMP_InputField clientingIpText;
     public TMP_InputField clientingPortText;
 
+    // Sliders
+    public Slider musicVolumeSlider;
+    public Slider effectsVolumeSlider;
+
     public bool isMultiplayerHosting;
 
     private AudioSource myAudioSource;
+    private AudioSource effectsAudioSource;
     private string hostingIp;
     private string hostingPort;
     private string clientingIp;
@@ -34,20 +39,26 @@ public class MenuUIScript : NetworkBehaviour
     public static bool joinAsClient = false;
     public static bool startNetworkingOnSpawn = true;
 
+    public static float musicVolume = 1;
+    public static float effectsVolume = 1;
+
 
     public void Start()
     {
         myAudioSource = GameObject.FindObjectOfType<AudioSource>();
-        UpdateFieldsFromPrefs();
+        effectsAudioSource = myAudioSource.gameObject.AddComponent<AudioSource>();
+        effectsAudioSource.volume = 1;
+        UpdatePortFieldsFromPrefs();
+        UpdateAudioSlidersFromPrefs();
         joinAsClient = false;
     }
 
     public void ButtonClicked()
     {
         
-        if (myAudioSource != null)
+        if (effectsAudioSource != null)
         {
-            myAudioSource.PlayOneShot(clickSoundEffect);
+            effectsAudioSource.PlayOneShot(clickSoundEffect);
         }
     }
 
@@ -59,14 +70,49 @@ public class MenuUIScript : NetworkBehaviour
 
     #region Settings Menu
 
-    public void MasterVolumeChanged()
+    public void EffectsVolumeChanged()
     {
-
+        effectsVolume = effectsVolumeSlider.value;
+        UpdateVolumes();
+        PlayerPrefs.SetFloat("effectsVolume", effectsVolume);
+        PlayerPrefs.SetInt("volumeSettingsRemembered", 1);
+        PlayerPrefs.Save();
     }
     public void MusicVolumeChanged()
     {
+        musicVolume = musicVolumeSlider.value;
+        UpdateVolumes();
+        PlayerPrefs.SetFloat("musicVolume", musicVolume);
+        PlayerPrefs.SetInt("volumeSettingsRemembered", 1);
+        PlayerPrefs.Save();
+    }
+
+    private void UpdateAudioSlidersFromPrefs()
+    {
+        if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
+        {
+            musicVolume = PlayerPrefs.GetFloat("musicVolume");
+            effectsVolume = PlayerPrefs.GetFloat("effectsVolume");
+            effectsVolumeSlider.value = effectsVolume;
+            musicVolumeSlider.value = musicVolume;
+        }
+        else
+        {
+            effectsVolume = effectsVolumeSlider.value;
+            musicVolume = musicVolumeSlider.value;
+            PlayerPrefs.SetFloat("musicVolume", musicVolume);
+            PlayerPrefs.SetFloat("effectsVolume", effectsVolume);
+            PlayerPrefs.SetInt("volumeSettingsRemembered", 1);
+            PlayerPrefs.Save();
+        }
 
     }
+    public void UpdateVolumes()
+    {
+        effectsAudioSource.volume = effectsVolume;
+        myAudioSource.volume = musicVolume * 0.7f;
+    }
+    
 
     #endregion
 
@@ -77,7 +123,7 @@ public class MenuUIScript : NetworkBehaviour
     {
         GameModePanel.SetActive(true);
 
-        UpdateFieldsFromPrefs();
+        UpdatePortFieldsFromPrefs();
     }
     public void EnableMainPanel()
     {
@@ -87,6 +133,7 @@ public class MenuUIScript : NetworkBehaviour
     public void EnableSettingsPanel()
     {
         SettingsPanel.SetActive(true);
+        UpdateAudioSlidersFromPrefs();
     }
 
 
@@ -201,18 +248,18 @@ public class MenuUIScript : NetworkBehaviour
 
     #region textfields
 
-    private void UpdateFieldsFromPrefs()
+    private void UpdatePortFieldsFromPrefs()
     {
         hostingIp = PlayerPrefs.GetString("hostingIp");
         hostingPort = PlayerPrefs.GetString("hostingPort");
         clientingIp = PlayerPrefs.GetString("clientingIp");
         clientingPort = PlayerPrefs.GetString("clientingPort");
-
         hostingIpText.text = hostingIp;
         hostingPortText.text = hostingPort;
         clientingIpText.text = clientingIp;
         clientingPortText.text = clientingPort;
     }
+
 
     public void UpdateHostingIp()
     {
