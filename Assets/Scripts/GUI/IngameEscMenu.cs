@@ -88,13 +88,18 @@ public class IngameEscMenu : MonoBehaviour
     private IEnumerator NetworkShutdown(OnNetworkShutdown OnShutdown)
     {
         NetworkManager netInstance = NetworkManager.Singleton;
-        
-        netInstance.Shutdown();
 
-        while (netInstance.ShutdownInProgress)
-            yield return null;
+        if (netInstance)
+        {
+            netInstance.Shutdown();
 
-        OnShutdown();
+            while (netInstance.ShutdownInProgress)
+                yield return null;
+        }
+
+        // :/ just for pressing stop in editor
+        if (this)
+            OnShutdown();
     }
 
     public static void LockCursor()
