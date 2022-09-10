@@ -6,6 +6,7 @@ public class SpeedBoost : MonoBehaviour
 {
     public float DashAcceleration = 1f;
     public float DashForce = 60f;
+    public float VerticalForce = 1f;
     private float timer;
     private float DashMultiplier;
     private float boostLength;
@@ -39,7 +40,10 @@ public class SpeedBoost : MonoBehaviour
                 if(DashMultiplier < 0) DashMultiplier = 0;
                 float currentDashForceAmount = (DashForce * DashMultiplier) * 2f;
                 boostVector = transform.forward * currentDashForceAmount;
-                verticalCompensationForce = new Vector3(0, rb.velocity.y * -1, 0);
+                //verticalCompensationForce = new Vector3(0, rb.velocity.y * -1 * VerticalForce * Time.deltaTime, 0);
+                float upComponent = Vector3.Dot(transform.up, rb.velocity);
+                verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
+
                 ForceMode boostType = ForceMode.Force;
                 pc.BoostForce(boostVector, boostType);
                 pc.BoostForce(verticalCompensationForce, ForceMode.Force);
