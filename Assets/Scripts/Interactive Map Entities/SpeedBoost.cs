@@ -6,14 +6,15 @@ public class SpeedBoost : MonoBehaviour
 {
     public float DashAcceleration = 1f;
     public float DashForce = 60f;
-    public float VerticalForce = 1f;
+    public float VerticalForce = 1050f;
+    public float SidewaysForce = 1050f;
     private float timer;
     private float DashMultiplier;
     private float boostLength;
     private PlayerController pc;
     private Rigidbody rb;
     private Vector3 boostVector;
-    private Vector3 verticalCompensationForce;
+    //private Vector3 verticalCompensationForce;
     
     private void OnTriggerEnter(Collider other)
     {
@@ -42,11 +43,15 @@ public class SpeedBoost : MonoBehaviour
                 boostVector = transform.forward * currentDashForceAmount;
                 //verticalCompensationForce = new Vector3(0, rb.velocity.y * -1 * VerticalForce * Time.deltaTime, 0);
                 float upComponent = Vector3.Dot(transform.up, rb.velocity);
-                verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
+                Vector3 verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
+
+                float rightComponent = Vector3.Dot(transform.right, rb.velocity);
+                Vector3 sidewaysCompensationForce = transform.right * rightComponent * -1 * VerticalForce * Time.deltaTime;
 
                 ForceMode boostType = ForceMode.Force;
                 pc.BoostForce(boostVector, boostType);
                 pc.BoostForce(verticalCompensationForce, ForceMode.Force);
+                pc.BoostForce(sidewaysCompensationForce, ForceMode.Force);
             }
         }
 

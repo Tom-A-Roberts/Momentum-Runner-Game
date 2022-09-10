@@ -5211,8 +5211,6 @@ GameObject:
   - component: {fileID: 1436886065477069269}
   - component: {fileID: 574348607158850445}
   - component: {fileID: 4138114321083695091}
-  - component: {fileID: 5420952490608753282}
-  - component: {fileID: 5860055928238864873}
   - component: {fileID: 6648653056881541072}
   m_Layer: 0
   m_Name: Teleporter
@@ -5311,34 +5309,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 9, y: 11, z: 14}
+  m_Size: {x: 9, y: 8.62, z: 15.18}
   m_Center: {x: 0, y: 0, z: -7}
---- !u!65 &5420952490608753282
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6648653056881541075}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 5, z: 14}
-  m_Center: {x: -5.5, y: 0, z: -7}
---- !u!65 &5860055928238864873
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6648653056881541075}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 5, z: 14}
-  m_Center: {x: 5.5, y: 0, z: -7}
 --- !u!114 &6648653056881541072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5351,8 +5323,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06b4aaec83ab85146a3a5ae2486cb2ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ActiveDashTimeAdjustment: 5
-  DashForce: 50
+  DashAcceleration: 0.15
+  DashForce: 25
+  VerticalForce: 1050
+  SidewaysForce: 1050
 --- !u!1 &6711630575261308998
 GameObject:
   m_ObjectHideFlags: 0
