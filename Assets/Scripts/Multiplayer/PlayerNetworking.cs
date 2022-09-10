@@ -43,7 +43,8 @@ public class PlayerNetworking : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        float localTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;
+        float localTime = NetworkManager.LocalTime.TimeAsFloat;
+        float serverTime = NetworkManager.ServerTime.TimeAsFloat;
 
         if (IsSpawned)
         {
@@ -53,7 +54,7 @@ public class PlayerNetworking : NetworkBehaviour
             }
             else
             {
-                HandlePositionData(localTime);
+                HandlePositionData(serverTime);
             }
         }
     }
@@ -81,7 +82,7 @@ public class PlayerNetworking : NetworkBehaviour
 
     private List<KeyValuePair<float, PositionData>> positionHistory = new List<KeyValuePair<float, PositionData>>();
 
-    private void HandlePositionData(float localTime)
+    private void HandlePositionData(float serverTime)
     {
         PlayerNetworkData dataReceived = _netState.Value;
         float time = dataReceived.SendTime;
@@ -90,7 +91,7 @@ public class PlayerNetworking : NetworkBehaviour
         positionHistory.Add(new KeyValuePair<float, PositionData>(time, positionData));
 
         if (positionHistory.Count > 0)
-            InterpolatePosition(localTime);
+            InterpolatePosition(serverTime);
     }
 
     private PositionData GetPositionDataAtTime(float localTime)
@@ -112,7 +113,7 @@ public class PlayerNetworking : NetworkBehaviour
         if (foundDataIndex < positionHistory.Count - 1)
         {
             foundData = positionHistory[foundDataIndex].Value;
-            interpRatio = (timeToFind - positionHistory[foundDataIndex].Key) / (positionHistory[foundDataIndex + 1].Key - positionHistory[foundDataIndex].Key);
+            interpRatio = (timeToFind - positionHistory[foundDataIndex].Key) / (positionHistory[foundDataIndex + 1].Key - positionHistory[foundDataIndex].Key);           
             foundData2 = positionHistory[foundDataIndex + 1].Value;
             position = Vector3.Lerp(foundData.Position, foundData2.Position, interpRatio);
             velocity = Vector3.Lerp(foundData.Velocity, foundData2.Velocity, interpRatio);
@@ -195,8 +196,12 @@ public class PlayerNetworking : NetworkBehaviour
             GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
             int hitID = CheckForPlayerHit(hitObj);
 
+            // OR: if I missed then no point checking
             if (hitID == -1)
+            {
                 Debug.Log("I missed");
+                return;
+            }
 
             float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;
             ShootServerRPC(shootTime, shootDirection, hitID);
@@ -213,7 +218,9 @@ public class PlayerNetworking : NetworkBehaviour
 
         if (!IsOwnedByServer)
         {
-            float timeToCheck = shootTime - NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId) / 1000f;
+            ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);
+            Debug.Log("Player " + OwnerClientId.ToString() + " RTT: " + rtt);
+            float timeToCheck = shootTime - rtt / 1000f;
             //Debug.Log(shootTime - NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId) / 1000f);
             InterpolatePosition(shootTime);
 
@@ -260,7 +267,9 @@ public class PlayerNetworking : NetworkBehaviour
         }
 
         if (success)
-            Debug.Log("Wahoo I hit who I wanted!");
+            Debug.Log("Wahoo I hit what I wanted!");
+        else
+            Debug.Log("Noooo I didn't hit what I wanted");
 
         //myLevelController.ProcessPotentialHit(playerHitID);
     }
