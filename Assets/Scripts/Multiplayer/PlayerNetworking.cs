@@ -6,7 +6,6 @@ public class PlayerNetworking : NetworkBehaviour
 {
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
-
     /// <summary>
     /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
     /// </summary>
@@ -43,36 +42,127 @@ public class PlayerNetworking : NetworkBehaviour
 
     // Update is called once per frame
     void Update()
-    {        
-        if (IsOwner)
+    {
+        float localTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;
+
+        if (IsSpawned)
         {
-            _netState.Value = new PlayerNetworkData()
+            if (IsOwner)
             {
-                Position = bodyRigidbody.position,
-                // OR: camera rotation used because locally it has the wallrunning rotation applied
-                // ...definitely not a janky way of animating this differently locally and remotely
-                Rotation = myCamera.transform.rotation.eulerAngles,
-                Velocity = bodyRigidbody.velocity,
-            };
-        }
-        else
-        {
-            // Some suuuper basic interpolation:
-
-            bodyRigidbody.position = Vector3.SmoothDamp(bodyRigidbody.position, _netState.Value.Position, ref _vel, _cheapInterpolationTime);
-            feetRigidbody.position = bodyRigidbody.position - myLevelController.bodyFeetOffset;
-
-            myCamera.transform.rotation = Quaternion.Euler(Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.x, _netState.Value.Rotation.x, ref _rotVelX, _cheapInterpolationTime),
-                Mathf.SmoothDampAngle(bodyRigidbody.rotation.eulerAngles.y, _netState.Value.Rotation.y, ref _rotVelY, _cheapInterpolationTime),
-                Mathf.SmoothDampAngle(myCamera.transform.rotation.eulerAngles.z, _netState.Value.Rotation.z, ref _rotVelZ, _cheapInterpolationTime));  
-            bodyRigidbody.rotation = Quaternion.Euler(0, myCamera.transform.eulerAngles.y, myCamera.transform.eulerAngles.z);           
-
-            // Keep velocities in sync (Might be a bad idea!)
-            bodyRigidbody.velocity = _netState.Value.Velocity;
-            feetRigidbody.velocity = _netState.Value.Velocity;
+                UpdatePositionData(localTime);
+            }
+            else
+            {
+                HandlePositionData(localTime);
+            }
         }
     }
 
+    private void UpdatePositionData(float localTime)
+    {
+        PositionData posData = new PositionData()
+        {
+            Position = bodyRigidbody.position,
+            // OR: camera rotation used because locally it has the wallrunning rotation applied
+            // ...definitely not a janky way of animating this differently locally and remotely
+            Rotation = myCamera.transform.rotation.eulerAngles,
+            Velocity = bodyRigidbody.velocity,
+        };
+
+        _netState.Value = new PlayerNetworkData()
+        {
+            SendTime = localTime,
+            PositionData = posData,
+        };
+        
+        // OR: needs to be stored to allow players to shoot at server host properly
+        positionHistory.Add(new KeyValuePair<float, PositionData>(localTime, posData));
+    }
+
+    private List<KeyValuePair<float, PositionData>> positionHistory = new List<KeyValuePair<float, PositionData>>();
+
+    private void HandlePositionData(float localTime)
+    {
+        PlayerNetworkData dataReceived = _netState.Value;
+        float time = dataReceived.SendTime;
+        PositionData positionData = dataReceived.PositionData;
+
+        positionHistory.Add(new KeyValuePair<float, PositionData>(time, positionData));
+
+        if (positionHistory.Count > 0)
+            InterpolatePosition(localTime);
+    }
+
+    private PositionData GetPositionDataAtTime(float localTime)
+    {
+        float timeToFind = localTime - _cheapInterpolationTime;
+
+        int foundDataIndex = positionHistory.FindLastIndex(value => value.Key < timeToFind);
+
+        PositionData foundData;
+
+        float interpRatio;
+        PositionData foundData2;
+        Vector3 position;
+        Vector3 velocity;
+        float xRot;
+        float yRot;
+        float zRot;
+
+        if (foundDataIndex < positionHistory.Count - 1)
+        {
+            foundData = positionHistory[foundDataIndex].Value;
+            interpRatio = (timeToFind - positionHistory[foundDataIndex].Key) / (positionHistory[foundDataIndex + 1].Key - positionHistory[foundDataIndex].Key);
+            foundData2 = positionHistory[foundDataIndex + 1].Value;
+            position = Vector3.Lerp(foundData.Position, foundData2.Position, interpRatio);
+            velocity = Vector3.Lerp(foundData.Velocity, foundData2.Velocity, interpRatio);
+            xRot = Mathf.LerpAngle(foundData.Rotation.x, foundData2.Rotation.x, interpRatio);
+            yRot = Mathf.LerpAngle(foundData.Rotation.y, foundData2.Rotation.y, interpRatio);
+            zRot = Mathf.LerpAngle(foundData.Rotation.z, foundData2.Rotation.z, interpRatio);
+
+        }
+        else
+        {
+            Debug.LogWarning("Cannot Interp!");
+            foundData = positionHistory[positionHistory.Count - 1].Value;
+            position = foundData.Position;
+            velocity = foundData.Velocity;
+            xRot = foundData.Rotation.x;
+            yRot = foundData.Rotation.y;
+            zRot = foundData.Rotation.z;
+        }
+
+        PositionData interpolatedData = new PositionData
+        {
+            Position = position,
+            Velocity = velocity,
+            Rotation = new Vector3(xRot, yRot, zRot)
+        };
+
+        return interpolatedData;
+    }
+
+    private void InterpolatePosition(float localTime)
+    {
+        PositionData interpolatedPosition = GetPositionDataAtTime(localTime);
+
+        Vector3 position = interpolatedPosition.Position;
+        Vector3 velocity = interpolatedPosition.Velocity;
+        float xRot = interpolatedPosition.Rotation.x; 
+        float yRot = interpolatedPosition.Rotation.y;
+        float zRot = interpolatedPosition.Rotation.z;
+
+        bodyRigidbody.position = position;
+        
+        feetRigidbody.position = bodyRigidbody.position - myLevelController.bodyFeetOffset;
+
+        myCamera.transform.rotation = Quaternion.Euler(xRot, yRot, zRot);
+        bodyRigidbody.rotation = Quaternion.Euler(0, myCamera.transform.eulerAngles.y, myCamera.transform.eulerAngles.z);
+
+        // Keep velocities in sync (Might be a bad idea!)
+        bodyRigidbody.velocity = velocity;
+        feetRigidbody.velocity = velocity;
+    }
 
     //public void LeverFlicked()
     //{
@@ -96,37 +186,83 @@ public class PlayerNetworking : NetworkBehaviour
     //    }
     //}
 
-
-
     #region SHOOTING
     public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
     {
         if (IsOwner)
-        {
-            ShootServerRPC(shootStartPosition, shootDirection);
+        {            
+            // who do we think we hit?
+            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
+            int hitID = CheckForPlayerHit(hitObj);
 
-            if (!IsServer)
-                LocalShoot(shootStartPosition, shootDirection);
+            if (hitID == -1)
+                Debug.Log("I missed");
+
+            float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;
+            ShootServerRPC(shootTime, shootDirection, hitID);
         }
     }
 
     [ServerRpc]
-    public void ShootServerRPC(Vector3 shootStartPosition, Vector3 shootDirection)
+    public void ShootServerRPC(float shootTime, Vector3 shootDirection, int hitPlayerID)
     {
-        GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
-        int hitID = CheckForShotHit(hitObj);
+        int hitID = hitPlayerID;
+        Vector3 shootStartPosition = bodyRigidbody.position;
 
-        ShootClientRPC(shootStartPosition, shootDirection, hitID);
+        bool shootSuccess = true;
+
+        if (!IsOwnedByServer)
+        {
+            float timeToCheck = shootTime - NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId) / 1000f;
+            //Debug.Log(shootTime - NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId) / 1000f);
+            InterpolatePosition(shootTime);
+
+            shootStartPosition = GetPositionDataAtTime(timeToCheck).Position;
+            //Debug.Log("shoot pos: " + shootStartPosition);
+
+            GameObject playerIThinkIHit;
+            ConnectedPlayers.TryGetValue((ulong)hitPlayerID, out playerIThinkIHit);
+            
+            // should probably rollback all players 
+            PlayerNetworking playerNetworkingToRollback;
+            if (playerIThinkIHit)
+            {
+                if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
+                {
+                    playerNetworkingToRollback.InterpolatePosition(timeToCheck);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + hitPlayerID);
+            }
+
+            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
+            hitID = CheckForPlayerHit(hitObj);
+
+            shootSuccess = hitPlayerID == hitID;
+
+            if (hitPlayerID == hitID)            
+                Debug.Log("No discrepancy found - Hit registered");            
+            else
+                Debug.Log("Discrepancy found - Hit missed");
+        }
+
+        ShootClientRPC(shootStartPosition, shootDirection, shootSuccess);
     }
 
     [ClientRpc]
-    public void ShootClientRPC(Vector3 shootStartPosition, Vector3 shootDirection, int playerHitID)
+    public void ShootClientRPC(Vector3 shootStartPosition, Vector3 shootDirection, bool success) // int playerHitID)
     {
         if (!IsOwner)
         {
             LocalShoot(shootStartPosition, shootDirection);
         }
-        myLevelController.ProcessPotentialHit(playerHitID);
+
+        if (success)
+            Debug.Log("Wahoo I hit who I wanted!");
+
+        //myLevelController.ProcessPotentialHit(playerHitID);
     }
 
     public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection)
@@ -139,7 +275,7 @@ public class PlayerNetworking : NetworkBehaviour
     /// </summary>
     /// <param name="rayHitObject">The gameobject that was hit by the shoot raycast</param>
     /// <returns>IF the ray hit a network player, returns OwnerClientID. ELSE, return -1</returns>
-    public int CheckForShotHit(GameObject rayHitObject)
+    public int CheckForPlayerHit(GameObject rayHitObject)
     {
         int playerHitID = -1;
         if (rayHitObject != null)
@@ -302,50 +438,19 @@ public class PlayerNetworking : NetworkBehaviour
 
     struct PlayerNetworkData : INetworkSerializable
     {
-        private float _x, _y, _z;
-        /// <summary>
-        /// Use shorts to save on network bandwidth
-        /// </summary>
-        private short _xVel, _yVel, _zVel;
-        private short _xRot, _yRot, _zRot;
-
-        /// <summary>
-        /// Gets/Sets position
-        /// </summary>
-        internal Vector3 Position
+        private float _sendTime;
+        private PositionData _posData;
+        
+        internal float SendTime
         {
-            get => new Vector3(_x, _y, _z);
-            set
-            {
-                _x = value.x;
-                _y = value.y;
-                _z = value.z;
-            }
+            get => _sendTime;
+            set { _sendTime = value; }
         }
-
-        internal Vector3 Velocity
+        
+        internal PositionData PositionData
         {
-            get => new Vector3(_xVel, _yVel, _zVel);
-            set
-            {
-                _xVel = (short)value.x;
-                _yVel = (short)value.y;
-                _zVel = (short)value.z;
-            }
-        }
-
-        /// <summary>
-        /// Gets/Sets rotation
-        /// </summary>
-        internal Vector3 Rotation
-        {
-            get => new Vector3(_xRot, _yRot, _zRot);
-            set
-            {
-                _xRot = (short)value.x;
-                _yRot = (short)value.y;
-                _zRot = (short)value.z;
-            }
+            get => _posData;
+            set { _posData = value; }
         }
 
         /// <summary>
@@ -353,15 +458,71 @@ public class PlayerNetworking : NetworkBehaviour
         /// </summary>
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref _x);
-            serializer.SerializeValue(ref _y);
-            serializer.SerializeValue(ref _z);
-            serializer.SerializeValue(ref _xVel);
-            serializer.SerializeValue(ref _yVel);
-            serializer.SerializeValue(ref _zVel);
-            serializer.SerializeValue(ref _xRot);
-            serializer.SerializeValue(ref _yRot);
-            serializer.SerializeValue(ref _zRot);
+            serializer.SerializeValue(ref _sendTime);
+            _posData.NetworkSerialize(serializer);
         }
+    }
+}
+
+struct PositionData : INetworkSerializable
+{
+    private float _x, _y, _z;
+
+    /// <summary>
+    /// Use shorts to save on network bandwidth
+    /// </summary>
+    private short _xVel, _yVel, _zVel;
+    private short _xRot, _yRot, _zRot;
+
+    /// <summary>
+    /// Gets/Sets position
+    /// </summary>
+    internal Vector3 Position
+    {
+        get => new Vector3(_x, _y, _z);
+        set
+        {
+            _x = value.x;
+            _y = value.y;
+            _z = value.z;
+        }
+    }
+
+    internal Vector3 Velocity
+    {
+        get => new Vector3(_xVel, _yVel, _zVel);
+        set
+        {
+            _xVel = (short)value.x;
+            _yVel = (short)value.y;
+            _zVel = (short)value.z;
+        }
+    }
+
+    /// <summary>
+    /// Gets/Sets rotation
+    /// </summary>
+    internal Vector3 Rotation
+    {
+        get => new Vector3(_xRot, _yRot, _zRot);
+        set
+        {
+            _xRot = (short)value.x;
+            _yRot = (short)value.y;
+            _zRot = (short)value.z;
+        }
+    }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref _x);
+        serializer.SerializeValue(ref _y);
+        serializer.SerializeValue(ref _z);
+        serializer.SerializeValue(ref _xVel);
+        serializer.SerializeValue(ref _yVel);
+        serializer.SerializeValue(ref _zVel);
+        serializer.SerializeValue(ref _xRot);
+        serializer.SerializeValue(ref _yRot);
+        serializer.SerializeValue(ref _zRot);
     }
 }

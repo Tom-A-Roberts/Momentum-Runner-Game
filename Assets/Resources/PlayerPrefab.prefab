@@ -1646,7 +1646,7 @@ MonoBehaviour:
   bodyRigidbody: {fileID: 4316027074644905781}
   feetRigidbody: {fileID: 4316027073947639282}
   multiplayerRepresentation: {fileID: 2473533998632247775}
-  _cheapInterpolationTime: 0.08
+  _cheapInterpolationTime: 0.1
 --- !u!114 &-7007361797976376309
 MonoBehaviour:
   m_ObjectHideFlags: 0
