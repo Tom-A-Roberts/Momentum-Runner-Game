@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class SpeedBoost : MonoBehaviour
 {
-    public float ActiveDashTimeAdjustment = 1f;
+    public float DashAcceleration = 1f;
     public float DashForce = 60f;
     private float timer;
-    private float speedBoostProgress;
+    private float DashMultiplier;
     private float boostLength;
     private PlayerController pc;
     private Rigidbody rb;
@@ -23,33 +23,33 @@ public class SpeedBoost : MonoBehaviour
         else
         {
             pc = other.gameObject.GetComponent<PlayerController>();
-            speedBoostProgress = 1;
+            DashMultiplier = 1;
             rb = pc.gameObject.GetComponent<Rigidbody>();
         }
         
     }
     private void Update()
     {
-        if (speedBoostProgress > 0)
+        if (DashMultiplier > 0)
         {
-            timer += Time.deltaTime * ActiveDashTimeAdjustment;
+            timer += Time.deltaTime / DashAcceleration;
             if (timer > 0)
             {
-                speedBoostProgress -= Time.deltaTime / timer;
-                if(speedBoostProgress < 0) speedBoostProgress = 0;
-                float currentDashForceAmount = DashForce * (1 - speedBoostProgress) * 2f;
+                DashMultiplier -= Time.deltaTime / timer;
+                if(DashMultiplier < 0) DashMultiplier = 0;
+                float currentDashForceAmount = (DashForce * DashMultiplier) * 2f;
                 boostVector = transform.forward * currentDashForceAmount;
                 verticalCompensationForce = new Vector3(0, rb.velocity.y * -1, 0);
                 ForceMode boostType = ForceMode.Force;
                 pc.BoostForce(boostVector, boostType);
-                pc.BoostForce(verticalCompensationForce, ForceMode.Acceleration);
+                pc.BoostForce(verticalCompensationForce, ForceMode.Force);
             }
         }
 
     }
     private void OnTriggerExit(Collider other)
     {
-        speedBoostProgress = 0;
+        DashMultiplier = 0;
         timer = 0;
         pc = null;
     }
