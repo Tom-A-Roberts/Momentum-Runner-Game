@@ -28,14 +28,14 @@ public class SpeedBoost : MonoBehaviour
         }
         
     }
-    private void OnTriggerStay(Collider other)
+    private void Update()
     {
         if (speedBoostProgress > 0)
         {
-            timer += Time.fixedDeltaTime * ActiveDashTimeAdjustment;
+            timer += Time.deltaTime * ActiveDashTimeAdjustment;
             if (timer > 0)
             {
-                speedBoostProgress -= Time.fixedDeltaTime / timer;
+                speedBoostProgress -= Time.deltaTime / timer;
                 if(speedBoostProgress < 0) speedBoostProgress = 0;
                 float currentDashForceAmount = DashForce * (1 - speedBoostProgress) * 2f;
                 boostVector = transform.forward * currentDashForceAmount;
