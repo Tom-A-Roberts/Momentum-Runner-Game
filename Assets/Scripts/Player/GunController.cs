@@ -61,7 +61,9 @@ public class GunController : MonoBehaviour
     public float glowIncreaseMultiplier = 1f;
 
     public HeatCoolingGunState myGunState;
-    
+
+    [System.NonSerialized]
+    public bool spectatorMode = false;
 
     private Renderer myRend;
     private Material myMat;
@@ -279,7 +281,7 @@ public class GunController : MonoBehaviour
         myGunState.Update(Time.deltaTime);
 
         bool canShoot = (myGunState.CanShootClientside && playerNetworking.IsOwner) || (myGunState.CanShootServerside && !playerNetworking.IsOwner);
-        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && canShoot && !IngameEscMenu.Singleton.curserUnlocked)
+        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && canShoot && !IngameEscMenu.Singleton.curserUnlocked && !spectatorMode)
         {
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;

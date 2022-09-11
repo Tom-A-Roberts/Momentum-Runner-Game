@@ -98,7 +98,7 @@ public class GameStateManager : NetworkBehaviour
     /// The client requests an update, which the server then broadcasts out to all clients, who then
     /// update their variables.
     /// </summary>
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void GetClosingSpeedServerRPC()
     {
         SetClosingSpeedClientRPC(closingSpeed);

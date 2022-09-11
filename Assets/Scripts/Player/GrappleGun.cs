@@ -40,6 +40,8 @@ public class GrappleGun : MonoBehaviour
     [Tooltip("(Visual Only) How fast the grapple gun looks at the grapple point")]
     public float LookAtSmoothSpeed = 0.05f;
 
+    [System.NonSerialized]
+    public bool spectatorMode = false;
 
     /// <summary>
     /// Is this GrappleGun owned by this clients player?
@@ -53,6 +55,7 @@ public class GrappleGun : MonoBehaviour
     
     private ConfigurableJoint ropeJoing;    
     private Rigidbody playerRigidbody;
+
     private GrappleCrosshair onScreenGrappleCrosshair;
 
     private Vector3 connectedPoint;
@@ -127,7 +130,7 @@ public class GrappleGun : MonoBehaviour
         // Check if grapple gun is being controlled by the owner. If yes, then process local player input
         if (isGrappleOwner && !IngameEscMenu.Singleton.curserUnlocked)
         {
-            if (Input.GetButton("Grapple") && !grappleConnected && raypointInfo.targetFound)
+            if (Input.GetButton("Grapple") && !grappleConnected && raypointInfo.targetFound && !spectatorMode)
             {
                 ConnectGrapple(raypointInfo);
             }
@@ -135,6 +138,11 @@ public class GrappleGun : MonoBehaviour
             {
                 DisconnectGrapple();
             }
+        }
+        // If switched to spectator, disconnect the grapple
+        if(spectatorMode && grappleConnected)
+        {
+            DisconnectGrapple();
         }
     }
 

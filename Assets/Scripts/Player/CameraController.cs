@@ -23,7 +23,10 @@ public class CameraController : NetworkBehaviour
 	[System.NonSerialized]
 	public float zRotation = 0;
 
-	private float originalFOV;
+    [System.NonSerialized]
+    public bool spectatorMode = false;
+
+    private float originalFOV;
 	private float targetFOV;
 	private float FOVchangeCurrentVelocity = 0.0f;
 	private Camera myCamera;
@@ -99,8 +102,14 @@ public class CameraController : NetworkBehaviour
         {
 			targetFOV = originalFOV * MaxFOVMultiplier;
 		}
-		
-		myCamera.fieldOfView = Mathf.SmoothDamp(myCamera.fieldOfView, targetFOV,  ref FOVchangeCurrentVelocity, fovChangeSmoothing);
-	}
 
+		if (!spectatorMode)
+		{
+            myCamera.fieldOfView = Mathf.SmoothDamp(myCamera.fieldOfView, targetFOV, ref FOVchangeCurrentVelocity, fovChangeSmoothing);
+        }
+		else
+		{
+			myCamera.fieldOfView = originalFOV;
+        }
+	}
 }

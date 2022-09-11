@@ -41,6 +41,9 @@ public class PlayerAudioManager : NetworkBehaviour
     public AudioClip gunCoolingEffect;
     // Start is called before the first frame update
 
+    [SerializeField]
+    public bool spectatorMode = false;
+
     private AudioSource ambianceSource;
     private AudioSource rollingSource;
     private AudioSource wallRollingSource;
@@ -144,6 +147,8 @@ public class PlayerAudioManager : NetworkBehaviour
 
     public void UpdateDeathwallIntensity(float newIntensity)
     {
+        if (spectatorMode)
+            newIntensity = 0;
         deathwallSource.volume = Mathf.Clamp01(newIntensity) * startVolume * 0.65f;
         const float pitchChange = 0.8f;
         float pitchIntensity = Mathf.Pow(newIntensity, 2);
@@ -223,17 +228,26 @@ public class PlayerAudioManager : NetworkBehaviour
         windCurrentIntensity = Mathf.SmoothDamp(windCurrentIntensity, windTargetIntensity, ref windIntensityDif, windSoundSmoothAmount);
         grappleCurrentIntensity = Mathf.SmoothDamp(grappleCurrentIntensity, grappleTargetIntensity, ref grappleIntensityDif, grappleSoundSmoothAmount);
 
-        wallRollingSource.volume = Mathf.Clamp01(wallRollingCurrentIntensity) * startVolume * 0.13f;
-        wallRollingSource.pitch = wallRollingPitch + (Mathf.Clamp01(wallRollingCurrentIntensity) * wallRollingPitchChange) - (wallRollingPitchChange / 2);
+        if (!spectatorMode)
+        {
+            wallRollingSource.volume = Mathf.Clamp01(wallRollingCurrentIntensity) * startVolume * 0.13f;
+            wallRollingSource.pitch = wallRollingPitch + (Mathf.Clamp01(wallRollingCurrentIntensity) * wallRollingPitchChange) - (wallRollingPitchChange / 2);
 
-        rollingSource.volume = Mathf.Clamp01(rollingCurrentIntensity + (wallRollingCurrentIntensity / 8f)) * startVolume * 0.5f;
-        rollingSource.pitch = rollingPitch + (Mathf.Clamp01(rollingCurrentIntensity) * rollingPitchChange) - (rollingPitchChange / 2);
+            rollingSource.volume = Mathf.Clamp01(rollingCurrentIntensity + (wallRollingCurrentIntensity / 8f)) * startVolume * 0.5f;
+            rollingSource.pitch = rollingPitch + (Mathf.Clamp01(rollingCurrentIntensity) * rollingPitchChange) - (rollingPitchChange / 2);
 
-        grapplingSwingingSource.volume = Mathf.Clamp01(grappleCurrentIntensity) * startVolume * grappleSwingVolume;
-        grapplingSwingingSource.pitch = grapplePitch + (Mathf.Clamp01(grappleCurrentIntensity) * grapplePitchChange) - (grapplePitchChange / 2);
+            grapplingSwingingSource.volume = Mathf.Clamp01(grappleCurrentIntensity) * startVolume * grappleSwingVolume;
+            grapplingSwingingSource.pitch = grapplePitch + (Mathf.Clamp01(grappleCurrentIntensity) * grapplePitchChange) - (grapplePitchChange / 2);
 
-
-        windSource.volume = Mathf.Clamp01(windCurrentIntensity) * startVolume * 0.2f;
-        windSource.pitch = 1 + (Mathf.Clamp01(windCurrentIntensity) * windPitchChange) - (windPitchChange / 2);
+            windSource.volume = Mathf.Clamp01(windCurrentIntensity) * startVolume * 0.2f;
+            windSource.pitch = 1 + (Mathf.Clamp01(windCurrentIntensity) * windPitchChange) - (windPitchChange / 2);
+        }
+        else
+        {
+            wallRollingSource.volume = 0;
+            rollingSource.volume = 0;
+            grapplingSwingingSource.volume = 0;
+            windSource.volume = 0;
+        }
     }
 }

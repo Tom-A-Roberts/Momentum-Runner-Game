@@ -15,9 +15,25 @@ public class PlayerStateManager : MonoBehaviour
     public Rigidbody playerFeet;
     public Camera playerCamera;
     public PlayerAudioManager playerAudioManager;
+    public PlayerController playerController;
+    public WallRunning wallRunningScript;
+    public GunController gunController;
+    public GrappleGun grappleGunScript;
+    public CameraController cameraController;
+    public Transform multiplayerRepresentation;
+    public MeshRenderer[] firstPersonViewMeshes;
+    public MeshRenderer spectatorRepresentation;
+    public CapsuleCollider bodyCollider;
+    public SphereCollider feetCollider;
+
 
     [Header("Effects settings")]
     public float deathwallRedStartDistance = 5;
+
+    [Header("Game States")]
+    [SerializeField]
+    private bool _spectatorMode = false;
+    public bool SpectatorMode => _spectatorMode;
 
     [System.NonSerialized]
     public Vector3 bodySpawnPosition;
@@ -32,8 +48,6 @@ public class PlayerStateManager : MonoBehaviour
     private Quaternion bodyStartRotation;
     private Vector3 feetStartPosition;
     private Quaternion feetStartRotation;
-
-
 
     void Start()
     {
@@ -115,11 +129,49 @@ public class PlayerStateManager : MonoBehaviour
 
         playerBody.position = bodyStartPosition;
         playerFeet.position = feetStartPosition;
+
+        if (SpectatorMode)
+        {
+            EnterSpectatorMode();
+        }
+        else
+        {
+            LeaveSpectatorMode();
+        }
     }
 
     void Update()
     {
 
+    }
+
+    public void ShowMultiplayerRepresentation()
+    {
+        for (int childID = 0; childID < multiplayerRepresentation.childCount; childID++)
+        {
+            multiplayerRepresentation.GetChild(childID).GetComponent<MeshRenderer>().enabled = true;
+        }
+    }
+    public void HideMultiplayerRepresentation()
+    {
+        for (int childID = 0; childID < multiplayerRepresentation.childCount; childID++)
+        {
+            multiplayerRepresentation.GetChild(childID).GetComponent<MeshRenderer>().enabled = false;
+        }
+    }
+    public void ShowFirstPersonRepresentation()
+    {
+        foreach (MeshRenderer mesh in firstPersonViewMeshes)
+        {
+            mesh.enabled = true;
+        }
+    }
+    public void HideFirstPersonRepresentation()
+    {
+        foreach (MeshRenderer mesh in firstPersonViewMeshes)
+        {
+            mesh.enabled = false;
+        }
     }
 
     public void RespawnPlayer()
@@ -145,6 +197,8 @@ public class PlayerStateManager : MonoBehaviour
         playerFeet.transform.rotation = feetStartRotation;
 
         playerBody.velocity = Vector3.zero;
+
+        playerNetworking.EnterSpectatorModeServerRPC();
     }
 
     /// <summary>
@@ -168,17 +222,63 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
-    //public void BeenShotByOwner()
-    //{
-    //    Debug.Log("I've (" + gameObject.name + ") been shot by the owner player");
-    //}
-    ///// <summary>
-    ///// Sent by server on CORRECT hit
-    ///// </summary>
-    //public void BeenShotByRemote()
-    //{
-    //    Debug.Log("I've (" + gameObject.name + ") been shot by a remote player");
-    //}
+    //public MeshRenderer spectatorRepresentation;
+    //public CapsuleCollider bodyCollider;
+    //public SphereCollider feetCollider;
+
+    public void EnterSpectatorMode()
+    {
+        _spectatorMode = true;
+
+        wallRunningScript.spectatorMode = true;
+        grappleGunScript.spectatorMode = true;
+        gunController.spectatorMode = true;
+        playerController.spectatorMode = true;
+        playerAudioManager.spectatorMode = true;
+        cameraController.spectatorMode = true;
+
+
+        HideFirstPersonRepresentation();
+
+        if (playerNetworking.IsOwner)
+        {
+            if (GrappleCrosshair.Instance)
+                GrappleCrosshair.Instance.spectatorMode = true;
+        }
+        else
+        {
+            bodyCollider.enabled = false;
+            feetCollider.enabled = false;
+            spectatorRepresentation.enabled = true;
+            HideMultiplayerRepresentation();
+        }
+    }
+    public void LeaveSpectatorMode()
+    {
+        _spectatorMode = false;
+
+        wallRunningScript.spectatorMode = false;
+        grappleGunScript.spectatorMode = false;
+        gunController.spectatorMode = false;
+        playerController.spectatorMode = false;
+        playerAudioManager.spectatorMode = false;
+        cameraController.spectatorMode = false;
+
+        ShowFirstPersonRepresentation();
+
+        if (playerNetworking.IsOwner)
+        {
+            if(GrappleCrosshair.Instance)
+                GrappleCrosshair.Instance.spectatorMode =false;
+        }
+        else
+        {
+            bodyCollider.enabled = true;
+            feetCollider.enabled = true;
+            spectatorRepresentation.enabled = false;
+            ShowMultiplayerRepresentation();
+        }
+    }
 
     public void ProcessPotentialHit(int playerHitID)
     {
