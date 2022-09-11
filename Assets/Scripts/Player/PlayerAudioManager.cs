@@ -30,6 +30,7 @@ public class PlayerAudioManager : NetworkBehaviour
     public AudioClip grapplingSwingingLoop;
     public AudioClip grapplingStart;
     public AudioClip grapplingEnd;
+    public AudioClip deathwallLoop;
     public AudioClip jump;
     public AudioClip land;
     public AudioClip wind;
@@ -47,6 +48,7 @@ public class PlayerAudioManager : NetworkBehaviour
     private AudioSource grapplingSwingingSource;
     private AudioSource shootingSource;
     private AudioSource jumpingSource;
+    private AudioSource deathwallSource;
 
     private float rollingTargetIntensity;
     private float rollingCurrentIntensity;
@@ -99,6 +101,12 @@ public class PlayerAudioManager : NetworkBehaviour
         windSource.volume = 0f;
         windSource.Play();
 
+        deathwallSource = gameObject.AddComponent<AudioSource>();
+        deathwallSource.clip = deathwallLoop;
+        deathwallSource.loop = true;
+        deathwallSource.volume = 0f;
+        deathwallSource.Play();
+
         grapplingSwingingSource = gameObject.AddComponent<AudioSource>();
         grapplingSwingingSource.clip = grapplingSwingingLoop;
         grapplingSwingingSource.loop = true;
@@ -111,8 +119,6 @@ public class PlayerAudioManager : NetworkBehaviour
         jumpingSource = gameObject.AddComponent<AudioSource>();
         jumpingSource.clip = jump;
     }
-
-
 
     public void UpdateWindIntensity(float newIntensity)
     {
@@ -136,10 +142,17 @@ public class PlayerAudioManager : NetworkBehaviour
         wallRollingTargetIntensity = newIntensity;
     }
 
+    public void UpdateDeathwallIntensity(float newIntensity)
+    {
+        deathwallSource.volume = Mathf.Clamp01(newIntensity) * startVolume * 0.65f;
+        const float pitchChange = 0.8f;
+        float pitchIntensity = Mathf.Pow(newIntensity, 2);
+        deathwallSource.pitch = 1f + (Mathf.Clamp01(pitchIntensity) * pitchChange) - (pitchChange / 2);
+    }
+
     public void UpdateGrappleSwingingIntensity(float newIntensity)
     {
         grappleTargetIntensity = newIntensity;
-
     }
 
 

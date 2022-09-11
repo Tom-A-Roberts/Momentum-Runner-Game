@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using UnityEngine.Playables;
+using UnityEngine.UI;
 
 /// <summary>
 /// This class handles the game state such as:
@@ -33,6 +34,10 @@ public class GameStateManager : NetworkBehaviour
     public float zoneProgress = 0;
     [Tooltip("The speed of the zone at the start of the game, measured in meters per second")]
     public float zoneSpeed = 1;
+
+    [Header("Effects settings")]
+    public Image ScreenRedEdges;
+
     /// <summary>
     /// The distance in meters between the fog wall and the death wall
     /// </summary>
@@ -48,6 +53,8 @@ public class GameStateManager : NetworkBehaviour
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
 
+    private BoxCollider deathWallCollider;
+
     private void Awake()
     {
         if (Singleton != null && Singleton != this)
@@ -62,6 +69,11 @@ public class GameStateManager : NetworkBehaviour
             throw new System.Exception("\"railwayPointsList is set to null.\\n Therefore no wall points found to use when moving the deathwall and fogwall!\"");
         }
         populateRailwayPoints();
+
+        if (deathWall)
+        {
+            deathWallCollider = deathWall.GetComponent<BoxCollider>();
+        }
 
         SetWallPositionAndRotationToProgress(zoneProgress);
     }
@@ -125,9 +137,9 @@ public class GameStateManager : NetworkBehaviour
         }
         UpdateWallPositions();
 
-        if (localPlayer)
+        if (localPlayer && deathWall && deathWallCollider)
         {
-            localPlayer.UpdateDeathWallEffects();
+            localPlayer.UpdateDeathWallEffects(deathWall.transform, deathWallCollider);
         }
     }
 

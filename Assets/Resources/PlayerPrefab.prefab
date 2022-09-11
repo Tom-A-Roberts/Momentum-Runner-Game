@@ -898,6 +898,7 @@ MonoBehaviour:
   grapplingSwingingLoop: {fileID: 8300000, guid: 636e133e6f24bf647b7ce4de5ca3cd6d, type: 3}
   grapplingStart: {fileID: 8300000, guid: 9028312e487565149aeb5b781eefab2c, type: 3}
   grapplingEnd: {fileID: 8300000, guid: 4dcce5dfceb478f438f624155aea841e, type: 3}
+  deathwallLoop: {fileID: 8300000, guid: 7b6afacab0e733a4ba81a73bbc6cd2a2, type: 3}
   jump: {fileID: 8300000, guid: 9a23d35c636de9847b279f19cf598354, type: 3}
   land: {fileID: 8300000, guid: 40d0b314db6267046ac1ddf616d7a20c, type: 3}
   wind: {fileID: 8300000, guid: c4206ced1c7aa6242947aa266338c546, type: 3}
@@ -1357,9 +1358,6 @@ MonoBehaviour:
   JumpLerpStart: 10
   MaxWallKickoffForce: 38
   MaxWallBoostForce: 5
-  DashForce: 90
-  DashForceActiveTime: 0.2
-  DashCooldown: 5
   PlayerHasAirControl: 1
 --- !u!33 &4316027074644905783
 MeshFilter:
@@ -1624,9 +1622,8 @@ MonoBehaviour:
   playerBody: {fileID: 4316027074644905781}
   playerFeet: {fileID: 4316027073947639282}
   playerCamera: {fileID: 4316027073834798314}
-  bodySpawnPosition: {x: 0, y: 0, z: 0}
-  feetSpawnPosition: {x: 0, y: 0, z: 0}
-  bodyFeetOffset: {x: 0, y: 0, z: 0}
+  playerAudioManager: {fileID: 8008624713252837793}
+  deathwallRedStartDistance: 15
 --- !u!114 &1445570255
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -66,6 +66,7 @@ MonoBehaviour:
   closingSpeed: 0
   zoneProgress: -0.01
   zoneSpeed: 1
+  ScreenRedEdges: {fileID: 0}
 --- !u!114 &6462836443202579315
 MonoBehaviour:
   m_ObjectHideFlags: 0

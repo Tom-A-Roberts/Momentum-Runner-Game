@@ -3,26 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using Unity.Netcode;
+using UnityEngine.UI;
 
 public class PlayerStateManager : MonoBehaviour
 {
     public bool SobelEnabled = true;
 
+    [Header("Known Objects")]
     public PlayerNetworking playerNetworking;
     public Rigidbody playerBody;
     public Rigidbody playerFeet;
     public Camera playerCamera;
+    public PlayerAudioManager playerAudioManager;
 
-    //private Transform spawnPoint;
+    [Header("Effects settings")]
+    public float deathwallRedStartDistance = 5;
 
+    [System.NonSerialized]
+    public Vector3 bodySpawnPosition;
+    [System.NonSerialized]
+    public Vector3 feetSpawnPosition;
+    [System.NonSerialized]
+    public Vector3 bodyFeetOffset;
+
+    // Privates
+    
     private Vector3 bodyStartPosition;
     private Quaternion bodyStartRotation;
     private Vector3 feetStartPosition;
     private Quaternion feetStartRotation;
 
-    public Vector3 bodySpawnPosition;
-    public Vector3 feetSpawnPosition;
-    public Vector3 bodyFeetOffset;
+
 
     void Start()
     {
@@ -91,12 +102,24 @@ public class PlayerStateManager : MonoBehaviour
             }
         }
 
+        if(GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+        {
+            Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
+            newcol.a = 0;
+            GameStateManager.Singleton.ScreenRedEdges.color = newcol;
+        }
+        else
+        {
+            Debug.LogWarning("No red edges image found in UI, the effect won't work. Please set GameStateManager.ScreenRedEdges");
+        }
+
         playerBody.position = bodyStartPosition;
         playerFeet.position = feetStartPosition;
     }
 
     void Update()
     {
+
     }
 
     public void RespawnPlayer()
@@ -127,9 +150,22 @@ public class PlayerStateManager : MonoBehaviour
     /// <summary>
     /// As the deathwall gets closer to the player, the effects show up on the screen more
     /// </summary>
-    public void UpdateDeathWallEffects()
+    public void UpdateDeathWallEffects(Transform deathwallTransform, BoxCollider deathWallCollider)
     {
+        if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+        {
+            Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, deathWallCollider, deathwallTransform.position, deathwallTransform.rotation);
 
+            float distance = Vector3.Distance(ClosestPoint, playerBody.position);
+
+            float power = Mathf.Clamp01((deathwallRedStartDistance - distance) / deathwallRedStartDistance);
+
+            playerAudioManager.UpdateDeathwallIntensity(power);
+
+            Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
+            newcol.a = power;
+            GameStateManager.Singleton.ScreenRedEdges.color = newcol;
+        }
     }
 
     //public void BeenShotByOwner()
