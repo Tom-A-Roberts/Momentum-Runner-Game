@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using Unity.Netcode;
 
-public class LevelLogicManager : MonoBehaviour
+public class PlayerStateManager : MonoBehaviour
 {
     public bool SobelEnabled = true;
 
@@ -65,6 +65,10 @@ public class LevelLogicManager : MonoBehaviour
 
         if (playerNetworking.IsOwner)
         {
+            // Let GameStateManager know who is the local player
+            GameStateManager.Singleton.localPlayer = this;
+
+            // Update the fog manager to know who is the local player
             if (FogManager.Instance)
             {
                 FogManager.Instance.ResetFog();
@@ -78,7 +82,6 @@ public class LevelLogicManager : MonoBehaviour
                 if (!fogger)
                     Debug.LogWarning("No FogManager found!");
             }
-
             // if we get to this point and no FogManager then big sad 
             if (FogManager.Instance)
             {
@@ -119,6 +122,14 @@ public class LevelLogicManager : MonoBehaviour
         playerFeet.transform.rotation = feetStartRotation;
 
         playerBody.velocity = Vector3.zero;
+    }
+
+    /// <summary>
+    /// As the deathwall gets closer to the player, the effects show up on the screen more
+    /// </summary>
+    public void UpdateDeathWallEffects()
+    {
+
     }
 
     //public void BeenShotByOwner()

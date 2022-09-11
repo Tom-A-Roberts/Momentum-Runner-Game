@@ -18,6 +18,8 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     private NetworkVariable<GameStateData> _gameState = new NetworkVariable<GameStateData>(writePerm: NetworkVariableWritePermission.Server);
 
+    public static GameStateManager Singleton { get; private set; }
+
     [Tooltip("Probably called 'PointsList', should be an object containing all the points that the walls will follow.")]
     public GameObject railwayPointsList;
     [Tooltip("The game object to treat as the death wall that chases the players")]
@@ -37,11 +39,21 @@ public class GameStateManager : NetworkBehaviour
     [System.NonSerialized]
     public float zoneWidth = 10;
 
+    [System.NonSerialized]
+    public PlayerStateManager localPlayer;
+    
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
     private float railwayLength = 0;
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
+
+    private void Awake()
+    {
+        if (Singleton != null && Singleton != this)
+            Destroy(Singleton);
+        Singleton = this;
+    }
 
     void Start()
     {
@@ -65,7 +77,6 @@ public class GameStateManager : NetworkBehaviour
             // Add callback function for when the game state is changed:
             _gameState.OnValueChanged += ChangedGameState;
         }
-        
     }
 
     #region RPC communications
@@ -113,6 +124,11 @@ public class GameStateManager : NetworkBehaviour
             _gameState.Value = stateData;
         }
         UpdateWallPositions();
+
+        if (localPlayer)
+        {
+            localPlayer.UpdateDeathWallEffects();
+        }
     }
 
     /// <summary>

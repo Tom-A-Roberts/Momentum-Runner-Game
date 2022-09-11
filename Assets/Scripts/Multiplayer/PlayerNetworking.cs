@@ -16,7 +16,7 @@ public class PlayerNetworking : NetworkBehaviour
     private float _rotVelY;
     private float _rotVelZ;
 
-    public LevelLogicManager myLevelController;
+    public PlayerStateManager myLevelController;
     public GameObject myCamera;
     public GameObject grappleGun;
     public GameObject shootingGun;
@@ -367,7 +367,7 @@ public class PlayerNetworking : NetworkBehaviour
         if (IsOwner)
         {
             // OR: if I am disconnected then send my player to main menu
-            IngameEscMenu.Instance.LoadMainMenu();
+            IngameEscMenu.Singleton.LoadMainMenu();
         }
     }
 

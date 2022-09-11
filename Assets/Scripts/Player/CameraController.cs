@@ -54,7 +54,7 @@ public class CameraController : NetworkBehaviour
 
 	void Update()
 	{
-        if (!IngameEscMenu.Instance.curserUnlocked)
+        if (!IngameEscMenu.Singleton.curserUnlocked)
         {
 			rotation.x += Input.GetAxis(xAxis) * sensitivity;
 			rotation.y += Input.GetAxis(yAxis) * sensitivity;

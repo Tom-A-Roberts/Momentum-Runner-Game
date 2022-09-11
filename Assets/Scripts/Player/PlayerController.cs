@@ -54,14 +54,14 @@ public class PlayerController : MonoBehaviour
     public float MaxWallKickoffForce = 50f;
     [Tooltip("How hard we boost forwards from a wall jump")]
     public float MaxWallBoostForce = 10f;
-    [Header("----------------")]
-    [Header("Dash Settings")]
-    [Tooltip("How much force is applied when air dashing")]
-    public float DashForce = 60f;
-    [Tooltip("Amount of seconds the dash force lasts")]
-    public float DashForceActiveTime = 0.1f;
-    [Tooltip("Amount of seconds for the dash cooldown, measured from time the key was pressed")]
-    public float DashCooldown = 1f;
+    //[Header("----------------")]
+    //[Header("Dash Settings")]
+    //[Tooltip("How much force is applied when air dashing")]
+    //public float DashForce = 60f;
+    //[Tooltip("Amount of seconds the dash force lasts")]
+    //public float DashForceActiveTime = 0.1f;
+    //[Tooltip("Amount of seconds for the dash cooldown, measured from time the key was pressed")]
+    //public float DashCooldown = 1f;
 
     [Tooltip("Allow the player to accelerate to walkspeed while in the air. This does not effect ability to slow down while in the air")]
     public bool PlayerHasAirControl = true;
@@ -96,10 +96,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            DashUIScript dashUI = FindObjectOfType<DashUIScript>();
             Speedometer speedometer = FindObjectOfType<Speedometer>();
-
-            dashUI.pc = this;
 
             speedometer.bodyToTrack = bodyRigidBody;
         }
@@ -107,14 +104,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !IngameEscMenu.Instance.curserUnlocked)
+        if (Input.GetKeyDown(KeyCode.Space) && !IngameEscMenu.Singleton.curserUnlocked)
         {
             
             jumpKeyPressed = true;
         }     
 
         #region SPRINTING LOGIC
-        if (Input.GetKey(KeyCode.LeftShift) && !IngameEscMenu.Instance.curserUnlocked) movementSpeed = WalkingSpeed * SprintMultiplier;
+        if (Input.GetKey(KeyCode.LeftShift) && !IngameEscMenu.Singleton.curserUnlocked) movementSpeed = WalkingSpeed * SprintMultiplier;
         else movementSpeed = WalkingSpeed;
         #endregion
   
@@ -268,7 +265,7 @@ public class PlayerController : MonoBehaviour
 
     public Tuple<float, float> GetMovementAxis()
     {
-        if (!IngameEscMenu.Instance.curserUnlocked)
+        if (!IngameEscMenu.Singleton.curserUnlocked)
         {
             float xInput = Input.GetAxisRaw("Horizontal");
             float yInput = Input.GetAxisRaw("Vertical");
