@@ -41,6 +41,8 @@ public class PlayerStateManager : MonoBehaviour
     public Vector3 feetSpawnPosition;
     [System.NonSerialized]
     public Vector3 bodyFeetOffset;
+    [System.NonSerialized]
+    public bool isDead = false;
 
     // Privates
     private int fogInitDelayCounter = 0;
@@ -162,8 +164,27 @@ public class PlayerStateManager : MonoBehaviour
                 InitializeFogwall();
             }
         }
-
+        if(!GameStateManager.Singleton.DeveloperMode && !isDead && (playerNetworking.IsOwner || NetworkManager.Singleton.IsHost))
+            CheckForDeath();
     }
+
+    /// <summary>
+    /// (Death by deathwall)
+    /// </summary>
+    void CheckForDeath()
+    {
+        if(GameStateManager.Singleton.deathWallCollider && GameStateManager.Singleton.deathWall)
+        {
+            Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, GameStateManager.Singleton.deathWallCollider, GameStateManager.Singleton.deathWall.transform.position, GameStateManager.Singleton.deathWall.transform.rotation);
+            //float distance = Vector3.Distance(ClosestPoint, playerBody.position);
+            float signedDistance = Vector3.Dot(playerBody.position - ClosestPoint, GameStateManager.Singleton.transform.forward);
+            if(signedDistance < -0.2)
+            {
+                playerNetworking.StartDeath();
+            }
+        }
+    }
+
 
     public void ShowMultiplayerRepresentation()
     {
@@ -211,14 +232,19 @@ public class PlayerStateManager : MonoBehaviour
     }
     public void PlayerDeath()
     {
-        playerBody.transform.position = bodyStartPosition;
-        playerBody.transform.rotation = bodyStartRotation;
-        playerFeet.transform.position = feetStartPosition;
-        playerFeet.transform.rotation = feetStartRotation;
+        if (!isDead)
+        {
+            playerBody.transform.position = bodyStartPosition;
+            playerBody.transform.rotation = bodyStartRotation;
+            playerFeet.transform.position = feetStartPosition;
+            playerFeet.transform.rotation = feetStartRotation;
 
-        playerBody.velocity = Vector3.zero;
+            playerBody.velocity = Vector3.zero;
 
-        playerNetworking.EnterSpectatorModeServerRPC();
+            //playerNetworking.EnterSpectatorModeServerRPC();
+            EnterSpectatorMode();
+        }
+        isDead = true;
     }
 
     /// <summary>

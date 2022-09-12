@@ -1175,7 +1175,7 @@ GameObject:
   - component: {fileID: 4316027073947639283}
   - component: {fileID: 4316027073947639282}
   - component: {fileID: 1371572323}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6946,7 +6946,7 @@ GameObject:
   - component: {fileID: 4843209585104937555}
   - component: {fileID: 5403134068769023415}
   - component: {fileID: 955790866180259259}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: SpectatorRepresentation
   m_TagString: Untagged
   m_Icon: {fileID: 0}

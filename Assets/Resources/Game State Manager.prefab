@@ -64,9 +64,11 @@ MonoBehaviour:
   deathWall: {fileID: 0}
   fogWall: {fileID: 0}
   closingSpeed: 0
-  zoneProgress: -0.01
+  zoneProgress: 0.08
   zoneSpeed: 1
+  zoneStartWidth: 350
   ScreenRedEdges: {fileID: 0}
+  DeveloperMode: 0
 --- !u!114 &6462836443202579315
 MonoBehaviour:
   m_ObjectHideFlags: 0
