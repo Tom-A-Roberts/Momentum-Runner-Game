@@ -85,6 +85,7 @@ public class PlayerNetworking : NetworkBehaviour
     {
         PlayerNetworkData dataReceived = _netState.Value;
         float time = dataReceived.SendTime;
+
         PositionData positionData = dataReceived.PositionData;
 
         positionHistory.Add(new KeyValuePair<float, PositionData>(time, positionData));
@@ -93,9 +94,9 @@ public class PlayerNetworking : NetworkBehaviour
             InterpolatePosition(serverTime);
     }
 
-    private PositionData GetPositionDataAtTime(float localTime)
+    private PositionData GetPositionDataAtTime(float localTime, float interpolationTime)
     {
-        float timeToFind = localTime - _cheapInterpolationTime;
+        float timeToFind = localTime - interpolationTime;
 
         int foundDataIndex = positionHistory.FindLastIndex(value => value.Key < timeToFind);
 
@@ -119,7 +120,6 @@ public class PlayerNetworking : NetworkBehaviour
             xRot = Mathf.LerpAngle(foundData.Rotation.x, foundData2.Rotation.x, interpRatio);
             yRot = Mathf.LerpAngle(foundData.Rotation.y, foundData2.Rotation.y, interpRatio);
             zRot = Mathf.LerpAngle(foundData.Rotation.z, foundData2.Rotation.z, interpRatio);
-
         }
         else
         {
@@ -144,7 +144,7 @@ public class PlayerNetworking : NetworkBehaviour
 
     private void InterpolatePosition(float localTime)
     {
-        PositionData interpolatedPosition = GetPositionDataAtTime(localTime);
+        PositionData interpolatedPosition = GetPositionDataAtTime(localTime, _cheapInterpolationTime);
 
         Vector3 position = interpolatedPosition.Position;
         Vector3 velocity = interpolatedPosition.Velocity;
@@ -190,7 +190,7 @@ public class PlayerNetworking : NetworkBehaviour
     public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
     {
         if (IsOwner)
-        {            
+        {
             // who do we think we hit?
             GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
             int hitID = CheckForPlayerHit(hitObj);
@@ -203,36 +203,29 @@ public class PlayerNetworking : NetworkBehaviour
             }
 
             float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;
-            ShootServerRPC(shootTime, shootDirection, hitID);
+            Debug.Log("Shot fired at time: " + shootTime);
+            ShootServerRPC(shootTime, shootStartPosition, shootDirection, hitID);
         }
     }
 
     [ServerRpc]
-    public void ShootServerRPC(float shootTime, Vector3 shootDirection, int hitPlayerID)
+    public void ShootServerRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection, int clientHitID)
     {
-        int hitID = hitPlayerID;
-        Vector3 shootStartPosition = bodyRigidbody.position;
+        int serverHitID = clientHitID;
 
         bool shootSuccess = true;
 
         if (!IsOwnedByServer)
         {
             ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);
-            Debug.Log("Player " + OwnerClientId.ToString() + " RTT: " + rtt);
+            Debug.Log("Shot received at time: " + NetworkManager.Singleton.ServerTime.TimeAsFloat);
             float timeToCheck = shootTime - rtt / 1000f;
-            //Debug.Log(shootTime - NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId) / 1000f);
-            InterpolatePosition(shootTime);
 
-            shootStartPosition = GetPositionDataAtTime(timeToCheck).Position;
-            //Debug.Log("shoot pos: " + shootStartPosition);
-
-            GameObject playerIThinkIHit;
-            ConnectedPlayers.TryGetValue((ulong)hitPlayerID, out playerIThinkIHit);
-            
             // should probably rollback all players 
-            PlayerNetworking playerNetworkingToRollback;
-            if (playerIThinkIHit)
+            GameObject playerIThinkIHit;;          
+            if (ConnectedPlayers.TryGetValue((ulong)clientHitID, out playerIThinkIHit))
             {
+                PlayerNetworking playerNetworkingToRollback;
                 if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
                 {
                     playerNetworkingToRollback.InterpolatePosition(timeToCheck);
@@ -240,15 +233,15 @@ public class PlayerNetworking : NetworkBehaviour
             }
             else
             {
-                Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + hitPlayerID);
+                Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + clientHitID);
             }
 
             GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
-            hitID = CheckForPlayerHit(hitObj);
+            serverHitID = CheckForPlayerHit(hitObj);
 
-            shootSuccess = hitPlayerID == hitID;
+            shootSuccess = clientHitID == serverHitID;
 
-            if (hitPlayerID == hitID)            
+            if (clientHitID == serverHitID)            
                 Debug.Log("No discrepancy found - Hit registered");            
             else
                 Debug.Log("Discrepancy found - Hit missed");
