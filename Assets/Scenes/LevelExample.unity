@@ -257,7 +257,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh33104
+  m_Name: pb_Mesh33102
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -4673,7 +4673,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570212, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -15.16
+      value: -15.26
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570212, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4707,9 +4707,29 @@ PrefabInstance:
       propertyPath: m_Intensity
       value: 1686.1635
       objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UseViewFrustumForShadowCasterCull
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_Intensity
       value: 21188.955
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_ShadowUpdateMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_AlwaysDrawDynamicShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UpdateShadowOnLightMovement
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570215, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_Name
@@ -6173,7 +6193,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-3102
+  m_Name: pb_Mesh-3030
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -7893,18 +7913,18 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: -6.4260216, y: -42.404877, z: 173.80952}
-  - {x: -5.6565065, y: -43.79262, z: 175.93573}
-  - {x: -4.8904552, y: -45.152866, z: 178.06293}
-  - {x: -4.13113, y: -46.459717, z: 180.19211}
-  - {x: -3.3814018, y: -47.690372, z: 182.32408}
-  - {x: -2.6435847, y: -48.82646, z: 184.45953}
-  - {x: -1.9192998, y: -49.855118, z: 186.59894}
-  - {x: -1.2093823, y: -50.769707, z: 188.74254}
-  - {x: -0.51383215, y: -51.57023, z: 190.89032}
-  - {x: 0.16818517, y: -52.26332, z: 193.04207}
-  - {x: 0.8382921, y: -52.861847, z: 195.1973}
-  - {x: 1.4988017, y: -53.384174, z: 197.35532}
-  - {x: 2.1525855, y: -53.853107, z: 199.51532}
+  - {x: -5.6814685, y: -43.80324, z: 175.93945}
+  - {x: -4.938928, y: -45.17349, z: 178.07019}
+  - {x: -4.2002974, y: -46.48914, z: 180.20245}
+  - {x: -3.4672434, y: -47.72689, z: 182.33693}
+  - {x: -2.7411118, y: -48.867954, z: 184.47414}
+  - {x: -2.0228446, y: -49.899166, z: 186.61444}
+  - {x: -1.3129271, y: -50.813755, z: 188.75804}
+  - {x: -0.61135924, y: -51.61172, z: 190.90492}
+  - {x: 0.08234366, y: -52.29984, z: 193.05492}
+  - {x: 0.7691249, y: -52.89127, z: 195.20764}
+  - {x: 1.4503286, y: -53.404797, z: 197.36258}
+  - {x: 2.1276236, y: -53.863728, z: 199.51904}
   - {x: 2.802905, y: -54.29454, z: 201.67632}
   m_Parameters:
     serializedVersion: 3
@@ -9406,7 +9426,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32526
+  m_Name: pb_Mesh32524
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -9866,7 +9886,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32612
+  m_Name: pb_Mesh32610
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -10110,7 +10130,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32596
+  m_Name: pb_Mesh32594
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -13214,7 +13234,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32840
+  m_Name: pb_Mesh32842
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -14200,6 +14220,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UseViewFrustumForShadowCasterCull
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_ShadowUpdateMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_AlwaysDrawDynamicShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UpdateShadowOnLightMovement
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 787337874249570215, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_Name
       value: Point Light (3)
@@ -14236,7 +14276,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32794
+  m_Name: pb_Mesh32796
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -14401,7 +14441,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh33090
+  m_Name: pb_Mesh33088
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -14663,18 +14703,18 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: -5.502465, y: -44.201553, z: 173.44766}
-  - {x: -4.780355, y: -45.49555, z: 175.59384}
-  - {x: -4.0617266, y: -46.762043, z: 177.74097}
-  - {x: -3.349861, y: -47.97515, z: 179.88992}
-  - {x: -2.6476436, y: -49.11208, z: 182.04149}
-  - {x: -1.9574012, y: -50.154457, z: 184.19632}
-  - {x: -1.2807637, y: -51.089417, z: 186.35481}
-  - {x: -0.6185707, y: -51.91033, z: 188.51723}
-  - {x: 0.029177725, y: -52.617203, z: 190.68356}
-  - {x: 0.6633216, y: -53.21665, z: 192.85359}
-  - {x: 1.2854903, y: -53.72155, z: 195.02686}
-  - {x: 1.8980101, y: -54.150272, z: 197.20273}
-  - {x: 2.5037684, y: -54.5256, z: 199.38046}
+  - {x: -4.80528, y: -45.506317, z: 175.59738}
+  - {x: -4.110129, y: -46.782955, z: 177.74785}
+  - {x: -3.418927, y: -48.004993, z: 179.89975}
+  - {x: -2.7333596, y: -49.149117, z: 182.05368}
+  - {x: -2.0547857, y: -50.196533, z: 184.21016}
+  - {x: -1.3841571, y: -51.134094, z: 186.36952}
+  - {x: -0.721964, y: -51.95501, z: 188.53194}
+  - {x: -0.06820673, y: -52.65928, z: 190.6974}
+  - {x: 0.57760566, y: -53.253685, z: 192.86578}
+  - {x: 1.2164242, y: -53.751392, z: 195.03668}
+  - {x: 1.849608, y: -54.171185, z: 197.20961}
+  - {x: 2.4788432, y: -54.53637, z: 199.384}
   - {x: 3.1060443, y: -54.873436, z: 201.55911}
   m_Parameters:
     serializedVersion: 3
@@ -14853,7 +14893,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh33186
+  m_Name: pb_Mesh33188
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -15136,18 +15176,18 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: -5.5263243, y: -42.390846, z: 173.7127}
-  - {x: -4.802957, y: -43.77897, z: 175.84518}
-  - {x: -4.083073, y: -45.139595, z: 177.97859}
-  - {x: -3.3699539, y: -46.44682, z: 180.11383}
-  - {x: -2.6664875, y: -47.67785, z: 182.2517}
-  - {x: -1.9750011, y: -48.81432, z: 184.39278}
-  - {x: -1.2971249, y: -49.84335, z: 186.53752}
-  - {x: -0.6336987, y: -50.758312, z: 188.68617}
-  - {x: 0.015276909, y: -51.559208, z: 190.83873}
-  - {x: 0.65064204, y: -52.25267, z: 192.99495}
-  - {x: 1.274027, y: -52.851566, z: 195.15442}
-  - {x: 1.8877597, y: -53.37427, z: 197.31648}
-  - {x: 2.4947278, y: -53.843575, z: 199.48038}
+  - {x: -4.8279943, y: -43.78958, z: 175.84839}
+  - {x: -4.1316934, y: -45.160202, z: 177.98483}
+  - {x: -3.439331, y: -46.476227, z: 180.12273}
+  - {x: -2.7525897, y: -47.714344, z: 182.26274}
+  - {x: -2.0728242, y: -48.85578, z: 184.40532}
+  - {x: -1.400984, y: -49.88737, z: 186.55084}
+  - {x: -0.7375578, y: -50.802334, z: 188.6995}
+  - {x: -0.082546294, y: -51.60067, z: 190.85127}
+  - {x: 0.56453985, y: -52.289165, z: 193.006}
+  - {x: 1.2046498, y: -52.880974, z: 195.16331}
+  - {x: 1.8391395, y: -53.39488, z: 197.32272}
+  - {x: 2.46969, y: -53.854187, z: 199.48358}
   - {x: 3.0982122, y: -54.285378, z: 201.6452}
   m_Parameters:
     serializedVersion: 3
@@ -15542,7 +15582,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32512
+  m_Name: pb_Mesh32510
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -15840,18 +15880,18 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: -1.4304633, y: -42.326973, z: 173.27197}
-  - {x: -0.91748416, y: -43.716812, z: 175.43321}
-  - {x: -0.40806207, y: -45.07915, z: 177.59505}
-  - {x: 0.09445268, y: -46.388092, z: 179.75806}
-  - {x: 0.58711123, y: -47.62084, z: 181.92274}
-  - {x: 1.0675375, y: -48.759018, z: 184.08952}
-  - {x: 1.5340663, y: -49.789753, z: 186.25867}
-  - {x: 1.9858402, y: -50.70642, z: 188.43033}
-  - {x: 2.4228592, y: -51.509018, z: 190.6045}
-  - {x: 2.8459804, y: -52.204178, z: 192.78105}
-  - {x: 3.2568698, y: -52.804775, z: 194.95966}
-  - {x: 3.6579025, y: -53.32917, z: 197.13997}
-  - {x: 4.0520287, y: -53.800167, z: 199.32146}
+  - {x: -0.9427249, y: -43.7274, z: 175.43399}
+  - {x: -0.45707655, y: -45.099716, z: 177.59656}
+  - {x: 0.024512984, y: -46.417435, z: 179.76022}
+  - {x: 0.50031096, y: -47.657253, z: 181.92543}
+  - {x: 0.9689212, y: -48.80039, z: 184.09258}
+  - {x: 1.4293652, y: -49.833675, z: 186.26192}
+  - {x: 1.881139, y: -50.750343, z: 188.43358}
+  - {x: 2.3242428, y: -51.550392, z: 190.60756}
+  - {x: 2.75918, y: -52.240593, z: 192.78374}
+  - {x: 3.1869302, y: -52.834118, z: 194.96182}
+  - {x: 3.6088881, y: -53.34973, z: 197.14148}
+  - {x: 4.0267878, y: -53.810757, z: 199.32224}
   - {x: 4.442597, y: -54.243664, z: 201.50354}
   m_Parameters:
     serializedVersion: 3
@@ -16078,18 +16118,18 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: -2.3053074, y: -42.340614, z: 173.36612}
-  - {x: -1.7473471, y: -43.730087, z: 175.5212}
-  - {x: -1.1929308, y: -45.09206, z: 177.67694}
-  - {x: -0.6453964, y: -46.40064, z: 179.834}
-  - {x: -0.10768162, y: -47.633015, z: 181.99294}
-  - {x: 0.41784608, y: -48.770824, z: 184.15422}
-  - {x: 0.9295274, y: -49.8012, z: 186.31816}
-  - {x: 1.4265088, y: -50.717506, z: 188.4849}
-  - {x: 1.9087893, y: -51.51974, z: 190.65445}
-  - {x: 2.3772237, y: -52.214535, z: 192.82666}
-  - {x: 2.8334713, y: -52.81477, z: 195.00122}
-  - {x: 3.2798986, y: -53.338802, z: 197.17764}
-  - {x: 3.7194445, y: -53.809433, z: 199.35538}
+  - {x: -1.7725645, y: -43.74068, z: 175.52249}
+  - {x: -1.2419001, y: -45.112633, z: 177.67947}
+  - {x: -0.71527153, y: -46.42999, z: 179.8376}
+  - {x: -0.19440177, y: -47.669445, z: 181.99742}
+  - {x: 0.31932074, y: -48.812214, z: 184.15932}
+  - {x: 0.82492286, y: -49.84514, z: 186.32356}
+  - {x: 1.3219042, y: -50.761444, z: 188.4903}
+  - {x: 1.810264, y: -51.561127, z: 190.65955}
+  - {x: 2.2905037, y: -52.250965, z: 192.83115}
+  - {x: 2.7635963, y: -52.84412, z: 195.00482}
+  - {x: 3.2309294, y: -53.35937, z: 197.18018}
+  - {x: 3.6942272, y: -53.820026, z: 199.35667}
   - {x: 4.1554465, y: -54.25257, z: 201.5338}
   m_Parameters:
     serializedVersion: 3
@@ -52138,7 +52178,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh33202
+  m_Name: pb_Mesh33204
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -52350,7 +52390,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32714
+  m_Name: pb_Mesh32716
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -52643,7 +52683,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32682
+  m_Name: pb_Mesh32684
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -53139,9 +53179,21 @@ PrefabInstance:
       propertyPath: m_Intensity
       value: 4869.0825
       objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UseViewFrustumForShadowCasterCull
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_Intensity
       value: 61186.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_ShadowUpdateMode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_VolumetricDimmer
@@ -53149,6 +53201,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_VolumetricShadowDimmer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_AlwaysDrawDynamicShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UpdateShadowOnLightMovement
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570215, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
@@ -53164,7 +53224,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32542
+  m_Name: pb_Mesh32540
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -53453,7 +53513,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-3088
+  m_Name: pb_Mesh-3016
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -56297,6 +56357,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UseViewFrustumForShadowCasterCull
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_ShadowUpdateMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_AlwaysDrawDynamicShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UpdateShadowOnLightMovement
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 787337874249570215, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_Name
       value: Point Light (4)
@@ -56565,18 +56645,18 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: -2.322208, y: -44.15196, z: 173.10545}
-  - {x: -1.7634103, y: -45.447285, z: 175.27391}
-  - {x: -1.2081546, y: -46.71511, z: 177.44305}
-  - {x: -0.6597767, y: -47.92955, z: 179.61354}
-  - {x: -0.12121262, y: -49.06781, z: 181.78592}
-  - {x: 0.40517142, y: -50.11151, z: 183.96066}
-  - {x: 0.91771764, y: -51.047802, z: 186.13809}
-  - {x: 1.4155722, y: -51.87004, z: 188.31837}
-  - {x: 1.8987348, y: -52.578228, z: 190.50151}
-  - {x: 2.3680596, y: -53.178997, z: 192.68733}
-  - {x: 2.8252044, y: -53.685215, z: 194.87552}
-  - {x: 3.2725348, y: -54.115253, z: 197.0656}
-  - {x: 3.7129884, y: -54.491898, z: 199.25702}
+  - {x: -1.7885371, y: -45.45804, z: 175.27559}
+  - {x: -1.2569479, y: -46.735992, z: 177.44632}
+  - {x: -0.72940075, y: -47.95935, z: 179.6182}
+  - {x: -0.20762126, y: -49.10479, z: 181.7917}
+  - {x: 0.307, y: -50.153526, z: 183.96724}
+  - {x: 0.81348884, y: -51.092407, z: 186.14508}
+  - {x: 1.3113433, y: -51.914646, z: 188.32536}
+  - {x: 1.8005635, y: -52.620243, z: 190.50809}
+  - {x: 2.281651, y: -53.215977, z: 192.69312}
+  - {x: 2.7555802, y: -53.715015, z: 194.88017}
+  - {x: 3.2237415, y: -54.136135, z: 197.06886}
+  - {x: 3.6878614, y: -54.50265, z: 199.2587}
   - {x: 4.1498995, y: -54.84105, z: 201.44913}
   m_Parameters:
     serializedVersion: 3
@@ -56773,9 +56853,29 @@ PrefabInstance:
       propertyPath: m_Intensity
       value: 2110.4807
       objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570213, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UseViewFrustumForShadowCasterCull
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_Intensity
       value: 26521.084
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_ShadowUpdateMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_AlwaysDrawDynamicShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 787337874249570214, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
+      propertyPath: m_UpdateShadowOnLightMovement
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 787337874249570215, guid: bd00cbf87d4e694419c868b2cdc75c4e, type: 3}
       propertyPath: m_Name
@@ -57097,6 +57197,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 543520848, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7677968518276337474, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
       propertyPath: m_RootOrder
       value: 23
@@ -57107,11 +57211,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7677968518276337474, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -14.3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7677968518276337474, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 58.75
+      value: 290.6
       objectReference: {fileID: 0}
     - target: {fileID: 7677968518276337474, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
       propertyPath: m_LocalRotation.w
@@ -57141,9 +57245,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7677968518276337475, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
+      propertyPath: fogwallPlane
+      value: 
+      objectReference: {fileID: 4635263885537378282, guid: e2d48fcb5b0c90c4ba33949291d9bbd1, type: 3}
     - target: {fileID: 7677968518276337476, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
       propertyPath: m_Name
       value: Fogwall
+      objectReference: {fileID: 0}
+    - target: {fileID: 7677968519137585286, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7677968519137585337, guid: 6bcc862e84204414d83a3535000d6340, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
