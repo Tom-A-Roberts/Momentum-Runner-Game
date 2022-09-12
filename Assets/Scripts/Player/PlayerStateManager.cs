@@ -43,7 +43,8 @@ public class PlayerStateManager : MonoBehaviour
     public Vector3 bodyFeetOffset;
 
     // Privates
-    
+    private int fogInitDelayCounter = 0;
+    private bool fogInitialized = false;
     private Vector3 bodyStartPosition;
     private Quaternion bodyStartRotation;
     private Vector3 feetStartPosition;
@@ -74,47 +75,29 @@ public class PlayerStateManager : MonoBehaviour
         feetSpawnPosition = feetStartPosition;
 
         //Sobel sobelController = null;
-        UnityEngine.Rendering.Volume sceneVolume = GameObject.FindObjectOfType<UnityEngine.Rendering.Volume>();
-        if(sceneVolume != null && SobelEnabled)
+        UnityEngine.Rendering.Volume[] sceneVolumes = GameObject.FindObjectsOfType<UnityEngine.Rendering.Volume>();
+        foreach (var sceneVolume in sceneVolumes)
         {
-            for (int componentID = 0; componentID < sceneVolume.profile.components.Count; componentID++)
+            if (sceneVolume != null && SobelEnabled)
             {
-                if (sceneVolume.profile.components[componentID].name.Contains("Sobel"))
+                for (int componentID = 0; componentID < sceneVolume.profile.components.Count; componentID++)
                 {
-                    sceneVolume.profile.components[componentID].active = true;
-                    //FogManager.Instance.sobelRenderer = sceneVolume.profile.components[componentID];
-                    //sobelController = (Sobel)sceneVolume.profile.components[componentID];
+                    if (sceneVolume.profile.components[componentID].name.Contains("Sobel"))
+                    {
+                        sceneVolume.profile.components[componentID].active = true;
+                        //FogManager.Instance.sobelRenderer = sceneVolume.profile.components[componentID];
+                        //sobelController = (Sobel)sceneVolume.profile.components[componentID];
+                        //Debug.Log("Here");
+                    }
                 }
             }
         }
 
-        if (playerNetworking.IsOwner)
-        {
-            // Let GameStateManager know who is the local player
-            GameStateManager.Singleton.localPlayer = this;
 
-            // Update the fog manager to know who is the local player
-            if (FogManager.Instance)
-            {
-                FogManager.Instance.ResetFog();
-            }
-            else
-            {
-                FogManager fogger = FindObjectOfType<FogManager>();
-
-                FogManager.Instance = fogger;
-
-                if (!fogger)
-                    Debug.LogWarning("No FogManager found!");
-            }
-            // if we get to this point and no FogManager then big sad 
-            if (FogManager.Instance)
-            {
-                FogManager.Instance.playerBody = playerBody.gameObject;
-                FogManager.Instance.playerCamera = playerCamera;
-                FogManager.Instance.Initialize();
-            }
-        }
+        //if (playerNetworking.IsOwner)
+        //{
+        //    InitializeFogwall();
+        //}
 
         if(GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
         {
@@ -140,8 +123,45 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
+    void InitializeFogwall()
+    {
+        // Let GameStateManager know who is the local player
+        GameStateManager.Singleton.localPlayer = this;
+
+        // Update the fog manager to know who is the local player
+        if (FogManager.Instance)
+        {
+            FogManager.Instance.ResetFog();
+        }
+        else
+        {
+            FogManager fogger = FindObjectOfType<FogManager>();
+
+            FogManager.Instance = fogger;
+
+            if (!fogger)
+                Debug.LogWarning("No FogManager found!");
+        }
+        // if we get to this point and no FogManager then big sad 
+        if (FogManager.Instance)
+        {
+            FogManager.Instance.playerBody = playerBody.gameObject;
+            FogManager.Instance.playerCamera = playerCamera;
+            FogManager.Instance.Initialize();
+        }
+    }
+
     void Update()
     {
+        if (!fogInitialized && playerNetworking.IsOwner)
+        {
+            fogInitDelayCounter += 1;// Time.deltaTime;
+            if (fogInitDelayCounter > 5)
+            {
+                fogInitialized = true;
+                InitializeFogwall();
+            }
+        }
 
     }
 
