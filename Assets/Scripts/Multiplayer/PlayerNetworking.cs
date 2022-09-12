@@ -22,6 +22,7 @@ public class PlayerNetworking : NetworkBehaviour
     public GameObject shootingGun;
     public Rigidbody bodyRigidbody;
     public Rigidbody feetRigidbody;
+    public Collider MultiplayerCollider;
 
     private GunController myGunController;
     private GrappleGun myGrappleGun;
@@ -195,15 +196,12 @@ public class PlayerNetworking : NetworkBehaviour
             GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
             int hitID = CheckForPlayerHit(hitObj);
 
-            // OR: if I missed then no point checking
             if (hitID == -1)
             {
                 Debug.Log("I missed");
-                return;
             }
 
-            float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;
-            Debug.Log("Shot fired at time: " + shootTime);
+            float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;            
             ShootServerRPC(shootTime, shootStartPosition, shootDirection, hitID);
         }
     }
@@ -213,12 +211,9 @@ public class PlayerNetworking : NetworkBehaviour
     {
         int serverHitID = clientHitID;
 
-        bool shootSuccess = true;
-
         if (!IsOwnedByServer)
         {
-            ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);
-            Debug.Log("Shot received at time: " + NetworkManager.Singleton.ServerTime.TimeAsFloat);
+            ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);            
             float timeToCheck = shootTime - rtt / 1000f;
 
             // should probably rollback all players 
@@ -228,7 +223,8 @@ public class PlayerNetworking : NetworkBehaviour
                 PlayerNetworking playerNetworkingToRollback;
                 if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
                 {
-                    playerNetworkingToRollback.InterpolatePosition(timeToCheck);
+                    PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(timeToCheck, _cheapInterpolationTime);
+                    playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;                    
                 }
             }
             else
@@ -239,31 +235,24 @@ public class PlayerNetworking : NetworkBehaviour
             GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
             serverHitID = CheckForPlayerHit(hitObj);
 
-            shootSuccess = clientHitID == serverHitID;
-
             if (clientHitID == serverHitID)            
                 Debug.Log("No discrepancy found - Hit registered");            
             else
-                Debug.Log("Discrepancy found - Hit missed");
+                Debug.LogWarning("Discrepancy found - Hit missed");
         }
 
-        ShootClientRPC(shootStartPosition, shootDirection, shootSuccess);
+        ShootClientRPC(shootStartPosition, shootDirection, serverHitID);
     }
 
     [ClientRpc]
-    public void ShootClientRPC(Vector3 shootStartPosition, Vector3 shootDirection, bool success) // int playerHitID)
+    public void ShootClientRPC(Vector3 shootStartPosition, Vector3 shootDirection, int playerHitID)
     {
         if (!IsOwner)
-        {
+        {   
             LocalShoot(shootStartPosition, shootDirection);
         }
 
-        if (success)
-            Debug.Log("Wahoo I hit what I wanted!");
-        else
-            Debug.Log("Noooo I didn't hit what I wanted");
-
-        //myLevelController.ProcessPotentialHit(playerHitID);
+        myPlayerStateController.ProcessPotentialHit(playerHitID);
     }
 
     public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection)
@@ -422,6 +411,8 @@ public class PlayerNetworking : NetworkBehaviour
         myPlayerController = GetComponentInChildren<PlayerController>();
         myPlayerController.NetworkInitialize(IsOwner);
 
+        MultiplayerCollider.enabled = !IsOwner;
+
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)
         {
@@ -452,9 +443,9 @@ public class PlayerNetworking : NetworkBehaviour
             //{
             //    GameObject spawnCam = Camera.main.gameObject;
             //    Destroy(spawnCam);
-            //}
+            //}    
 
-            
+            myPlayerStateController.HideMultiplayerRepresentation();
 
             gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
         }

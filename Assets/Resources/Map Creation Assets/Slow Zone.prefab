@@ -125,8 +125,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67c0b9d3dcb13f544babf691afd4ee1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinimumSpeed: 10
-  SlowDownForce: 0.1
+  MinimumSpeed: 15
+  SlowDownForce: 5
   SidewaysForce: 1050
   VerticalForce: 1050
 --- !u!1 &88342676091516411
@@ -165,7 +165,7 @@ Transform:
   - {fileID: 1869017635503218243}
   - {fileID: 9034736165958249771}
   m_Father: {fileID: 0}
-  m_RootOrder: 25
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 10.567, z: 0}
 --- !u!1 &801763480100345500
 GameObject:
