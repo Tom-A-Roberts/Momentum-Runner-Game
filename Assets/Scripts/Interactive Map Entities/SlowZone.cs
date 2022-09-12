@@ -41,9 +41,10 @@ public class SlowZone : MonoBehaviour
                 float rightComponent = Vector3.Dot(transform.right, rb.velocity);
                 Vector3 sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.deltaTime;
                 pc.BoostForce(slowZoneVelocity, ForceMode.Force);
-                pc.BoostForce(verticalCompensationForce, ForceMode.Force);
-                pc.BoostForce(sidewaysCompensationForce, ForceMode.Force);
+               
             }
+            pc.BoostForce(verticalCompensationForce, ForceMode.Force);
+            pc.BoostForce(sidewaysCompensationForce, ForceMode.Force);
         }
     }
 
