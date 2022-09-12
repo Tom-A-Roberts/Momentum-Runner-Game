@@ -193,13 +193,13 @@ public class PlayerNetworking : NetworkBehaviour
         if (IsOwner)
         {
             // who do we think we hit?
-            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
+            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, 0f);
             int hitID = CheckForPlayerHit(hitObj);
 
             if (hitID == -1)
             {
                 Debug.Log("I missed");
-            }
+            }            
 
             float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;            
             ShootServerRPC(shootTime, shootStartPosition, shootDirection, hitID);
@@ -217,22 +217,26 @@ public class PlayerNetworking : NetworkBehaviour
             float timeToCheck = shootTime - rtt / 1000f;
 
             // should probably rollback all players 
-            GameObject playerIThinkIHit;;          
-            if (ConnectedPlayers.TryGetValue((ulong)clientHitID, out playerIThinkIHit))
+            GameObject playerIThinkIHit;
+            if (clientHitID != -1)
             {
-                PlayerNetworking playerNetworkingToRollback;
-                if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
+                if (ConnectedPlayers.TryGetValue((ulong)clientHitID, out playerIThinkIHit))
                 {
-                    PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(timeToCheck, _cheapInterpolationTime);
-                    playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;                    
+                    PlayerNetworking playerNetworkingToRollback;
+                    if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
+                    {
+                        PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(timeToCheck, _cheapInterpolationTime);
+                        playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + clientHitID);
                 }
             }
-            else
-            {
-                Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + clientHitID);
-            }
 
-            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
+            float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, timeToWait);
             serverHitID = CheckForPlayerHit(hitObj);
 
             if (clientHitID == serverHitID)            
@@ -241,24 +245,46 @@ public class PlayerNetworking : NetworkBehaviour
                 Debug.LogWarning("Discrepancy found - Hit missed");
         }
 
-        ShootClientRPC(shootStartPosition, shootDirection, serverHitID);
+        ShootClientRPC(shootTime, shootStartPosition, shootDirection, serverHitID);
     }
 
     [ClientRpc]
-    public void ShootClientRPC(Vector3 shootStartPosition, Vector3 shootDirection, int playerHitID)
+    public void ShootClientRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection, int playerHitID)
     {
         if (!IsOwner)
-        {   
-            LocalShoot(shootStartPosition, shootDirection);
+        {
+            float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+
+            LocalShoot(shootStartPosition, shootDirection, timeToWait);
         }
 
         myPlayerStateController.ProcessPotentialHit(playerHitID);
     }
 
-    public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection)
+    public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
     {
         GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
+
+        // OR: fire instantly if client shooting
+        if (timeToWait > 0)
+        {
+            StartCoroutine(SyncedShoot(shootStartPosition, shootDirection, timeToWait));
+        }
+        else
+        {
+            myGunController.DoShoot(shootStartPosition, shootDirection);
+        }
+
         return hitObj;
+    }
+
+    // TODO: sync shooting result too!
+    IEnumerator SyncedShoot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
+    {
+        if (timeToWait > 0)        
+            yield return new WaitForSeconds(timeToWait);
+
+        myGunController.DoShoot(shootStartPosition, shootDirection);
     }
 
     /// <summary>
@@ -337,11 +363,13 @@ public class PlayerNetworking : NetworkBehaviour
     [ClientRpc]
     public void EnterSpectatorModeClientRPC()
     {
+        MultiplayerCollider.enabled = false;
         myPlayerStateController.EnterSpectatorMode();
     }
     [ClientRpc]
     public void LeaveSpectatorModeClientRPC()
     {
+        MultiplayerCollider.enabled = true;
         myPlayerStateController.LeaveSpectatorMode();
     }
     #endregion
@@ -411,7 +439,8 @@ public class PlayerNetworking : NetworkBehaviour
         myPlayerController = GetComponentInChildren<PlayerController>();
         myPlayerController.NetworkInitialize(IsOwner);
 
-        MultiplayerCollider.enabled = !IsOwner;
+        // OR: not sure it matters if this is always on?
+        MultiplayerCollider.enabled = true; //!IsOwner;
 
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)

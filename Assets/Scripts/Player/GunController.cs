@@ -288,7 +288,6 @@ public class GunController : MonoBehaviour
         {
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;
-
             
             playerNetworking.ShootStart(shootStart, shootDirection);
         }
@@ -315,6 +314,15 @@ public class GunController : MonoBehaviour
             myMat.SetColor("_EmissiveColor", Color.HSVToRGB(hOriginal + currentHueChange, sOriginal, vOriginal) * glowMultiplier);
     }
 
+    public void DoShoot(Vector3 startPos, Vector3 shootDirection)
+    {
+        RaycastHit hitRaycastReferenceObj;
+        bool hit;
+        Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
+
+        Shoot(shootDirectionAfterAimAssist, hit, hitRaycastReferenceObj);
+    }
+
     public GameObject TryShoot(Vector3 startPos, Vector3 shootDirection)
     {
         if (myGunState.CanShootServerside)
@@ -322,10 +330,19 @@ public class GunController : MonoBehaviour
             myGunState.Shoot();
 
             RaycastHit hitRaycastReferenceObj;
-            bool hit;
-            Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
+            bool hit;            
+            AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
 
-            return Shoot(startPos, shootDirectionAfterAimAssist, hit, hitRaycastReferenceObj);
+            if (hit)
+            {
+                GameObject hitGameObject = hitRaycastReferenceObj.collider.gameObject;
+
+                return hitGameObject;
+            }
+            else
+            {
+                return null;
+            }
         }
         else
         {
@@ -419,15 +436,8 @@ public class GunController : MonoBehaviour
     /// Animates shooting the gun from a particlar start position and direction
     /// </summary>
     /// <returns>The gameobject that was shot. Is null if nothing is shot</returns>
-    public GameObject Shoot(Vector3 startPos, Vector3 shootDirection, bool hit, RaycastHit hitRaycastReferenceObj)
+    public void Shoot(Vector3 shootDirection, bool hit, RaycastHit hitRaycastReferenceObj)
     {
-
-        GameObject hitGameObject = null;
-        //RaycastHit hitRaycastReferenceObj;
-        //bool hit;
-
-        //Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
-
         GameObject myLine = new GameObject();
         myLine.transform.position = muzzlePoint.position;
         myLine.AddComponent<LineRenderer>();
@@ -456,8 +466,6 @@ public class GunController : MonoBehaviour
                 hitObject.TargetHit();
             }
 
-            hitGameObject = hitRaycastReferenceObj.collider.gameObject;
-
             lr.SetPosition(1, hitRaycastReferenceObj.point);
 
             GameObject ground_particle = Instantiate(groundHitParticlePrefab, hitRaycastReferenceObj.point, Quaternion.FromToRotation(Vector3.forward, hitRaycastReferenceObj.normal));
@@ -475,8 +483,6 @@ public class GunController : MonoBehaviour
         animationActive = true;
         animationProgress = 0;
         clientsideCooldownProgress = 1;
-
-        return hitGameObject;
     }
 
 }
