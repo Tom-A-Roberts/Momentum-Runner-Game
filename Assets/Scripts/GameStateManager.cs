@@ -34,6 +34,8 @@ public class GameStateManager : NetworkBehaviour
     public float zoneProgress = 0;
     [Tooltip("The speed of the zone at the start of the game, measured in meters per second")]
     public float zoneSpeed = 1;
+    [Tooltip("How wide the zone starts in meters")]
+    public float zoneStartWidth = 350;
 
     [Header("Effects settings")]
     public Image ScreenRedEdges;
@@ -42,7 +44,7 @@ public class GameStateManager : NetworkBehaviour
     /// The distance in meters between the fog wall and the death wall
     /// </summary>
     [System.NonSerialized]
-    public float zoneWidth = 10;
+    public float zoneWidth;
 
     [System.NonSerialized]
     public PlayerStateManager localPlayer;
@@ -64,7 +66,8 @@ public class GameStateManager : NetworkBehaviour
 
     void Start()
     {
-        if(railwayPointsList == null)
+        
+        if (railwayPointsList == null)
         {
             throw new System.Exception("\"railwayPointsList is set to null.\\n Therefore no wall points found to use when moving the deathwall and fogwall!\"");
         }
@@ -73,14 +76,21 @@ public class GameStateManager : NetworkBehaviour
         if (deathWall)
         {
             deathWallCollider = deathWall.GetComponent<BoxCollider>();
+
+            //SetWallPositionAndRotationToProgress(deathWall.transform, zoneProgress);
+        }
+        if (fogWall)
+        {
+            //SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress);
         }
 
-        SetWallPositionAndRotationToProgress(zoneProgress);
+        
     }
 
 
     public override void OnNetworkSpawn()
     {
+        zoneWidth = zoneStartWidth;
         // Only need to update this once since it doesn't change throughout the game.
         if (!IsHost)
         {
@@ -162,10 +172,22 @@ public class GameStateManager : NetworkBehaviour
     void UpdateWallPositions()
     {
         float metersToTravel = zoneSpeed * Time.deltaTime;
+        float widthInLapsUnits = convertMetersToLapsUnits(zoneWidth);
 
-        zoneProgress += convertMetersToProgressUnits(metersToTravel);
+        zoneProgress += convertMetersToLapsUnits(metersToTravel);
 
-        SetWallPositionAndRotationToProgress(zoneProgress);
+
+        if (deathWall)
+        {
+            Quaternion deathwallRotationOffset = Quaternion.Euler(90, 0, 0);
+            SetWallPositionAndRotationToProgress(deathWall.transform, zoneProgress - (widthInLapsUnits / 2), deathwallRotationOffset);
+        }
+
+        if (fogWall)
+        {
+            Quaternion fogwallRotationOffset = Quaternion.Euler(0, 0, 0);
+            SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress + (widthInLapsUnits / 2), fogwallRotationOffset);
+        }
     }
 
     /// <summary>
@@ -173,11 +195,11 @@ public class GameStateManager : NetworkBehaviour
     /// fog wall and death wall (if they exist) using interpolation.
     /// </summary>
     /// <param name="progress">progress value measured in laps</param>
-    void SetWallPositionAndRotationToProgress(float progress)
+    void SetWallPositionAndRotationToProgress(Transform wall, float progress, Quaternion rotationOffset)
     {
         float progressSimplified = convertProgressToBetween01(progress);
 
-        Quaternion deathwallRotationOffset = Quaternion.Euler(90, 0, 0);
+        //Quaternion deathwallRotationOffset = Quaternion.Euler(90, 0, 0);
 
         float interpProgress = progressSimplified * railwayPoints.Length;
         // Calculate which points to interpolate between
@@ -189,14 +211,12 @@ public class GameStateManager : NetworkBehaviour
         // Calculate the interpolation amount:
         float interpAmount = interpProgress - Mathf.Floor(interpProgress);
 
-        if (deathWall)
-        {
-            deathWall.transform.position = Vector3.Lerp(railwayPoints[lowestPoint], railwayPoints[highestPoint], interpAmount);
+        wall.position = Vector3.Lerp(railwayPoints[lowestPoint], railwayPoints[highestPoint], interpAmount);
 
-            Quaternion targetQuaternion = Quaternion.Lerp(railwayDirections[lowestPoint], railwayDirections[highestPoint], interpAmount);
+        Quaternion targetQuaternion = Quaternion.Lerp(railwayDirections[lowestPoint], railwayDirections[highestPoint], interpAmount);
 
-            deathWall.transform.rotation = targetQuaternion * deathwallRotationOffset;
-        }
+        wall.rotation = targetQuaternion * rotationOffset;
+        
     }
 
     /// <summary>
@@ -215,7 +235,7 @@ public class GameStateManager : NetworkBehaviour
         return progressSimplified;
     }
 
-    public float convertMetersToProgressUnits(float meters)
+    public float convertMetersToLapsUnits(float meters)
     {
         return meters / railwayLength;
     }
