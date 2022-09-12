@@ -8,10 +8,8 @@ public class SlowZone : MonoBehaviour
     public float SlowDownForce;
     public float SidewaysForce = 1050f;
     public float VerticalForce = 1050f;
-    private float upComponent;
-    private float rightComponent;
-    private Vector3 sidewaysCompensationForce;
-    private Vector3 verticalCompensationForce;
+
+
     private PlayerController pc;
     private Rigidbody rb;
     private bool playerIsInZone;
@@ -32,20 +30,22 @@ public class SlowZone : MonoBehaviour
 
     private void Update()
     {
+            float upComponent;
+            float rightComponent;
+            Vector3 sidewaysCompensationForce;
+            Vector3 verticalCompensationForce;
         if (playerIsInZone == true)
         {
-            if (Vector3.Dot(rb.velocity, transform.forward) < MinimumSpeed) return;
+            upComponent = Vector3.Dot(transform.up, rb.velocity);
+            rightComponent = Vector3.Dot(transform.right, rb.velocity);
+            verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
+            sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.deltaTime;
+
+            if (Vector3.Dot(rb.velocity, transform.forward) < MinimumSpeed) { }
             else
             {
                 Vector3 slowZoneVelocity = transform.forward * SlowDownForce * -1;
-
-                upComponent = Vector3.Dot(transform.up, rb.velocity);
-                verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
-
-                rightComponent = Vector3.Dot(transform.right, rb.velocity);
-                sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.deltaTime;
                 pc.BoostForce(slowZoneVelocity, ForceMode.Force);
-               
             }
             pc.BoostForce(verticalCompensationForce, ForceMode.Force);
             pc.BoostForce(sidewaysCompensationForce, ForceMode.Force);
