@@ -21,6 +21,7 @@ public class GameStateManager : NetworkBehaviour
 
     public static GameStateManager Singleton { get; private set; }
 
+    [Header("Known Objects")]
     [Tooltip("Probably called 'PointsList', should be an object containing all the points that the walls will follow.")]
     public GameObject railwayPointsList;
     [Tooltip("The game object to treat as the death wall that chases the players")]
@@ -28,6 +29,7 @@ public class GameStateManager : NetworkBehaviour
     [Tooltip("The game object to treat as the fog wall that leads the players")]
     public GameObject fogWall;
 
+    [Header("Zone settings")]
     [Tooltip("The speed at which the playable zone gets smaller")]
     public float closingSpeed = 0;
     [Tooltip("The zone progress at the start of the game, measured in laps as the unit.")]
@@ -40,6 +42,10 @@ public class GameStateManager : NetworkBehaviour
     [Header("Effects settings")]
     public Image ScreenRedEdges;
 
+    [Header("Dev settings")]
+    [Tooltip("When true: disables death")]
+    public bool DeveloperMode = true;
+
     /// <summary>
     /// The distance in meters between the fog wall and the death wall
     /// </summary>
@@ -48,14 +54,16 @@ public class GameStateManager : NetworkBehaviour
 
     [System.NonSerialized]
     public PlayerStateManager localPlayer;
-    
+
+    [System.NonSerialized]
+    public BoxCollider deathWallCollider;
+
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
     private float railwayLength = 0;
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
 
-    private BoxCollider deathWallCollider;
 
     private void Awake()
     {
@@ -66,7 +74,7 @@ public class GameStateManager : NetworkBehaviour
 
     void Start()
     {
-        
+        zoneWidth = zoneStartWidth;
         if (railwayPointsList == null)
         {
             throw new System.Exception("\"railwayPointsList is set to null.\\n Therefore no wall points found to use when moving the deathwall and fogwall!\"");

@@ -335,6 +335,7 @@ public class PlayerNetworking : NetworkBehaviour
     }
     #endregion
 
+    #region SpectatorMode
     /// <summary>
     /// Allow clients to turn themselves into spectators when they like.
     /// No need to prevent cheaters here lol, let them do it
@@ -354,7 +355,34 @@ public class PlayerNetworking : NetworkBehaviour
     {
         myPlayerStateController.LeaveSpectatorMode();
     }
+    #endregion
 
+    #region Death
+
+    public void StartDeath()
+    {
+        if(IsOwner || NetworkManager.Singleton.IsHost)
+        {
+            PlayerDeathServerRPC();
+            myPlayerStateController.PlayerDeath();
+        }
+    }
+
+    [ServerRpc]
+    public void PlayerDeathServerRPC()
+    {
+        PlayerDeathClientRPC();
+    }
+    [ClientRpc]
+    public void PlayerDeathClientRPC()
+    {
+        if(!(IsOwner || NetworkManager.Singleton.IsHost))
+        {
+            myPlayerStateController.PlayerDeath();
+        }
+    }
+   
+    #endregion
 
     private void PlayerConnect()
     {
