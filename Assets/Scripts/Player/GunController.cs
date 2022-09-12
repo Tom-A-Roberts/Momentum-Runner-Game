@@ -31,6 +31,9 @@ public class GunController : MonoBehaviour
     [Tooltip("How quickly should a full cool take (in seconds)")]
     public float heatReloadCoolingSpeed = 3f;
 
+    [Tooltip("What layers can be shot")]
+    public LayerMask shootableLayers;
+
 
     [Header("Aim Assist Settings")]
     [Tooltip("Aiming within this amount of degrees to an enemy will snap your aim to them")]
@@ -341,7 +344,7 @@ public class GunController : MonoBehaviour
     /// <returns></returns>
     private Vector3 AdjustForAimAssist(Vector3 startPos, Vector3 shootDirection, out bool hitBool, out RaycastHit hitRaycastReferenceObj)
     {
-        hitBool = Physics.Raycast(startPos, shootDirection, out hitRaycastReferenceObj, raycastDistance);
+        hitBool = Physics.Raycast(startPos, shootDirection, out hitRaycastReferenceObj, raycastDistance, shootableLayers);
 
         Vector3 outShootDirection = shootDirection;
         // If the player missed, see if aim assist will help
@@ -387,7 +390,7 @@ public class GunController : MonoBehaviour
                     {
                         // If within angle, see if raycast would hit
                         RaycastHit targetRaycastHit;
-                        bool targetHit = Physics.Raycast(startPos, shootDirectionToTarget, out targetRaycastHit, raycastDistance);
+                        bool targetHit = Physics.Raycast(startPos, shootDirectionToTarget, out targetRaycastHit, raycastDistance, shootableLayers);
                         if (targetHit)
                         {
                             // If target is hittable, see if it's the closest one to the mouse pointer

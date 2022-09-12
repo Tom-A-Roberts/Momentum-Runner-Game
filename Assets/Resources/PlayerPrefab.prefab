@@ -1177,7 +1177,7 @@ GameObject:
   - component: {fileID: 1371572323}
   m_Layer: 3
   m_Name: Feet
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1308,7 +1308,7 @@ GameObject:
   - component: {fileID: 1970319852}
   m_Layer: 3
   m_Name: Body
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1326,6 +1326,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1107696932417630914}
+  - {fileID: 7203573840929668150}
   - {fileID: 2473533998632247775}
   - {fileID: 4843209585104937555}
   m_Father: {fileID: 4316027075412832467}
@@ -1664,6 +1665,7 @@ MonoBehaviour:
   shootingGun: {fileID: 5661523781473890172}
   bodyRigidbody: {fileID: 4316027074644905781}
   feetRigidbody: {fileID: 4316027073947639282}
+  MultiplayerCollider: {fileID: 4187372158593544072}
   _cheapInterpolationTime: 0.1
 --- !u!114 &-7007361797976376309
 MonoBehaviour:
@@ -1822,7 +1824,10 @@ MonoBehaviour:
   heatPerShot: 0.2
   heatReloadingWaitTime: 1
   heatReloadCoolingSpeed: 2
-  aimAssistAngle: 4
+  shootableLayers:
+    serializedVersion: 2
+    m_Bits: 73
+  aimAssistAngle: 0
   optimalAimAssistDistance: 15
   maximumAimAssistDistance: 50
   raycastDistance: 100
@@ -6801,6 +6806,52 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6562488243367867276
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7203573840929668150}
+  - component: {fileID: 4187372158593544072}
+  m_Layer: 3
+  m_Name: MultiplayerHitBox
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7203573840929668150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6562488243367867276}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1.4285712, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4316027074644905776}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &4187372158593544072
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6562488243367867276}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  m_Radius: 0.7
+  m_Height: 2.096988
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.039509654, z: 0}
 --- !u!1 &7190525482697960738
 GameObject:
   m_ObjectHideFlags: 0
@@ -6895,7 +6946,7 @@ GameObject:
   - component: {fileID: 4843209585104937555}
   - component: {fileID: 5403134068769023415}
   - component: {fileID: 955790866180259259}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SpectatorRepresentation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
