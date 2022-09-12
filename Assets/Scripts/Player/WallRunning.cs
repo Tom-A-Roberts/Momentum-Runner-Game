@@ -23,6 +23,8 @@ public class WallRunning : NetworkBehaviour
     private float currentTargetTime;
     private float angleTimer;
 
+    [System.NonSerialized]
+    public bool spectatorMode = false;
 
     [Tooltip("0= weightless, 1= as weighty as normal")]
     [Range(0f, 1f)]
@@ -95,7 +97,7 @@ public class WallRunning : NetworkBehaviour
     {
         axisValues = pc.GetMovementAxis();
         
-        if((wallLeft || wallRight) && axisValues.Item2 > 0 && !GroundDetector.IsOnGround)
+        if((wallLeft || wallRight) && axisValues.Item2 > 0 && !GroundDetector.IsOnGround && !spectatorMode)
         {
             StartWallRun();
             

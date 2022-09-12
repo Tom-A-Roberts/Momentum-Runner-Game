@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     [Header("Known Objects")]
     public Transform mainCamera;
     public PlayerAudioManager audioManager;
-
+    public Rigidbody feetRigidBody;
     public CollisionDetector GroundDetector;
     private Rigidbody bodyRigidBody;
     private WallRunning wallRunning;
@@ -54,14 +54,18 @@ public class PlayerController : MonoBehaviour
     public float MaxWallKickoffForce = 50f;
     [Tooltip("How hard we boost forwards from a wall jump")]
     public float MaxWallBoostForce = 10f;
-    [Header("----------------")]
-    [Header("Dash Settings")]
-    [Tooltip("How much force is applied when air dashing")]
-    public float DashForce = 60f;
-    [Tooltip("Amount of seconds the dash force lasts")]
-    public float DashForceActiveTime = 0.1f;
-    [Tooltip("Amount of seconds for the dash cooldown, measured from time the key was pressed")]
-    public float DashCooldown = 1f;
+
+    [System.NonSerialized]
+    public bool spectatorMode = false;
+
+    //[Header("----------------")]
+    //[Header("Dash Settings")]
+    //[Tooltip("How much force is applied when air dashing")]
+    //public float DashForce = 60f;
+    //[Tooltip("Amount of seconds the dash force lasts")]
+    //public float DashForceActiveTime = 0.1f;
+    //[Tooltip("Amount of seconds for the dash cooldown, measured from time the key was pressed")]
+    //public float DashCooldown = 1f;
 
     [Tooltip("Allow the player to accelerate to walkspeed while in the air. This does not effect ability to slow down while in the air")]
     public bool PlayerHasAirControl = true;
@@ -71,9 +75,6 @@ public class PlayerController : MonoBehaviour
     private float movementSpeed;
     private float currentJumpForce;
     private float yVelocity;
-    //private bool canDash;
-    private Vector3 BoostDirection;
-    private float airDashProgress = 0;
 
     private bool jumpKeyPressed = false;
 
@@ -96,10 +97,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            DashUIScript dashUI = FindObjectOfType<DashUIScript>();
             Speedometer speedometer = FindObjectOfType<Speedometer>();
-
-            dashUI.pc = this;
 
             speedometer.bodyToTrack = bodyRigidBody;
         }
@@ -107,17 +105,18 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !IngameEscMenu.Instance.curserUnlocked)
+        if (Input.GetKeyDown(KeyCode.Space) && !IngameEscMenu.Singleton.curserUnlocked)
         {
             
             jumpKeyPressed = true;
         }     
 
         #region SPRINTING LOGIC
-        if (Input.GetKey(KeyCode.LeftShift) && !IngameEscMenu.Instance.curserUnlocked) movementSpeed = WalkingSpeed * SprintMultiplier;
+        if (Input.GetKey(KeyCode.LeftShift) && !IngameEscMenu.Singleton.curserUnlocked) movementSpeed = WalkingSpeed * SprintMultiplier;
         else movementSpeed = WalkingSpeed;
         #endregion
   
+
     }
 
     private void FixedUpdate()
@@ -126,77 +125,90 @@ public class PlayerController : MonoBehaviour
 
         Tuple<float, float> axisValues = GetMovementAxis();
 
-        processMotion(axisValues.Item1, axisValues.Item2);
-
-        #region JUMPING LOGIC
-        if (remainingJumps != JumpCount)
+        if (!spectatorMode)
         {
-            if (GroundDetector.IsOnGroundCoyote)
-                remainingJumps = JumpCount;
-        }
-        else
-        {
-            if (!GroundDetector.IsOnGroundCoyote)
-                remainingJumps = JumpCount - 1;
-        }
+            processMotion(axisValues.Item1, axisValues.Item2);
 
-        if (remainingJumps > 0 && jumpKeyPressed)
-        {
-
-            yVelocity = bodyRigidBody.velocity.y;
-
-            // don't apply as much force if beginning the jump
-            float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
-
-            currentJumpForce = (Mathf.Lerp(MinJumpForce, JumpForce, airLerp));
-
-            if (!GroundDetector.IsOnGroundCoyote) currentJumpForce *= AirJumpMultiplier; //apply air jump multiplier if in air
-
-            if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
-
-            bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
-
-            // force end coyote time due to jump
-            GroundDetector.EndCoyoteTime();
-
-            // unstick and 'kick off' wall
-            wallRunning.Unstick();
-
-            if (remainingJumps == 1)
+            #region JUMPING LOGIC
+            if (remainingJumps != JumpCount)
             {
-                audioManager.AirJump();
+                if (GroundDetector.IsOnGroundCoyote)
+                    remainingJumps = JumpCount;
             }
             else
             {
-                audioManager.Jump();
+                if (!GroundDetector.IsOnGroundCoyote)
+                    remainingJumps = JumpCount - 1;
             }
 
-            if (wallRunning.IsWallRunning)
+            if (remainingJumps > 0 && jumpKeyPressed)
             {
-                float dot = Vector3.Dot(transform.forward, wallNormal);
-                float wallKickRatio = (1f - dot) / 2f; // kick hardest when facing into wall
-                float wallBoostRatio = 1f - Mathf.Abs(dot); // boost hardest when facing along direction of the wall
 
-                bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
-                bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
+                yVelocity = bodyRigidBody.velocity.y;
 
+                // don't apply as much force if beginning the jump
+                float airLerp = Mathf.Lerp(1, 0, Mathf.Clamp01(yVelocity / JumpLerpStart));
+
+                currentJumpForce = (Mathf.Lerp(MinJumpForce, JumpForce, airLerp));
+
+                if (!GroundDetector.IsOnGroundCoyote) currentJumpForce *= AirJumpMultiplier; //apply air jump multiplier if in air
+
+                if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
+
+                bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
+
+                // force end coyote time due to jump
+                GroundDetector.EndCoyoteTime();
+
+                // unstick and 'kick off' wall
+                wallRunning.Unstick();
+
+                if (remainingJumps == 1)
+                {
+                    audioManager.AirJump();
+                }
+                else
+                {
+                    audioManager.Jump();
+                }
+
+                if (wallRunning.IsWallRunning)
+                {
+                    float dot = Vector3.Dot(transform.forward, wallNormal);
+                    float wallKickRatio = (1f - dot) / 2f; // kick hardest when facing into wall
+                    float wallBoostRatio = 1f - Mathf.Abs(dot); // boost hardest when facing along direction of the wall
+
+                    bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
+                    bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
+
+                }
+
+                remainingJumps--;
             }
 
-            remainingJumps--;
+            // Reset jump key pressed
+            if (jumpKeyPressed)
+            {
+                //Debug.Log("jumped");
+                jumpKeyPressed = false;
+            }
+            #endregion
+        
         }
-
-        // Reset jump key pressed
-        if (jumpKeyPressed)
+        else
         {
-            //Debug.Log("jumped");
-            jumpKeyPressed = false;
+            float heightInput = Input.GetAxisRaw("HeightChange");
+            //HeightChange
+
+            processSpectatorMotion(axisValues.Item1, axisValues.Item2, heightInput);
         }
-        #endregion
     }
 
     void processMotion(float xInput, float yInput)
     {
-        
+        bodyRigidBody.useGravity = true;
+        feetRigidBody.useGravity = true;
+
         // Check if there's motion input
         if (xInput != 0 || yInput != 0)
         {
@@ -261,6 +273,49 @@ public class PlayerController : MonoBehaviour
         audioManager.UpdateWindIntensity((bodyRigidBody.velocity.magnitude - 25f) / 70f);        
     }
 
+    void processSpectatorMotion(float xInput, float yInput, float heightInput)
+    {
+        bodyRigidBody.useGravity = false;
+        feetRigidBody.useGravity = false;
+        bodyRigidBody.drag = 5;
+
+        if (xInput != 0 || yInput != 0 || heightInput != 0)
+        {
+            Vector3 input = new Vector3(xInput, heightInput, yInput).normalized;
+
+            // Calculate what directions the inputs mean in worldcoordinate terms
+            Vector3 verticalInputWorldDirection = mainCamera.transform.forward * input.z;
+            Vector3 horizontalInputWorldDirection = mainCamera.transform.right * input.x;
+            Vector3 heightInputWorldDirection = mainCamera.transform.up * input.y;
+
+            // The direction that the player wishes to go in
+            Vector3 wishDirection = (verticalInputWorldDirection + horizontalInputWorldDirection + heightInputWorldDirection).normalized;
+
+            // Current velocity without the y speed included
+            Vector3 currentPlanarVelocity = Vector3.ProjectOnPlane(bodyRigidBody.velocity, mainCamera.transform.up);
+
+            float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
+
+            // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
+            if (forwardsSpeed < 0)
+            {
+                float activeCancellationPower = CancellationPower;
+                if (!PlayerHasAirControl) activeCancellationPower /= 8;
+
+                bodyRigidBody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
+            }
+            else if (forwardsSpeed < movementSpeed * 5 && (GroundDetector.IsOnGround || PlayerHasAirControl))
+            {
+                // How much required acceleration there is to reach the intended speed (walkingspeed).
+                float requiredAcc = (movementSpeed * 5 - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
+
+                bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
+            }
+
+        }
+
+    }
+
     public void BoostForce(Vector3 boost, ForceMode boostType)
     {
         bodyRigidBody.AddForce(boost, boostType);
@@ -268,7 +323,7 @@ public class PlayerController : MonoBehaviour
 
     public Tuple<float, float> GetMovementAxis()
     {
-        if (!IngameEscMenu.Instance.curserUnlocked)
+        if (!IngameEscMenu.Singleton.curserUnlocked)
         {
             float xInput = Input.GetAxisRaw("Horizontal");
             float yInput = Input.GetAxisRaw("Vertical");

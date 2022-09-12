@@ -7,7 +7,7 @@ using System;
 
 public class IngameEscMenu : MonoBehaviour
 {
-    public static IngameEscMenu Instance { get; private set; }
+    public static IngameEscMenu Singleton { get; private set; }
 
     public GameObject escapeMenuUIObject;
     public bool isEscMenuShowing = false;
@@ -15,12 +15,11 @@ public class IngameEscMenu : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Singleton != null && Singleton != this)
         {
-            Destroy(Instance);
+            Destroy(Singleton);
         }
-
-        Instance = this;
+        Singleton = this;
     }
 
     void Start()
@@ -105,12 +104,12 @@ public class IngameEscMenu : MonoBehaviour
     public static void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        Instance.curserUnlocked = false;
+        Singleton.curserUnlocked = false;
     }
 
     public static void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
-        Instance.curserUnlocked = true;
+        Singleton.curserUnlocked = true;
     }
 }

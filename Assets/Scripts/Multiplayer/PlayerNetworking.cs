@@ -16,13 +16,12 @@ public class PlayerNetworking : NetworkBehaviour
     private float _rotVelY;
     private float _rotVelZ;
 
-    public LevelLogicManager myLevelController;
+    public PlayerStateManager myPlayerStateController;
     public GameObject myCamera;
     public GameObject grappleGun;
     public GameObject shootingGun;
     public Rigidbody bodyRigidbody;
     public Rigidbody feetRigidbody;
-    public Transform multiplayerRepresentation;
 
     private GunController myGunController;
     private GrappleGun myGrappleGun;
@@ -155,7 +154,7 @@ public class PlayerNetworking : NetworkBehaviour
 
         bodyRigidbody.position = position;
         
-        feetRigidbody.position = bodyRigidbody.position - myLevelController.bodyFeetOffset;
+        feetRigidbody.position = bodyRigidbody.position - myPlayerStateController.bodyFeetOffset;
 
         myCamera.transform.rotation = Quaternion.Euler(xRot, yRot, zRot);
         bodyRigidbody.rotation = Quaternion.Euler(0, myCamera.transform.eulerAngles.y, myCamera.transform.eulerAngles.z);
@@ -336,6 +335,27 @@ public class PlayerNetworking : NetworkBehaviour
     }
     #endregion
 
+    /// <summary>
+    /// Allow clients to turn themselves into spectators when they like.
+    /// No need to prevent cheaters here lol, let them do it
+    /// </summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void EnterSpectatorModeServerRPC()
+    {
+        EnterSpectatorModeClientRPC();
+    }
+    [ClientRpc]
+    public void EnterSpectatorModeClientRPC()
+    {
+        myPlayerStateController.EnterSpectatorMode();
+    }
+    [ClientRpc]
+    public void LeaveSpectatorModeClientRPC()
+    {
+        myPlayerStateController.LeaveSpectatorMode();
+    }
+
+
     private void PlayerConnect()
     {
         if (ConnectedPlayers == null || (IsOwner && IsHost))
@@ -360,7 +380,7 @@ public class PlayerNetworking : NetworkBehaviour
         if (IsOwner)
         {
             // OR: if I am disconnected then send my player to main menu
-            IngameEscMenu.Instance.LoadMainMenu();
+            IngameEscMenu.Singleton.LoadMainMenu();
         }
     }
 
@@ -390,10 +410,9 @@ public class PlayerNetworking : NetworkBehaviour
             bodyRigidbody.gameObject.layer = 6;
 
             // enable the multiplayer 3rd person representation of this prefab
-            for (int childID = 0; childID < multiplayerRepresentation.childCount; childID++)
-            {
-                multiplayerRepresentation.GetChild(childID).GetComponent<MeshRenderer>().enabled = true;
-            }
+
+            myPlayerStateController.ShowMultiplayerRepresentation();
+
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
