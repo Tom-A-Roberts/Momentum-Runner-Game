@@ -2,19 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpeedBoost : MonoBehaviour
+public class SlowZone : MonoBehaviour
 {
-    public float DashAcceleration = 1f;
-    public float DashForce = 60f;
-    public float VerticalForce = 1050f;
+    public float MinimumSpeed;
+    public float SlowDownForce;
     public float SidewaysForce = 1050f;
-    private float timer;
-    private float DashMultiplier;
-    private float boostLength;
+    public float VerticalForce = 1050f;
     private PlayerController pc;
     private Rigidbody rb;
-    private Vector3 boostVector;
-
+    private bool playerIsInZone;
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.GetComponent<PlayerController>() == null)
@@ -23,41 +19,38 @@ public class SpeedBoost : MonoBehaviour
         }
         else
         {
+            playerIsInZone = true;
             pc = other.gameObject.GetComponent<PlayerController>();
-            DashMultiplier = 1;
             rb = pc.gameObject.GetComponent<Rigidbody>();
         }
 
     }
+
     private void Update()
     {
-        if (DashMultiplier > 0)
+        if (playerIsInZone == true)
         {
-            timer += Time.deltaTime / DashAcceleration;
-            if (timer > 0)
+            if (Vector3.Dot(rb.velocity, transform.forward) < MinimumSpeed) return;
+            else
             {
-                DashMultiplier -= Time.deltaTime / timer;
-                if (DashMultiplier < 0) DashMultiplier = 0;
-                float currentDashForceAmount = (DashForce * DashMultiplier) * 2f;
-                boostVector = transform.forward * currentDashForceAmount;
+                Vector3 slowZoneVelocity = transform.forward * SlowDownForce * -1;
+
                 float upComponent = Vector3.Dot(transform.up, rb.velocity);
                 Vector3 verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
 
                 float rightComponent = Vector3.Dot(transform.right, rb.velocity);
                 Vector3 sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.deltaTime;
-
-                ForceMode boostType = ForceMode.Force;
-                pc.BoostForce(boostVector, boostType);
+                pc.BoostForce(slowZoneVelocity, ForceMode.Force);
                 pc.BoostForce(verticalCompensationForce, ForceMode.Force);
                 pc.BoostForce(sidewaysCompensationForce, ForceMode.Force);
             }
         }
-
     }
+
     private void OnTriggerExit(Collider other)
     {
-        DashMultiplier = 0;
-        timer = 0;
+        playerIsInZone = false;
+        rb = null;
         pc = null;
     }
 }
