@@ -463,7 +463,8 @@ public class GunController : MonoBehaviour
             Target hitObject = hitRaycastReferenceObj.transform.gameObject.GetComponent<Target>();
             if(!(hitObject == null))
             {
-                hitObject.TargetHit();
+                
+                hitObject.OnHitByLaser();
             }
 
             lr.SetPosition(1, hitRaycastReferenceObj.point);
