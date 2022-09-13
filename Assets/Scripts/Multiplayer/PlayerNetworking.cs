@@ -231,7 +231,21 @@ public class PlayerNetworking : NetworkBehaviour
                     if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
                     {
                         PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(timeToCheck, _cheapInterpolationTime);
+
+                        Vector3 originalColliderPosition = playerNetworkingToRollback.MultiplayerCollider.transform.localPosition;
+
                         playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;
+
+                        float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+                        GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, timeToWait);
+                        serverHitID = CheckForPlayerHit(hitObj);
+
+                        playerNetworkingToRollback.MultiplayerCollider.transform.localPosition = originalColliderPosition;
+
+                        if (clientHitID == serverHitID)
+                            Debug.Log("No discrepancy found - Hit registered");
+                        else
+                            Debug.LogWarning("Discrepancy found - Hit missed");
                     }
                 }
                 else
@@ -239,15 +253,11 @@ public class PlayerNetworking : NetworkBehaviour
                     Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + clientHitID);
                 }
             }
-
-            float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
-            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, timeToWait);
-            serverHitID = CheckForPlayerHit(hitObj);
-
-            if (clientHitID == serverHitID)            
-                Debug.Log("No discrepancy found - Hit registered");            
             else
-                Debug.LogWarning("Discrepancy found - Hit missed");
+            {
+                float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+                LocalShoot(shootStartPosition, shootDirection, timeToWait);
+            }
         }
 
         ShootClientRPC(shootTime, shootStartPosition, shootDirection, serverHitID);
