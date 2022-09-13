@@ -4,11 +4,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using System;
+using TMPro;
 
 public class IngameEscMenu : MonoBehaviour
 {
     public static IngameEscMenu Singleton { get; private set; }
 
+    public GameObject recoveringText;
     public GameObject escapeMenuUIObject;
     public bool isEscMenuShowing = false;
     public bool curserUnlocked = false;
@@ -40,6 +42,21 @@ public class IngameEscMenu : MonoBehaviour
             Hide();
         else if (Input.GetKeyDown(KeyCode.Escape))
             Show();
+    }
+
+    public void ShowRecoveringInfo()
+    {
+        if (recoveringText)
+        {
+            recoveringText.SetActive(true);
+        }
+    }
+    public void HideRecoveringInfo()
+    {
+        if (recoveringText)
+        {
+            recoveringText.SetActive(false);
+        }
     }
 
     public void Show()

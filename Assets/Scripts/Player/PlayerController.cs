@@ -55,8 +55,22 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How hard we boost forwards from a wall jump")]
     public float MaxWallBoostForce = 10f;
 
+    [Header("----------------")]
+    [Header("Respawning Movement Settings")]
+    [Tooltip("upwards speed to accelerate to when respawning")]
+    public float upwardsFlightSpeed = 10f;
+    [Tooltip("How hard we accelerate upwards while respawning")]
+    public float respawningUpwardsAcceleration = 10f;
+    [Tooltip("How hard we accelerate upwards")]
+    public float respawningDrag = 5f;
+    [Tooltip("How much control we get when respawning")]
+    public float respawningControlMultiplier = 0.2f;
+
     [System.NonSerialized]
     public bool spectatorMode = false;
+
+    [System.NonSerialized]
+    public bool respawningMode = false;
 
     //[Header("----------------")]
     //[Header("Dash Settings")]
@@ -200,7 +214,15 @@ public class PlayerController : MonoBehaviour
             float heightInput = Input.GetAxisRaw("HeightChange");
             //HeightChange
 
-            processSpectatorMotion(axisValues.Item1, axisValues.Item2, heightInput);
+            if (respawningMode)
+            {
+                processRespawningMotion(axisValues.Item1, axisValues.Item2, heightInput);
+            }
+            else
+            {
+                processSpectatorMotion(axisValues.Item1, axisValues.Item2, heightInput);
+            }
+            
         }
     }
 
@@ -311,9 +333,54 @@ public class PlayerController : MonoBehaviour
 
                 bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
             }
+        }
+    }
+    void processRespawningMotion(float xInput, float yInput, float heightInput)
+    {
+        bodyRigidBody.useGravity = false;
+        feetRigidBody.useGravity = false;
+        bodyRigidBody.drag = respawningDrag;
+
+        if (xInput != 0 || yInput != 0 || heightInput != 0)
+        {
+            Vector3 input = new Vector3(xInput, heightInput, yInput).normalized;
+
+            // Calculate what directions the inputs mean in worldcoordinate terms
+            //Vector3 verticalInputWorldDirection = mainCamera.transform.forward * input.z;
+            //Vector3 horizontalInputWorldDirection = mainCamera.transform.right * input.x;
+            Vector3 verticalInputWorldDirection = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * input.z;
+            Vector3 horizontalInputWorldDirection = new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z).normalized * input.x;
+            Vector3 heightInputWorldDirection = Vector3.up * input.y;
+
+            // The direction that the player wishes to go in
+            Vector3 wishDirection = (verticalInputWorldDirection + horizontalInputWorldDirection).normalized;
+
+            // Current velocity without the y speed included
+            Vector3 currentPlanarVelocity = Vector3.ProjectOnPlane(bodyRigidBody.velocity, Vector3.up);
+
+            float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
+
+            // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
+            if (forwardsSpeed < 0)
+            {
+                float activeCancellationPower = CancellationPower;
+                if (!PlayerHasAirControl) activeCancellationPower /= 8;
+
+                bodyRigidBody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
+            }
+            else if (forwardsSpeed < movementSpeed * respawningControlMultiplier && (GroundDetector.IsOnGround || PlayerHasAirControl))
+            {
+                // How much required acceleration there is to reach the intended speed (walkingspeed).
+                float requiredAcc = (movementSpeed * respawningControlMultiplier - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
+
+                bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
+            }
+        }
+        if(Vector3.Dot(bodyRigidBody.velocity, Vector3.up) < upwardsFlightSpeed)
+        {
+            bodyRigidBody.AddForce(Vector3.up * respawningUpwardsAcceleration, ForceMode.Acceleration);
 
         }
-
     }
 
     public void BoostForce(Vector3 boost, ForceMode boostType)

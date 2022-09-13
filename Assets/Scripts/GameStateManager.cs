@@ -39,6 +39,10 @@ public class GameStateManager : NetworkBehaviour
     [Tooltip("How wide the zone starts in meters")]
     public float zoneStartWidth = 350;
 
+    [Header("Gameplay settings")]
+    [Tooltip("How many seconds you are floating upwards for. See PlayerController for more settings")]
+    public float respawnDuration = 3;
+
     [Header("Effects settings")]
     public Image ScreenRedEdges;
 

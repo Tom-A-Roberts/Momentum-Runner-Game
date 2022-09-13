@@ -378,15 +378,20 @@ public class PlayerNetworking : NetworkBehaviour
     [ClientRpc]
     public void EnterSpectatorModeClientRPC()
     {
+        // TR: this collider line should be moved to inside the EnterSpectatorMode function. The EnterSpectatorMode function is called
+        // from other places too.
         MultiplayerCollider.enabled = false;
         myPlayerStateController.EnterSpectatorMode();
     }
     [ClientRpc]
     public void LeaveSpectatorModeClientRPC()
     {
+        // TR: this collider line should be moved to inside the LeaveSpectatorMode function. The LeaveSpectatorMode function is called
+        // from other places too.
         MultiplayerCollider.enabled = true;
         myPlayerStateController.LeaveSpectatorMode();
     }
+
     /// <summary>
     /// Asks the server to produce a list of who are spectators and who aren't
     /// </summary>
@@ -408,7 +413,7 @@ public class PlayerNetworking : NetworkBehaviour
         ReturnListOfSpectatorsClientRPC(playerIDs.ToArray(), spectatorStatus.ToArray());
     }
     /// <summary>
-    /// Sends a list of who's spectators and who isn't to the owner who called it
+    /// Sends a list of who's spectators and who isn't to the connected clients, updating their states
     /// </summary>
     [ClientRpc]
     public void ReturnListOfSpectatorsClientRPC(ulong[] playerIDs, bool[] spectatorStatus)
@@ -443,6 +448,33 @@ public class PlayerNetworking : NetworkBehaviour
     }
 
     #endregion
+
+    #region Respawning
+    // respawning is completely handled by the server.
+    // The server tells clients when they should begin respawning AND end respawning
+    public void EnterRespawningModeServer(Vector3 respawnLocation)
+    {
+        EnterRespawningModeClientRPC(respawnLocation);
+    }
+
+    public void LeaveRespawningModeServer()
+    {
+        LeaveRespawningModeClientRPC();
+    }
+
+    [ClientRpc]
+    public void EnterRespawningModeClientRPC(Vector3 respawnLocation)
+    {
+        myPlayerStateController.EnterRespawningMode(respawnLocation);
+    }
+    [ClientRpc]
+    public void LeaveRespawningModeClientRPC()
+    {
+        myPlayerStateController.LeaveRespawningMode();
+    }
+
+    #endregion
+
 
     #region Death
 

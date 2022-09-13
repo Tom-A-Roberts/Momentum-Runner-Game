@@ -1362,6 +1362,10 @@ MonoBehaviour:
   JumpLerpStart: 10
   MaxWallKickoffForce: 38
   MaxWallBoostForce: 5
+  upwardsFlightSpeed: 20
+  respawningUpwardsAcceleration: 400
+  respawningDrag: 5
+  respawningControlMultiplier: 1
   PlayerHasAirControl: 1
 --- !u!33 &4316027074644905783
 MeshFilter:
@@ -1647,6 +1651,8 @@ MonoBehaviour:
   feetCollider: {fileID: 4316027073947639283}
   deathwallRedStartDistance: 15
   _spectatorMode: 0
+  _isRespawningAndIsHost: 0
+  _isRespawning: 0
 --- !u!114 &1445570255
 MonoBehaviour:
   m_ObjectHideFlags: 0

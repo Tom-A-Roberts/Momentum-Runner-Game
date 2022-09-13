@@ -78,9 +78,13 @@ public class CollisionDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider deathbox)
     {
-        if(deathbox.gameObject.tag == "TriggerDeath")
+        if (deathbox.gameObject.tag == "TriggerDeath")
         {
-            levelController.RespawnPlayer();
+            levelController.CheckForRespawn();
+        }
+        if (deathbox.gameObject.tag == "FinishLine")
+        {
+            levelController.RespawnPlayerToBeginning();
         }
 
     }

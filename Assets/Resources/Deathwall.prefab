@@ -93,6 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7969073017720851683}
   - component: {fileID: 223569191}
+  - component: {fileID: 7037276586663071360}
   m_Layer: 0
   m_Name: Deathwall
   m_TagString: Untagged
@@ -118,6 +119,19 @@ Transform:
   m_RootOrder: 26
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!65 &223569191
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7969073017720851680}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 15, y: 0.02, z: 25}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!65 &7037276586663071360
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

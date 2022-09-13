@@ -35,6 +35,20 @@ public class PlayerStateManager : MonoBehaviour
     private bool _spectatorMode = false;
     public bool SpectatorMode => _spectatorMode;
 
+    [SerializeField]
+    private bool _isRespawningAndIsHost = false;
+    public bool IsRespawningAndIsHost => _isRespawningAndIsHost;
+
+    /// <summary>
+    /// WARNING! This property is ONLY consistent for the host and also owner. It may be wrong sometimes otherwise
+    /// </summary>
+    [SerializeField]
+    private bool _isRespawning = false;
+    /// <summary>
+    /// WARNING! This property is ONLY consistent for the host and also owner. It may be wrong sometimes otherwise
+    /// </summary>
+    public bool IsRespawning => _isRespawning;
+
     [System.NonSerialized]
     public Vector3 bodySpawnPosition;
     [System.NonSerialized]
@@ -51,6 +65,8 @@ public class PlayerStateManager : MonoBehaviour
     private Quaternion bodyStartRotation;
     private Vector3 feetStartPosition;
     private Quaternion feetStartRotation;
+
+    private float respawningTimer = 0;
 
     void Start()
     {
@@ -166,7 +182,30 @@ public class PlayerStateManager : MonoBehaviour
         }
         if(!GameStateManager.Singleton.DeveloperMode && !isDead && (playerNetworking.IsOwner || NetworkManager.Singleton.IsHost))
             CheckForDeath();
+
+        if (_isRespawningAndIsHost)
+        {
+            respawningTimer += Time.deltaTime;
+            if(respawningTimer > GameStateManager.Singleton.respawnDuration)
+            {
+                playerNetworking.LeaveRespawningModeServer();
+            }
+        }
+
     }
+
+    /// <summary>
+    /// Called by collision detector
+    /// </summary>
+    public void CheckForRespawn()
+    {
+        // Server checks for respawning state:
+        if (NetworkManager.Singleton.IsHost && !_isRespawningAndIsHost)
+        {
+            playerNetworking.EnterRespawningModeServer(playerBody.position);
+        }
+    }
+   
 
     /// <summary>
     /// (Death by deathwall)
@@ -215,11 +254,12 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
-    public void RespawnPlayer()
+    public void RespawnPlayerToBeginning()
     {
-        playerBody.transform.position = bodySpawnPosition;
+        TeleportPlayer(bodyStartPosition);
+        //playerBody.transform.position = bodySpawnPosition;
         playerBody.transform.rotation = bodyStartRotation;
-        playerFeet.transform.position = feetSpawnPosition;
+        //playerFeet.transform.position = feetSpawnPosition;
         playerFeet.transform.rotation = feetStartRotation;
     }
 
@@ -227,24 +267,27 @@ public class PlayerStateManager : MonoBehaviour
     {
         bodySpawnPosition = bodyStartPosition;
         feetSpawnPosition = feetStartPosition;
-        RespawnPlayer();
+
+        RespawnPlayerToBeginning();
         //reset any other variables changes during the level
     }
     public void PlayerDeath()
     {
         if (!isDead)
         {
-            playerBody.transform.position = bodyStartPosition;
-            playerBody.transform.rotation = bodyStartRotation;
-            playerFeet.transform.position = feetStartPosition;
-            playerFeet.transform.rotation = feetStartRotation;
-
-            playerBody.velocity = Vector3.zero;
-
-            //playerNetworking.EnterSpectatorModeServerRPC();
             EnterSpectatorMode();
         }
         isDead = true;
+    }
+
+    public void TeleportPlayer(Vector3 newBodyPosition)
+    {
+        playerBody.transform.position = newBodyPosition;
+        playerFeet.transform.position = newBodyPosition - bodyFeetOffset;
+        playerFeet.transform.rotation = feetStartRotation;
+
+        playerBody.velocity = Vector3.zero;
+        playerFeet.velocity = Vector3.zero;
     }
 
     /// <summary>
@@ -283,7 +326,6 @@ public class PlayerStateManager : MonoBehaviour
         playerAudioManager.spectatorMode = true;
         cameraController.spectatorMode = true;
 
-
         HideFirstPersonRepresentation();
 
         if (playerNetworking.IsOwner)
@@ -293,8 +335,8 @@ public class PlayerStateManager : MonoBehaviour
         }
         else
         {
-            bodyCollider.enabled = false;
-            feetCollider.enabled = false;
+            //bodyCollider.enabled = false;
+            //feetCollider.enabled = false;
             spectatorRepresentation.enabled = true;
             HideMultiplayerRepresentation();
         }
@@ -319,12 +361,54 @@ public class PlayerStateManager : MonoBehaviour
         }
         else
         {
-            bodyCollider.enabled = true;
-            feetCollider.enabled = true;
+            //bodyCollider.enabled = true;
+            //feetCollider.enabled = true;
             spectatorRepresentation.enabled = false;
             ShowMultiplayerRepresentation();
         }
     }
+
+    public void EnterRespawningMode(Vector3 respawnLocation)
+    {
+        if(NetworkManager.Singleton.IsHost)
+        {
+            _isRespawningAndIsHost = true;
+            respawningTimer = 0;
+        }
+        if (playerNetworking.IsOwner && IngameEscMenu.Singleton)
+            IngameEscMenu.Singleton.ShowRecoveringInfo();
+
+        TeleportPlayer(respawnLocation);
+        _isRespawning = true;
+        playerController.respawningMode = true;
+        EnterSpectatorMode();
+    }
+    public void LeaveRespawningMode()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            _isRespawningAndIsHost = false;
+            respawningTimer = 0;
+        }
+        if (_isRespawning)
+        {
+            playerBody.velocity = Vector3.zero;
+            playerController.AddForce(10, playerBody.transform.forward, ForceMode.VelocityChange);
+            playerController.AddForce(10, Vector3.up, ForceMode.VelocityChange);
+        }
+
+        if (playerNetworking.IsOwner && IngameEscMenu.Singleton)
+            IngameEscMenu.Singleton.HideRecoveringInfo();
+
+        _isRespawning = false;
+        playerController.respawningMode = false;
+
+        LeaveSpectatorMode();
+
+    }
+
+
+
 
     public void ProcessPotentialHit(int playerHitID)
     {
