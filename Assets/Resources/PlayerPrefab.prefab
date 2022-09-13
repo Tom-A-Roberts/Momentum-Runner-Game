@@ -1175,7 +1175,7 @@ GameObject:
   - component: {fileID: 4316027073947639283}
   - component: {fileID: 4316027073947639282}
   - component: {fileID: 1371572323}
-  m_Layer: 9
+  m_Layer: 3
   m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1826,7 +1826,7 @@ MonoBehaviour:
   heatReloadCoolingSpeed: 2
   shootableLayers:
     serializedVersion: 2
-    m_Bits: 73
+    m_Bits: 1089
   aimAssistAngle: 0
   optimalAimAssistDistance: 15
   maximumAimAssistDistance: 50
@@ -6816,7 +6816,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7203573840929668150}
   - component: {fileID: 4187372158593544072}
-  m_Layer: 3
+  m_Layer: 10
   m_Name: MultiplayerHitBox
   m_TagString: Player
   m_Icon: {fileID: 0}
