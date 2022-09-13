@@ -67,7 +67,7 @@ MonoBehaviour:
   zoneProgress: 0.08
   zoneSpeed: 1
   zoneStartWidth: 350
-  respawnDuration: 3
+  respawnDuration: 2.5
   ScreenRedEdges: {fileID: 0}
   DeveloperMode: 1
 --- !u!114 &6462836443202579315

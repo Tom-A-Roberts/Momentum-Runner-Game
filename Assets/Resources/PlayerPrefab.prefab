@@ -1362,10 +1362,10 @@ MonoBehaviour:
   JumpLerpStart: 10
   MaxWallKickoffForce: 38
   MaxWallBoostForce: 5
-  upwardsFlightSpeed: 20
+  upwardsFlightSpeed: 25
   respawningUpwardsAcceleration: 400
   respawningDrag: 5
-  respawningControlMultiplier: 1
+  respawningControlMultiplier: 1.3
   PlayerHasAirControl: 1
 --- !u!33 &4316027074644905783
 MeshFilter:
