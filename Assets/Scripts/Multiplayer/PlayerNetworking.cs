@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.Rendering;
+using System;
+using System.Linq;
+using System.Xml;
+
 public class PlayerNetworking : NetworkBehaviour
 {
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
@@ -226,7 +231,21 @@ public class PlayerNetworking : NetworkBehaviour
                     if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
                     {
                         PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(timeToCheck, _cheapInterpolationTime);
+
+                        Vector3 originalColliderPosition = playerNetworkingToRollback.MultiplayerCollider.transform.localPosition;
+
                         playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;
+
+                        float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+                        GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, timeToWait);
+                        serverHitID = CheckForPlayerHit(hitObj);
+
+                        playerNetworkingToRollback.MultiplayerCollider.transform.localPosition = originalColliderPosition;
+
+                        if (clientHitID == serverHitID)
+                            Debug.Log("No discrepancy found - Hit registered");
+                        else
+                            Debug.LogWarning("Discrepancy found - Hit missed");
                     }
                 }
                 else
@@ -234,15 +253,11 @@ public class PlayerNetworking : NetworkBehaviour
                     Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + clientHitID);
                 }
             }
-
-            float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
-            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, timeToWait);
-            serverHitID = CheckForPlayerHit(hitObj);
-
-            if (clientHitID == serverHitID)            
-                Debug.Log("No discrepancy found - Hit registered");            
             else
-                Debug.LogWarning("Discrepancy found - Hit missed");
+            {
+                float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+                LocalShoot(shootStartPosition, shootDirection, timeToWait);
+            }
         }
 
         ShootClientRPC(shootTime, shootStartPosition, shootDirection, serverHitID);
@@ -372,6 +387,61 @@ public class PlayerNetworking : NetworkBehaviour
         MultiplayerCollider.enabled = true;
         myPlayerStateController.LeaveSpectatorMode();
     }
+    /// <summary>
+    /// Asks the server to produce a list of who are spectators and who aren't
+    /// </summary>
+    [ServerRpc]
+    public void GetListOfSpectatorsServerRPC()
+    {
+        List<ulong> playerIDs = new List<ulong>(ConnectedPlayers.Count);
+        List<bool> spectatorStatus = new List<bool>(ConnectedPlayers.Count);
+
+        foreach (KeyValuePair<ulong, GameObject> entry in ConnectedPlayers)
+        {
+            PlayerStateManager currentPlayerState;
+            if(entry.Value.TryGetComponent(out currentPlayerState))
+            {
+                playerIDs.Add(currentPlayerState.playerNetworking.OwnerClientId);
+                spectatorStatus.Add(currentPlayerState.SpectatorMode);
+            }
+        }
+        ReturnListOfSpectatorsClientRPC(playerIDs.ToArray(), spectatorStatus.ToArray());
+    }
+    /// <summary>
+    /// Sends a list of who's spectators and who isn't to the owner who called it
+    /// </summary>
+    [ClientRpc]
+    public void ReturnListOfSpectatorsClientRPC(ulong[] playerIDs, bool[] spectatorStatus)
+    {
+        if (IsOwner && !IsHost)
+        {
+            Dictionary<ulong, bool> spectatorStatusDict = new Dictionary<ulong, bool>();
+            for (int index = 0; index < playerIDs.Length; index++)
+            {
+                spectatorStatusDict.Add(playerIDs[index], spectatorStatus[index]);
+            }
+
+            foreach (KeyValuePair<ulong, GameObject> entry in ConnectedPlayers)
+            {
+                PlayerStateManager currentPlayerState;
+                if (spectatorStatusDict.ContainsKey(entry.Key) && entry.Value.TryGetComponent(out currentPlayerState))
+                {
+                    // If status is set to spectator = true:
+                    if (spectatorStatusDict[entry.Key] == true)
+                    {
+                        if (!currentPlayerState.SpectatorMode)
+                            currentPlayerState.EnterSpectatorMode();
+                    }
+                    else
+                    {
+                        if (currentPlayerState.SpectatorMode)
+                            currentPlayerState.LeaveSpectatorMode();
+                    }
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region Death
@@ -433,6 +503,7 @@ public class PlayerNetworking : NetworkBehaviour
     {
         PlayerConnect();
 
+
         myGrappleGun = grappleGun.GetComponent<GrappleGun>();
         myGrappleGun.isGrappleOwner = IsOwner;
 
@@ -472,7 +543,10 @@ public class PlayerNetworking : NetworkBehaviour
             //{
             //    GameObject spawnCam = Camera.main.gameObject;
             //    Destroy(spawnCam);
-            //}    
+            //}
+
+            // Update who in the game is currently spectators or not
+            GetListOfSpectatorsServerRPC();
 
             myPlayerStateController.HideMultiplayerRepresentation();
 
