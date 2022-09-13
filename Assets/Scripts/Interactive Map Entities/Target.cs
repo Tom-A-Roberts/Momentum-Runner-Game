@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 
-public class Target: MonoBehaviour// , IShootInterface
+public class Target: MonoBehaviour, IShootInterface
 {
     public GameObject[] ObjectsToChange;
 
