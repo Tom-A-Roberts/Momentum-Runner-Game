@@ -45,6 +45,7 @@ public class CornerPlacer : MonoBehaviour
         {
             corners[i].localPosition = Vector3.Scale(cornerOriginalPositions[i], transform.localScale /2);
         }
+
         particles.transform.localScale = transform.localScale;
     }
 }

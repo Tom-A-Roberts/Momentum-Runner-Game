@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class SlowZone : MonoBehaviour
 {
-    public float MinimumSpeed;
-    public float SlowDownForce;
-    public float SidewaysForce = 1050f;
-    public float VerticalForce = 1050f;
-
+    [Tooltip("The drag coefficient of this zone")]
+    public float dragCoefficient = 1;
+    [Tooltip("Drag is applied until the player is below this speed")]
+    public float MinimumSpeed = 10f;
 
     private PlayerController pc;
     private Rigidbody rb;
@@ -25,30 +24,26 @@ public class SlowZone : MonoBehaviour
             pc = other.gameObject.GetComponent<PlayerController>();
             rb = pc.gameObject.GetComponent<Rigidbody>();
         }
-
     }
 
     private void Update()
     {
-            float upComponent;
-            float rightComponent;
-            Vector3 sidewaysCompensationForce;
-            Vector3 verticalCompensationForce;
         if (playerIsInZone == true)
         {
-            upComponent = Vector3.Dot(transform.up, rb.velocity);
-            rightComponent = Vector3.Dot(transform.right, rb.velocity);
-            verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
-            sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.deltaTime;
-
-            if (Vector3.Dot(rb.velocity, transform.forward) < MinimumSpeed) { }
-            else
+            // Formula for drag is: drag_coefficient * v^2
+            if(rb.velocity.magnitude > MinimumSpeed)
             {
-                Vector3 slowZoneVelocity = transform.forward * SlowDownForce * -1;
-                pc.BoostForce(slowZoneVelocity, ForceMode.Force);
+                Vector3 dragDirection = -rb.velocity.normalized;
+                float v_squared = Mathf.Pow(rb.velocity.magnitude, 2);
+                Vector3 dragForce = dragDirection * v_squared * dragCoefficient * Time.deltaTime;
+
+                pc.BoostForce(dragForce, ForceMode.Acceleration);
             }
-            pc.BoostForce(verticalCompensationForce, ForceMode.Force);
-            pc.BoostForce(sidewaysCompensationForce, ForceMode.Force);
+
+            // Remove gravity:
+            // extra 1.1 seems to be needed to counter the feet
+            Vector3 GravityForce = Physics.gravity * 1.1f;// + pc.CharacterFallingWeight * Vector3.down;
+            pc.BoostForce(-GravityForce, ForceMode.Force);
         }
     }
 

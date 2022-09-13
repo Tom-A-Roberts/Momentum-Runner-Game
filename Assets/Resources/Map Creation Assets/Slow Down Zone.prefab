@@ -113,9 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MinimumSpeed: 10
-  SlowDownForce: 25
-  SidewaysForce: 1050
-  VerticalForce: 1050
+  dragCoefficient: 1
 --- !u!114 &7808350247563189029
 MonoBehaviour:
   m_ObjectHideFlags: 0
