@@ -56872,6 +56872,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1422375622357097793, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1440823696544203542, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: m_Name
       value: SpeedBoostZone
@@ -56919,6 +56923,10 @@ PrefabInstance:
     - target: {fileID: 1780334897903950252, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -6.455
+      objectReference: {fileID: 0}
+    - target: {fileID: 7070735569837519697, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

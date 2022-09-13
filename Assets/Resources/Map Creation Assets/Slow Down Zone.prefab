@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7808350247563189025}
   - component: {fileID: 7808350247563189026}
   - component: {fileID: 7808350247563189029}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Trigger Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,8 +112,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67c0b9d3dcb13f544babf691afd4ee1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinimumSpeed: 10
   dragCoefficient: 1
+  MinimumSpeed: 10
 --- !u!114 &7808350247563189029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5010,7 +5010,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7808350249629433756}
   - component: {fileID: 7808350249629433759}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Lines
   m_TagString: Untagged
   m_Icon: {fileID: 0}
