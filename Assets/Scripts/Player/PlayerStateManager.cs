@@ -110,14 +110,14 @@ public class PlayerStateManager : MonoBehaviour
                 }
             }
         }
-
-
+        //// Let GameStateManager know who is the local player
+        //GameStateManager.Singleton.localPlayer = this;
         //if (playerNetworking.IsOwner)
         //{
         //    InitializeFogwall();
         //}
 
-        if(GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+        if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
         {
             Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
             newcol.a = 0;
@@ -143,8 +143,7 @@ public class PlayerStateManager : MonoBehaviour
 
     void InitializeFogwall()
     {
-        // Let GameStateManager know who is the local player
-        GameStateManager.Singleton.localPlayer = this;
+
 
         // Update the fog manager to know who is the local player
         if (FogManager.Instance)

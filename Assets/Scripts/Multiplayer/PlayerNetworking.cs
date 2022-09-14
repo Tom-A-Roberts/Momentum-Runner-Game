@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 using System;
 using System.Linq;
 using System.Xml;
+using static GameStateManager;
 
 public class PlayerNetworking : NetworkBehaviour
 {
@@ -32,6 +33,18 @@ public class PlayerNetworking : NetworkBehaviour
     private GunController myGunController;
     private GrappleGun myGrappleGun;
     private PlayerController myPlayerController;
+
+    public ReadyUpState PlayerReadyUpState => _playerReadyUpState;
+    private ReadyUpState _playerReadyUpState = ReadyUpState.unready;
+
+    public enum ReadyUpState
+    {
+        unready,
+        waitingToReady,
+        ready,
+        waitingToUnready
+    }
+
     //public AudioSource myAudioSource;
 
     /// <summary>
@@ -475,6 +488,73 @@ public class PlayerNetworking : NetworkBehaviour
 
     #endregion
 
+    #region ReadyingUp
+    public void ReadyUpStateChange()
+    {
+        if (IsOwner)
+        {
+            if (_playerReadyUpState == ReadyUpState.ready || _playerReadyUpState == ReadyUpState.waitingToReady)
+            {
+                _playerReadyUpState = ReadyUpState.waitingToUnready;
+                GameStateManager.Singleton.gameStateSwitcher.LocalStartUnreadyEffects();
+                UnReadyUpServerRPC();
+            }
+            else if (_playerReadyUpState == ReadyUpState.unready || _playerReadyUpState == ReadyUpState.waitingToUnready)
+            {
+                _playerReadyUpState = ReadyUpState.waitingToReady;
+                GameStateManager.Singleton.gameStateSwitcher.LocalStartReadyUpEffects();
+                ReadyUpServerRPC();
+            }
+        }
+    }
+    public void ServerReadyUp()
+    {
+        if (IsOwner)
+        {
+            _playerReadyUpState = ReadyUpState.ready;
+            GameStateManager.Singleton.gameStateSwitcher.LocalServerReadyUpEffects();
+        }
+        else
+        {
+            // Display unready state above myPlayerStateManager's head
+        }
+    }
+
+    public void ServerUnready()
+    {
+        if (IsOwner)
+        {
+            _playerReadyUpState = ReadyUpState.unready;
+            GameStateManager.Singleton.gameStateSwitcher.LocalServerUnreadyEffects();
+        }
+        else
+        {
+            // Display unready state above myPlayerStateManager's head
+        }
+    }
+
+    [ServerRpc]
+    public void ReadyUpServerRPC()
+    {
+        ReadyUpClientRPC();
+    }
+    [ServerRpc]
+    public void UnReadyUpServerRPC()
+    {
+        UnReadyUpClientRPC();
+    }
+    [ClientRpc]
+    public void ReadyUpClientRPC()
+    {
+        ServerReadyUp();
+    }
+    [ClientRpc]
+    public void UnReadyUpClientRPC()
+    {
+        ServerUnready();
+    }
+
+    #endregion
 
     #region Death
 
@@ -535,7 +615,6 @@ public class PlayerNetworking : NetworkBehaviour
     {
         PlayerConnect();
 
-
         myGrappleGun = grappleGun.GetComponent<GrappleGun>();
         myGrappleGun.isGrappleOwner = IsOwner;
 
@@ -550,7 +629,7 @@ public class PlayerNetworking : NetworkBehaviour
         {
             //bodyRigidbody.isKinematic = true;
             //feetRigidbody.isKinematic = true;
-           
+            
             // Remove camera
             Destroy(myCamera.GetComponent<CameraController>());
             Destroy(myCamera.GetComponent<UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData>());
@@ -571,10 +650,22 @@ public class PlayerNetworking : NetworkBehaviour
         }
         else
         {
-            //if (Camera.main != myCamera)
+            GameStateManager.Singleton.localPlayer = this;
+            // Force ready or unready upon joining:
+
+            // Activate the game state manager initialization:
+            // Sadly has to be done here as the GameStateManager OnNetworkSpawn is unreliable
+            GameStateManager.Singleton.OnLocalPlayerNetworkSpawn();
+
+            //if (GameStateManager.Singleton != null && GameStateManager.Singleton.gameStateSwitcher != null)
             //{
-            //    GameObject spawnCam = Camera.main.gameObject;
-            //    Destroy(spawnCam);
+            //    if (GameStateManager.Singleton.gameStateSwitcher.GameState != GameState.waitingToReadyUp)
+            //    {
+            //        if (PlayerReadyUpState == ReadyUpState.unready || PlayerReadyUpState == ReadyUpState.waitingToUnready)
+            //        {
+            //            ReadyUpStateChange();
+            //        }
+            //    }
             //}
 
             // Update who in the game is currently spectators or not

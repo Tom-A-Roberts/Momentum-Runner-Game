@@ -6,6 +6,7 @@ using System;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 using TMPro;
+using static PlayerNetworking;
 
 /// <summary>
 /// This class handles the game state such as:
@@ -55,6 +56,7 @@ public class GameStateManager : NetworkBehaviour
     [Tooltip("When true: disables death")]
     public bool DeveloperMode = true;
 
+
     /// <summary>
     /// The distance in meters between the fog wall and the death wall
     /// </summary>
@@ -62,7 +64,7 @@ public class GameStateManager : NetworkBehaviour
     public float zoneWidth;
 
     [System.NonSerialized]
-    public PlayerStateManager localPlayer;
+    public PlayerNetworking localPlayer;
 
     [System.NonSerialized]
     public BoxCollider deathWallCollider;
@@ -76,7 +78,12 @@ public class GameStateManager : NetworkBehaviour
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
 
-    
+    /// <summary>
+    /// Gets set in NetworkSpawn to the material of the ready up cube
+    /// </summary>
+    private Material readyUpCubeMaterial;
+    private float readyUpCubeOriginalHeight;
+
     public enum GameState
     {
         waitingToReadyUp,
@@ -112,18 +119,24 @@ public class GameStateManager : NetworkBehaviour
             //SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress);
         }
 
+    }
+
+    public void OnLocalPlayerNetworkSpawn()
+    {
+        if (ReadyUpCube)
+        {
+            readyUpCubeMaterial = ReadyUpCube.GetComponent<Renderer>().material;
+            readyUpCubeOriginalHeight = ReadyUpCube.transform.position.y;
+        }
+        else
+            Debug.LogWarning("No ready up cube found! please assign it in the GameStateManager inspector");
+
         gameStateSwitcher = new GameStateSwitcher(this);
-
-
         if (DeveloperMode)
         {
             gameStateSwitcher.SwitchToPlayingGame(false);
         }
-    }
 
-
-    public override void OnNetworkSpawn()
-    {
         zoneWidth = zoneStartWidth;
         // Only need to update this once since it doesn't change throughout the game.
         if (!IsHost)
@@ -133,6 +146,16 @@ public class GameStateManager : NetworkBehaviour
             // Add callback function for when the game state is changed:
             _gameState.OnValueChanged += ChangedGameState;
         }
+
+
+        if (GameStateManager.Singleton.gameStateSwitcher.GameState != GameState.waitingToReadyUp)
+        {
+            if (localPlayer.PlayerReadyUpState == ReadyUpState.unready || localPlayer.PlayerReadyUpState == ReadyUpState.waitingToUnready)
+            {
+                localPlayer.ReadyUpStateChange();
+            }
+        }
+
     }
 
     /// <summary>
@@ -149,6 +172,7 @@ public class GameStateManager : NetworkBehaviour
         {
             parent = _parent;
             _gameState = GameState.waitingToReadyUp;
+            //localPlayerNetworking = parent.localPlayer.playerNetworking;
             SwitchToWaitingToReadyUp(false);
         }
 
@@ -163,15 +187,9 @@ public class GameStateManager : NetworkBehaviour
             {
                 Debug.LogWarning("No 'waitingToReadyUpPanel' found in GameStateManager, please add this reference in the inspector");
             }
+
             if (parent.ReadyUpBarrier)
                 parent.ReadyUpBarrier.SetActive(true);
-
-            if (parent.ReadyUpFloatingText)
-                parent.ReadyUpFloatingText.text = "Shoot this button to ready up";
-            else
-            {
-                Debug.LogWarning("No 'ReadyUpFloatingText' found in GameStateManager, please add this reference in the inspector");
-            }
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
@@ -179,6 +197,7 @@ public class GameStateManager : NetworkBehaviour
         {
             SwitchFromState(_gameState, useEffects);
             _gameState = GameState.readiedUp;
+
             if (parent.ReadyUpBarrier)
                 parent.ReadyUpBarrier.SetActive(true);
         }
@@ -188,6 +207,7 @@ public class GameStateManager : NetworkBehaviour
         {
             SwitchFromState(_gameState, useEffects);
             _gameState = GameState.playingGame;
+
             if (parent.ReadyUpBarrier)
             {
                 parent.ReadyUpBarrier.SetActive(false);
@@ -203,6 +223,7 @@ public class GameStateManager : NetworkBehaviour
         {
             SwitchFromState(_gameState, useEffects);
             _gameState = GameState.someoneHasWon;
+
             if (parent.ReadyUpBarrier)
                 parent.ReadyUpBarrier.SetActive(false);
         }
@@ -213,9 +234,6 @@ public class GameStateManager : NetworkBehaviour
             {
                 if (parent.waitingToReadyUpPanel)
                     parent.waitingToReadyUpPanel.SetActive(false);
-
-                if (parent.ReadyUpFloatingText)
-                    parent.ReadyUpFloatingText.text = "Ready";
 
             }
             else if(previousState == GameState.readiedUp)
@@ -230,9 +248,56 @@ public class GameStateManager : NetworkBehaviour
             {
 
             }
-
         }
 
+        public void LocalStartReadyUpEffects()
+        {
+            if (parent.readyUpCubeMaterial)
+            {
+                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 1);
+                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
+                float newHeight = parent.readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
+                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
+            }
+            if (parent.ReadyUpFloatingText)
+                parent.ReadyUpFloatingText.text = "...";
+        }
+        public void LocalServerReadyUpEffects()
+        {
+            if (parent.readyUpCubeMaterial)
+            {
+                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 8);
+                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
+                float newHeight = parent.readyUpCubeOriginalHeight;
+                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
+            }
+            if (parent.ReadyUpFloatingText)
+                parent.ReadyUpFloatingText.text = "Readied up!";
+        }
+        public void LocalStartUnreadyEffects()
+        {
+            if (parent.readyUpCubeMaterial)
+            {
+                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 1);
+                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
+                float newHeight = parent.readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
+                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
+            }
+            if (parent.ReadyUpFloatingText)
+                parent.ReadyUpFloatingText.text = "...";
+        }
+        public void LocalServerUnreadyEffects()
+        {
+            if (parent.readyUpCubeMaterial)
+            {
+                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 4);
+                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
+                float newHeight = parent.readyUpCubeOriginalHeight;
+                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
+            }
+            if (parent.ReadyUpFloatingText)
+                parent.ReadyUpFloatingText.text = "Shoot this button to ready up";
+        }
     }
 
 
@@ -284,7 +349,7 @@ public class GameStateManager : NetworkBehaviour
 
         if (localPlayer && deathWall && deathWallCollider)
         {
-            localPlayer.UpdateDeathWallEffects(deathWall.transform, deathWallCollider);
+            localPlayer.myPlayerStateController.UpdateDeathWallEffects(deathWall.transform, deathWallCollider);
         }
     }
 
@@ -354,11 +419,6 @@ public class GameStateManager : NetworkBehaviour
         
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="progress"></param>
-    /// <returns></returns>
     public static float convertProgressToBetween01(float progress)
     {
         float progressSimplified = progress - Mathf.Floor(progress);

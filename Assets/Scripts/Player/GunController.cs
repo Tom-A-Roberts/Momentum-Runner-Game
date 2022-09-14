@@ -466,6 +466,10 @@ public class GunController : MonoBehaviour
                 
                 hitObject.OnHitByLaser();
             }
+            if (hitRaycastReferenceObj.transform.tag == "Readyup")
+            {
+                playerNetworking.ReadyUpStateChange();
+            }
 
             lr.SetPosition(1, hitRaycastReferenceObj.point);
 
