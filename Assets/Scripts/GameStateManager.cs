@@ -371,11 +371,16 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     void UpdateWallPositions()
     {
-        float metersToTravel = zoneSpeed * Time.deltaTime;
+        float metersToTravel = 0;
+
+        if(gameStateSwitcher.GameState == GameState.playingGame)
+        {
+            metersToTravel = zoneSpeed * Time.deltaTime;
+            zoneWidth -= Time.deltaTime * closingSpeed;
+        }
+
         float widthInLapsUnits = convertMetersToLapsUnits(zoneWidth);
-
         zoneProgress += convertMetersToLapsUnits(metersToTravel);
-
 
         if (deathWall)
         {

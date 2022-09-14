@@ -491,7 +491,7 @@ public class PlayerNetworking : NetworkBehaviour
     #region ReadyingUp
     public void ReadyUpStateChange()
     {
-        if (IsOwner)
+        if (IsOwner && GameStateManager.Singleton.gameStateSwitcher.GameState == GameState.waitingToReadyUp)
         {
             if (_playerReadyUpState == ReadyUpState.ready || _playerReadyUpState == ReadyUpState.waitingToReady)
             {
