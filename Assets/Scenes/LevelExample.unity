@@ -13306,7 +13306,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 661366441}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 17.326, z: -62.34}
+  m_LocalPosition: {x: 0, y: 17.326, z: -59.111}
   m_LocalScale: {x: 0.3198283, y: 0.3795655, z: 0.30334127}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19364,7 +19364,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1358249147}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 16.357, z: -62.34}
+  m_LocalPosition: {x: 0, y: 16.357, z: -59.111}
   m_LocalScale: {x: 0.65626, y: 1.6597102, z: 0.62243}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56965,7 +56965,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Shoot the button to ready up
+  m_text: Shoot this button to ready up
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5b3d1b4c145179940a7f3289afe425be, type: 2}
   m_sharedMaterial: {fileID: -6862646134182506265, guid: 5b3d1b4c145179940a7f3289afe425be, type: 2}
@@ -57087,7 +57087,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1744372048}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -62.029}
+  m_LocalPosition: {x: 0, y: 0, z: -58.8}
   m_LocalScale: {x: 0.09362526, y: 0.09362526, z: 0.09362526}
   m_ConstrainProportionsScale: 0
   m_Children: []
