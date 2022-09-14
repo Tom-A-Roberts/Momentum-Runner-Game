@@ -5,6 +5,7 @@ using Unity.Netcode;
 using System;
 using UnityEngine.Playables;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// This class handles the game state such as:
@@ -45,6 +46,10 @@ public class GameStateManager : NetworkBehaviour
 
     [Header("Effects settings")]
     public Image ScreenRedEdges;
+    public GameObject waitingToReadyUpPanel;
+    public GameObject ReadyUpCube;
+    public TMP_Text ReadyUpFloatingText;
+    public GameObject ReadyUpBarrier;
 
     [Header("Dev settings")]
     [Tooltip("When true: disables death")]
@@ -62,12 +67,23 @@ public class GameStateManager : NetworkBehaviour
     [System.NonSerialized]
     public BoxCollider deathWallCollider;
 
+    [System.NonSerialized]
+    public GameStateSwitcher gameStateSwitcher;
+
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
     private float railwayLength = 0;
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
 
+    
+    public enum GameState
+    {
+        waitingToReadyUp,
+        readiedUp,
+        playingGame,
+        someoneHasWon
+    }
 
     private void Awake()
     {
@@ -96,7 +112,13 @@ public class GameStateManager : NetworkBehaviour
             //SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress);
         }
 
-        
+        gameStateSwitcher = new GameStateSwitcher(this);
+
+
+        if (DeveloperMode)
+        {
+            gameStateSwitcher.SwitchToPlayingGame(false);
+        }
     }
 
 
@@ -112,6 +134,107 @@ public class GameStateManager : NetworkBehaviour
             _gameState.OnValueChanged += ChangedGameState;
         }
     }
+
+    /// <summary>
+    /// Handles switching between different game states such as readied up
+    /// </summary>
+    public class GameStateSwitcher
+    {
+        public GameState GameState => _gameState;
+        private GameState _gameState;
+
+        public GameStateManager parent;
+
+        public GameStateSwitcher(GameStateManager _parent)
+        {
+            parent = _parent;
+            _gameState = GameState.waitingToReadyUp;
+            SwitchToWaitingToReadyUp(false);
+        }
+
+        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
+        public void SwitchToWaitingToReadyUp(bool useEffects)
+        {
+            SwitchFromState(_gameState, useEffects);
+            _gameState = GameState.waitingToReadyUp;
+            if (parent.waitingToReadyUpPanel)
+                parent.waitingToReadyUpPanel.SetActive(true);
+            else
+            {
+                Debug.LogWarning("No 'waitingToReadyUpPanel' found in GameStateManager, please add this reference in the inspector");
+            }
+            if (parent.ReadyUpBarrier)
+                parent.ReadyUpBarrier.SetActive(true);
+
+            if (parent.ReadyUpFloatingText)
+                parent.ReadyUpFloatingText.text = "Shoot this button to ready up";
+            else
+            {
+                Debug.LogWarning("No 'ReadyUpFloatingText' found in GameStateManager, please add this reference in the inspector");
+            }
+        }
+
+        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
+        public void SwitchToReadiedUp(bool useEffects)
+        {
+            SwitchFromState(_gameState, useEffects);
+            _gameState = GameState.readiedUp;
+            if (parent.ReadyUpBarrier)
+                parent.ReadyUpBarrier.SetActive(true);
+        }
+
+        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
+        public void SwitchToPlayingGame(bool useEffects)
+        {
+            SwitchFromState(_gameState, useEffects);
+            _gameState = GameState.playingGame;
+            if (parent.ReadyUpBarrier)
+            {
+                parent.ReadyUpBarrier.SetActive(false);
+            }
+            else
+            {
+                Debug.LogWarning("No 'ready up barrier' found in GameStateManager, please add this reference in the inspector");
+            }
+        }
+
+        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
+        public void SwitchToSomeoneHasWon(bool useEffects)
+        {
+            SwitchFromState(_gameState, useEffects);
+            _gameState = GameState.someoneHasWon;
+            if (parent.ReadyUpBarrier)
+                parent.ReadyUpBarrier.SetActive(false);
+        }
+
+        private void SwitchFromState(GameState previousState, bool useEffects)
+        {
+            if(previousState == GameState.waitingToReadyUp)
+            {
+                if (parent.waitingToReadyUpPanel)
+                    parent.waitingToReadyUpPanel.SetActive(false);
+
+                if (parent.ReadyUpFloatingText)
+                    parent.ReadyUpFloatingText.text = "Ready";
+
+            }
+            else if(previousState == GameState.readiedUp)
+            {
+
+            }
+            else if (previousState == GameState.playingGame)
+            {
+
+            }
+            else if (previousState == GameState.someoneHasWon)
+            {
+
+            }
+
+        }
+
+    }
+
 
     #region RPC communications
 
