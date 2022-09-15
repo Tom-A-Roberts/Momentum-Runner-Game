@@ -1453,7 +1453,7 @@ MonoBehaviour:
   SprintMultiplier: 1.5
   Acceleration: 0.8
   CancellationPower: 50
-  SidewaysDeceleration: 10
+  SidewaysDeceleration: 6
   DragWhenNoKeysPressed: 10
   CharacterFallingWeight: 20
   JumpForce: 8
