@@ -55,44 +55,65 @@ public class GameStateManager : NetworkBehaviour
     public TMP_Text CountdownText;
 
     [Header("Level Music Settings")]
-    //[Tooltip("When true: disables death")]
     public AudioClip waitingToReadyUpSong;
     public AudioClip levelSoundTracks;
 
     [Header("Dev settings")]
-    [Tooltip("When true: disables death")]
+    [Tooltip("When true: disables death, disables ready up sequence, disables music")]
     public bool DeveloperMode = true;
 
     /// <summary>
     /// The distance in meters between the fog wall and the death wall
     /// </summary>
-    [System.NonSerialized]
-    public float zoneWidth;
+    public float ZoneWidth => _zoneWidth;
+    /// <summary>
+    /// The distance in meters between the fog wall and the death wall
+    /// </summary>
+    private float _zoneWidth;
 
+    /// <summary>
+    /// The local player who is playing this game (IsOwner = true).
+    /// <para>This is NOT necessarily the host</para>
+    /// </summary>
     [System.NonSerialized]
     public PlayerNetworking localPlayer;
 
+    /// <summary>
+    /// Holds the deathwall collider, used by gameobjects to find out how close they are to it
+    /// </summary>
     [System.NonSerialized]
     public BoxCollider deathWallCollider;
 
+    /// <summary>
+    /// This class can be told to switch between any game state and it will handle it for you
+    /// </summary>
     [System.NonSerialized]
     public GameStateSwitcher gameStateSwitcher;
 
+    /// <summary>
+    /// A maintained set that contains the ID's of all players that are readied up.
+    /// Only reliably maintained during the waiting to ready up gamestate
+    /// </summary>
     public HashSet<ulong> readiedPlayers;
+
+    /// <summary>
+    /// The current game state within the level
+    /// </summary>
+    public static GameState CurrentGameState => Singleton.gameStateSwitcher.GameState;
+    /// <summary>
+    /// The current game state within the level
+    /// </summary>
+    public GameState currentGameState => gameStateSwitcher.GameState;
 
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
     private float railwayLength = 0;
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
-
-    /// <summary>
-    /// Gets set in NetworkSpawn to the material of the ready up cube
-    /// </summary>
-    private Material readyUpCubeMaterial;
-    private float readyUpCubeOriginalHeight;
     
-
+    /// <summary>
+    /// Which game states the current level can be in
+    /// </summary>
     public enum GameState
     {
         waitingToReadyUp,
@@ -112,7 +133,7 @@ public class GameStateManager : NetworkBehaviour
 
     void Start()
     {
-        zoneWidth = zoneStartWidth;
+        _zoneWidth = zoneStartWidth;
         if (railwayPointsList == null)
         {
             throw new System.Exception("\"railwayPointsList is set to null.\\n Therefore no wall points found to use when moving the deathwall and fogwall!\"");
@@ -131,19 +152,14 @@ public class GameStateManager : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Called on PlayerNetwork OnNetworkSpawn() (specifically, when the IsOwner spawns)
+    /// </summary>
     public void OnLocalPlayerNetworkSpawn()
     {
         readiedPlayers = new HashSet<ulong>();
 
         localPlayer.myPlayerStateController.playerAudioManager.SetupLevelSoundtracks(waitingToReadyUpSong, levelSoundTracks);
-
-        if (ReadyUpCube)
-        {
-            readyUpCubeMaterial = ReadyUpCube.GetComponent<Renderer>().material;
-            readyUpCubeOriginalHeight = ReadyUpCube.transform.position.y;
-        }
-        else
-            Debug.LogWarning("No ready up cube found! please assign it in the GameStateManager inspector");
 
         gameStateSwitcher = new GameStateSwitcher(this);
         if (DeveloperMode)
@@ -151,7 +167,7 @@ public class GameStateManager : NetworkBehaviour
             gameStateSwitcher.SwitchToPlayingGame(false);
         }
 
-        zoneWidth = zoneStartWidth;
+        _zoneWidth = zoneStartWidth;
         // Only need to update this once since it doesn't change throughout the game.
         if (!IsHost)
         {
@@ -169,9 +185,7 @@ public class GameStateManager : NetworkBehaviour
                 localPlayer.ReadyUpStateChange();
             }
         }
-
     }
-
     #endregion
 
     /// <summary>
@@ -179,21 +193,50 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     public class GameStateSwitcher
     {
+        /// <summary>
+        /// Maintains the current state of the game (the current level)
+        /// </summary>
         public GameState GameState => _gameState;
         private GameState _gameState;
 
+        /// <summary>
+        /// The parent who owns this object
+        /// </summary>
         public GameStateManager parent;
 
+        /// <summary>
+        /// Gets set in NetworkSpawn to the material of the ready up cube
+        /// </summary>
+        private Material readyUpCubeMaterial;
+        /// <summary>
+        /// Records the original height of the readyup cube so that it can be pressed down and released using the height
+        /// </summary>
+        private float readyUpCubeOriginalHeight;
+
+        /// <summary>
+        /// Counts down from 5.99 to 0 when everyone is readied up
+        /// </summary>
         public float readiedCountdownProgress = 0;
 
         public GameStateSwitcher(GameStateManager _parent)
         {
             parent = _parent;
             _gameState = GameState.waitingToReadyUp;
-            //localPlayerNetworking = parent.localPlayer.playerNetworking;
+
+            if (parent.ReadyUpCube)
+            {
+                readyUpCubeMaterial = parent.ReadyUpCube.GetComponent<Renderer>().material;
+                readyUpCubeOriginalHeight = parent.ReadyUpCube.transform.position.y;
+            }
+            else
+                Debug.LogWarning("No ready up cube found! please assign it in the GameStateManager inspector");
+
             SwitchToWaitingToReadyUp(false);
         }
 
+        /// <summary>
+        /// Called by GameStateManager.Update()
+        /// </summary>
         public void Update()
         {
             if(_gameState == GameState.readiedUp)
@@ -290,6 +333,9 @@ public class GameStateManager : NetworkBehaviour
                 parent.ReadyUpBarrier.SetActive(false);
         }
 
+        /// <summary>
+        /// When switching out from a state, this function turns off previous state effects
+        /// </summary>
         private void SwitchFromState(GameState previousState, bool useEffects)
         {
             if(previousState == GameState.waitingToReadyUp)
@@ -314,49 +360,61 @@ public class GameStateManager : NetworkBehaviour
             }
         }
 
+        /// <summary>
+        /// Initiates local effects when player has begun the ready up phase
+        /// </summary>
         public void LocalStartReadyUpEffects()
         {
-            if (parent.readyUpCubeMaterial)
+            if (readyUpCubeMaterial)
             {
-                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 1);
-                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
-                float newHeight = parent.readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
+                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 1);
+                readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
+                float newHeight = readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
                 parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
             }
             if (parent.ReadyUpFloatingText)
                 parent.ReadyUpFloatingText.text = "...";
         }
+        /// <summary>
+        /// Initiates local effects when player has readied up (confirmed by the server)
+        /// </summary>
         public void LocalServerReadyUpEffects()
         {
-            if (parent.readyUpCubeMaterial)
+            if (readyUpCubeMaterial)
             {
-                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 8);
-                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
-                float newHeight = parent.readyUpCubeOriginalHeight;
+                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 8);
+                readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
+                float newHeight = readyUpCubeOriginalHeight;
                 parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
             }
             if (parent.ReadyUpFloatingText)
                 parent.ReadyUpFloatingText.text = "Readied up!";
         }
+        /// <summary>
+        /// Initiates local effects when player has begun the unready up phase
+        /// </summary>
         public void LocalStartUnreadyEffects()
         {
-            if (parent.readyUpCubeMaterial)
+            if (readyUpCubeMaterial)
             {
-                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 1);
-                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
-                float newHeight = parent.readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
+                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 1);
+                readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
+                float newHeight = readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
                 parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
             }
             if (parent.ReadyUpFloatingText)
                 parent.ReadyUpFloatingText.text = "...";
         }
+        /// <summary>
+        /// Initiates local effects when player has unreadied (confirmed by the server)
+        /// </summary>
         public void LocalServerUnreadyEffects()
         {
-            if (parent.readyUpCubeMaterial)
+            if (readyUpCubeMaterial)
             {
-                parent.readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 4);
-                parent.readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
-                float newHeight = parent.readyUpCubeOriginalHeight;
+                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 4);
+                readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
+                float newHeight = readyUpCubeOriginalHeight;
                 parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
             }
             if (parent.ReadyUpFloatingText)
@@ -404,7 +462,7 @@ public class GameStateManager : NetworkBehaviour
             GameStateData stateData = new GameStateData()
             {
                 ZoneProgress = zoneProgress,
-                ZoneWidth = zoneWidth,
+                ZoneWidth = _zoneWidth,
                 ZoneSpeed = zoneSpeed
             };
             _gameState.Value = stateData;
@@ -425,7 +483,7 @@ public class GameStateManager : NetworkBehaviour
     private void ChangedGameState(GameStateData oldGameState, GameStateData newGameState)
     {
         zoneProgress = newGameState.ZoneProgress;
-        zoneWidth = newGameState.ZoneWidth;
+        _zoneWidth = newGameState.ZoneWidth;
         zoneSpeed = newGameState.ZoneSpeed;
     }
 
@@ -444,19 +502,21 @@ public class GameStateManager : NetworkBehaviour
             if (gameStateSwitcher.GameState == GameState.playingGame)
             {
                 metersToTravel = zoneSpeed * Time.deltaTime;
-                zoneWidth -= Time.deltaTime * closingSpeed;
+                _zoneWidth -= Time.deltaTime * closingSpeed;
             }
         }
 
-        float widthInLapsUnits = convertMetersToLapsUnits(zoneWidth);
+        float widthInLapsUnits = convertMetersToLapsUnits(_zoneWidth);
         zoneProgress += convertMetersToLapsUnits(metersToTravel);
 
+        // Move position of death wall along
         if (deathWall)
         {
             Quaternion deathwallRotationOffset = Quaternion.Euler(90, 0, 0);
             SetWallPositionAndRotationToProgress(deathWall.transform, zoneProgress - (widthInLapsUnits / 2), deathwallRotationOffset);
         }
 
+        // Move position of fog wall along
         if (fogWall)
         {
             Quaternion fogwallRotationOffset = Quaternion.Euler(0, 0, 0);
@@ -493,6 +553,11 @@ public class GameStateManager : NetworkBehaviour
         
     }
 
+    /// <summary>
+    /// Given a progress in laps, e.g -3.5, this function converts it to single lap progress, e.g 0.5
+    /// </summary>
+    /// <param name="progress">progress in laps units</param>
+    /// <returns>progress in laps units clamped to 01</returns>
     public static float convertProgressToBetween01(float progress)
     {
         float progressSimplified = progress - Mathf.Floor(progress);
@@ -504,13 +569,20 @@ public class GameStateManager : NetworkBehaviour
         return progressSimplified;
     }
 
+    /// <summary>
+    /// Using the length of the track, given something like 50 meters, it works out how far that is in laps units
+    /// </summary>
+    /// <param name="meters">Length of distance in meters</param>
+    /// <returns>Length in laps units</returns>
     public float convertMetersToLapsUnits(float meters)
     {
         return meters / railwayLength;
     }
 
     /// <summary>
-    /// The walls run along rails, which is called the railway.
+    /// The walls run along rails, which is called the railway. This function creates the list of railway points
+    /// and directions
+    ///  - And works out the railway length
     /// </summary>
     private void populateRailwayPoints()
     {
@@ -533,12 +605,11 @@ public class GameStateManager : NetworkBehaviour
         railwayDirections = directionsList.ToArray();
         railwayLength = distAccumulator;
     }
-
     #endregion
 }
 
 /// <summary>
-/// Holds all continuous game state datas
+/// Holds all continuous game state datas such as zone progress, zone width, and zone speed
 /// </summary>
 struct GameStateData : INetworkSerializable
 {

@@ -144,7 +144,7 @@ public class PlayerAudioManager : NetworkBehaviour
         levelSoundTracks = _levelSoundTracks;
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.clip = waitingToReadyUpSong;
-        musicSource.volume = musicVolume * 0.3f;
+        musicSource.volume = musicVolume * 0.9f;
 
         musicSource.loop = true;
     }
@@ -153,7 +153,7 @@ public class PlayerAudioManager : NetworkBehaviour
         if (musicSource)
         {
             musicSource.clip = waitingToReadyUpSong;
-            musicSource.volume = musicVolume * 0.6f;
+            musicSource.volume = musicVolume * 0.9f;
             musicSource.loop = true;
             musicSource.PlayDelayed(1);
 

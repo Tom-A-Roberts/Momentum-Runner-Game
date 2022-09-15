@@ -10,18 +10,13 @@ using static GameStateManager;
 
 public class PlayerNetworking : NetworkBehaviour
 {
+    /// <summary>
+    /// All continuously updated player state data, specifically for this one player
+    /// </summary>
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
-    /// <summary>
-    /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
-    /// </summary>
-    public static Dictionary<ulong, GameObject> ConnectedPlayers;
 
-    private Vector3 _vel;
-    private float _rotVelX;
-    private float _rotVelY;
-    private float _rotVelZ;
-
+    [Header("Known Objects")]
     public PlayerStateManager myPlayerStateController;
     public GameObject myCamera;
     public GameObject grappleGun;
@@ -30,13 +25,37 @@ public class PlayerNetworking : NetworkBehaviour
     public Rigidbody feetRigidbody;
     public Collider MultiplayerCollider;
 
+    // These variables are set in OnNetworkSpawn
     private GunController myGunController;
     private GrappleGun myGrappleGun;
     private PlayerController myPlayerController;
 
+    /// <summary>
+    /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
+    /// </summary>
+    public static Dictionary<ulong, GameObject> ConnectedPlayers;
+
+    /// <summary>
+    /// Holds past player states. If IsOwner, then time is local time. If data is recieved from remote, then time is recieved from the remote owner.
+    /// </summary>
+    private List<KeyValuePair<float, PositionData>> positionHistory = new List<KeyValuePair<float, PositionData>>();
+
+    /// <summary>
+    /// Which ready up state this player is in. May not be accurate in all cases when the player
+    /// is not the owner
+    /// </summary>
     public ReadyUpState PlayerReadyUpState => _playerReadyUpState;
+    /// <summary>
+    /// Which ready up state this player is in. May not be accurate in all cases when the player
+    /// is not the owner
+    /// </summary>
     private ReadyUpState _playerReadyUpState = ReadyUpState.unready;
 
+    /// <summary>
+    /// <para>unready and ready are what they say on the tin</para>
+    /// <para>waitingToReady and waitingToUnready are when you have shot and are waiting for
+    /// the server to confirm your new state.</para>
+    /// </summary>
     public enum ReadyUpState
     {
         unready,
@@ -44,8 +63,6 @@ public class PlayerNetworking : NetworkBehaviour
         ready,
         waitingToUnready
     }
-
-    //public AudioSource myAudioSource;
 
     /// <summary>
     /// How smoothed out a multiplayer player's movement should be. Higher = smoother
@@ -77,6 +94,12 @@ public class PlayerNetworking : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Using the local time, this function writes the local player's state along with the time stamp into a struct
+    /// and sends this over the network to the other clients. The state is added to a position history list, ordered by
+    /// timestamp. Local time is calculated by NetworkManager.LocalTime.TimeAsFloat
+    /// </summary>
+    /// <param name="localTime">Calculated by: NetworkManager.LocalTime.TimeAsFloat</param>
     private void UpdatePositionData(float localTime)
     {
         PositionData posData = new PositionData()
@@ -98,8 +121,10 @@ public class PlayerNetworking : NetworkBehaviour
         positionHistory.Add(new KeyValuePair<float, PositionData>(localTime, posData));
     }
 
-    private List<KeyValuePair<float, PositionData>> positionHistory = new List<KeyValuePair<float, PositionData>>();
-
+    /// <summary>
+    /// Reads the latest player state from the network variable, and updates the position history list with this state .
+    /// </summary>
+    /// <param name="serverTime">NetworkManager.ServerTime.TimeAsFloat</param>
     private void HandlePositionData(float serverTime)
     {
         PlayerNetworkData dataReceived = _netState.Value;
@@ -113,6 +138,13 @@ public class PlayerNetworking : NetworkBehaviour
             InterpolatePosition(serverTime);
     }
 
+    /// <summary>
+    /// Finds what position the player was likely to be in at a given point in time.
+    /// The function creates a new set of position data, interpolated from the existing data.
+    /// </summary>
+    /// <param name="localTime">The time at which we wish to observe the state of</param>
+    /// <param name="interpolationTime">How much we reverse the time, giving an allowance for lag and packet jitter</param>
+    /// <returns>INTERPOLATED position data</returns>
     private PositionData GetPositionDataAtTime(float localTime, float interpolationTime)
     {
         float timeToFind = localTime - interpolationTime;
@@ -161,6 +193,11 @@ public class PlayerNetworking : NetworkBehaviour
         return interpolatedData;
     }
 
+    /// <summary>
+    /// Finds the state of a player from back in time (a particular localTime) and SETS the player's state back
+    /// to the old state.
+    /// </summary>
+    /// <param name="localTime">The time to revert to, as defined by the owner who created the state</param>
     private void InterpolatePosition(float localTime)
     {
         PositionData interpolatedPosition = GetPositionDataAtTime(localTime, _cheapInterpolationTime);
@@ -183,27 +220,6 @@ public class PlayerNetworking : NetworkBehaviour
         feetRigidbody.velocity = velocity;
     }
 
-    //public void LeverFlicked()
-    //{
-    //    LevelFlickRequestServerRPC();
-    //    AnimateLeverClientRPC();
-    //}
-
-    //[ServerRpc]
-    //public void LevelFlickRequestServerRPC()
-    //{
-    //    // Check the player position
-    //    AnimateLeverClientRPC();
-    //}
-
-    //[ClientRpc]
-    //public void AnimateLeverClientRPC()
-    //{
-    //    if(!IsOwner)
-    //    {
-    //        // Makes new route appear to user
-    //    }
-    //}
 
     #region SHOOTING
     public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
@@ -489,17 +505,22 @@ public class PlayerNetworking : NetworkBehaviour
     #endregion
 
     #region ReadyingUp
+
+    /// <summary>
+    /// Toggles the current ready up state, sending a request to change state to the server. In the meantime, the waiting effects are applied, such as the button
+    /// being half pressed.
+    /// </summary>
     public void ReadyUpStateChange()
     {
         if (IsOwner && GameStateManager.Singleton.gameStateSwitcher.GameState == GameState.waitingToReadyUp)
         {
-            if (_playerReadyUpState == ReadyUpState.ready || _playerReadyUpState == ReadyUpState.waitingToReady)
+            if (_playerReadyUpState == ReadyUpState.ready)
             {
                 _playerReadyUpState = ReadyUpState.waitingToUnready;
                 GameStateManager.Singleton.gameStateSwitcher.LocalStartUnreadyEffects();
                 UnReadyUpServerRPC();
             }
-            else if (_playerReadyUpState == ReadyUpState.unready || _playerReadyUpState == ReadyUpState.waitingToUnready)
+            else if (_playerReadyUpState == ReadyUpState.unready)
             {
                 _playerReadyUpState = ReadyUpState.waitingToReady;
                 GameStateManager.Singleton.gameStateSwitcher.LocalStartReadyUpEffects();
@@ -507,6 +528,10 @@ public class PlayerNetworking : NetworkBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// Activated when the client recieves a message from the server saying you are now fully readied up
+    /// </summary>
     public void ServerReadyUp()
     {
         if (IsOwner)
@@ -533,6 +558,9 @@ public class PlayerNetworking : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Activated when the client recieves a message from the server saying you are now fully unreadied
+    /// </summary>
     public void ServerUnready()
     {
         if (IsOwner)
@@ -573,12 +601,21 @@ public class PlayerNetworking : NetworkBehaviour
         ServerUnready();
     }
 
+    /// <summary>
+    /// When a client (the server, really) thinks everyone has readied up, they can prompt the server to do a check. Usually the server
+    /// itself does this. If the server agrees everyone is ready, then it calls the client RPC to say everyone is ready. At this point
+    /// it cannot be undone
+    /// </summary>
     [ServerRpc(RequireOwnership =false)]
     public void EveryoneHasReadiedUpServerRPC()
     {
         if(GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
             EveryoneHasReadiedUpClientRPC();
     }
+
+    /// <summary>
+    /// Sent by the server to let all clients know the ready up has happened
+    /// </summary>
     [ClientRpc]
     public void EveryoneHasReadiedUpClientRPC()
     {
@@ -611,9 +648,13 @@ public class PlayerNetworking : NetworkBehaviour
             myPlayerStateController.PlayerDeath();
         }
     }
-   
+
     #endregion
 
+    /// <summary>
+    /// Called by the player who joins, they modify the static list that persists across all playerNetworking instances locally.
+    /// If the static instance doesn't exist, it is created
+    /// </summary>
     private void PlayerConnect()
     {
         if (ConnectedPlayers == null || (IsOwner && IsHost))
@@ -630,6 +671,9 @@ public class PlayerNetworking : NetworkBehaviour
         Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
     }
 
+    /// <summary>
+    /// Called by the player who disconnects, they modify the static list that persists across all playerNetworking instances locally.
+    /// </summary>
     private void PlayerDisconnect()
     {
         ConnectedPlayers.Remove(OwnerClientId);
@@ -682,22 +726,10 @@ public class PlayerNetworking : NetworkBehaviour
         else
         {
             GameStateManager.Singleton.localPlayer = this;
-            // Force ready or unready upon joining:
 
             // Activate the game state manager initialization:
             // Sadly has to be done here as the GameStateManager OnNetworkSpawn is unreliable
             GameStateManager.Singleton.OnLocalPlayerNetworkSpawn();
-
-            //if (GameStateManager.Singleton != null && GameStateManager.Singleton.gameStateSwitcher != null)
-            //{
-            //    if (GameStateManager.Singleton.gameStateSwitcher.GameState != GameState.waitingToReadyUp)
-            //    {
-            //        if (PlayerReadyUpState == ReadyUpState.unready || PlayerReadyUpState == ReadyUpState.waitingToUnready)
-            //        {
-            //            ReadyUpStateChange();
-            //        }
-            //    }
-            //}
 
             // Update who in the game is currently spectators or not
             GetListOfSpectatorsServerRPC();
@@ -724,6 +756,9 @@ public class PlayerNetworking : NetworkBehaviour
         Debug.Log(outStr);
     }
 
+    /// <summary>
+    /// Called whenever the object is destroyed, such as when a remote client disconnects, their prefab is destroyed.
+    /// </summary>
     public override void OnDestroy()
     {
         // OR: not a huge fan of disconnect being handled here
@@ -733,6 +768,9 @@ public class PlayerNetworking : NetworkBehaviour
         base.OnDestroy();
     }
 
+    /// <summary>
+    /// The continuous data that is synced across the network. A time key along with a state is syncronized
+    /// </summary>
     struct PlayerNetworkData : INetworkSerializable
     {
         private float _sendTime;
@@ -761,8 +799,14 @@ public class PlayerNetworking : NetworkBehaviour
     }
 }
 
+/// <summary>
+/// Represents a single tick of player state information, to be synced in PlayerNetworkData across the network
+/// </summary>
 struct PositionData : INetworkSerializable
 {
+    /// <summary>
+    /// The position of the body
+    /// </summary>
     private float _x, _y, _z;
 
     /// <summary>
@@ -785,6 +829,9 @@ struct PositionData : INetworkSerializable
         }
     }
 
+    /// <summary>
+    /// Also upload velocity to improve interpolation accuracy
+    /// </summary>
     internal Vector3 Velocity
     {
         get => new Vector3(_xVel, _yVel, _zVel);
