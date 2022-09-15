@@ -1987,7 +1987,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh816186
+  m_Name: pb_Mesh838058
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -61190,7 +61190,7 @@ PrefabInstance:
       objectReference: {fileID: 112149360}
     - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: DeveloperMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: CountdownPanel
@@ -62809,4 +62809,4 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0

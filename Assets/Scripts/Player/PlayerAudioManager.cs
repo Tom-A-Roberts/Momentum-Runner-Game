@@ -136,11 +136,16 @@ public class PlayerAudioManager : NetworkBehaviour
 
     public void SetupLevelSoundtracks(AudioClip _waitingToReadyUpSong, AudioClip _levelSoundTracks)
     {
+        MenuUIScript.UpdateAudioStaticsFromPrefs();
+        startVolume = MenuUIScript.effectsVolume;
+        musicVolume = MenuUIScript.musicVolume;
+
         waitingToReadyUpSong = _waitingToReadyUpSong;
         levelSoundTracks = _levelSoundTracks;
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.clip = waitingToReadyUpSong;
-        musicSource.volume = musicVolume * 0.8f;
+        musicSource.volume = musicVolume * 0.3f;
+
         musicSource.loop = true;
     }
     public void SwitchToReadyUpMusic()
@@ -148,9 +153,10 @@ public class PlayerAudioManager : NetworkBehaviour
         if (musicSource)
         {
             musicSource.clip = waitingToReadyUpSong;
-            musicSource.volume = musicVolume * 0.3f;
+            musicSource.volume = musicVolume * 0.6f;
             musicSource.loop = true;
             musicSource.PlayDelayed(1);
+
         }
     }
     public void SwitchToCountdown()
@@ -160,7 +166,7 @@ public class PlayerAudioManager : NetworkBehaviour
             musicSource.Stop();
         }
         if (mainAudioSource != null)
-            mainAudioSource.PlayOneShot(countdownStart, startVolume * 0.4f);
+            mainAudioSource.PlayOneShot(countdownStart, startVolume * 0.2f);
     }
     public void SwitchToGameplaySoundtrack()
     {

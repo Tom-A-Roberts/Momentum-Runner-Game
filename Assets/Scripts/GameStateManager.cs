@@ -257,6 +257,9 @@ public class GameStateManager : NetworkBehaviour
 
             if (!parent.DeveloperMode)
                 parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToCountdown();
+
+            if (parent.ReadyUpFloatingText)
+                parent.ReadyUpFloatingText.text = "";
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
@@ -269,6 +272,9 @@ public class GameStateManager : NetworkBehaviour
             {
                 parent.ReadyUpBarrier.SetActive(false);
             }
+
+            if (parent.ReadyUpFloatingText)
+                parent.ReadyUpFloatingText.text = "";
 
             if (!parent.DeveloperMode)
                 parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToGameplaySoundtrack();
