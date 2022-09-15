@@ -877,6 +877,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startVolume: 1
+  musicVolume: 1
   rollingSoundSmoothAmount: 0.1
   wallRollingSoundSmoothAmount: 0.15
   windSoundSmoothAmount: 0.15
@@ -908,6 +909,9 @@ MonoBehaviour:
   airJump: {fileID: 8300000, guid: 9a23d35c636de9847b279f19cf598354, type: 3}
   overheatedGun: {fileID: 8300000, guid: cd9fe50eeb6c0fd42aafbb1c603e6081, type: 3}
   gunCoolingEffect: {fileID: 8300000, guid: 364ae69753be8fb44a33c87dd1fe0825, type: 3}
+  countdownStart: {fileID: 8300000, guid: 550365b304244ed4383b68179575d377, type: 3}
+  countdownBeep: {fileID: 8300000, guid: b29eee395940cf747bb20893856b58f0, type: 3}
+  countdownEnd: {fileID: 8300000, guid: fceb26558f3f80648af6f75d568a35e5, type: 3}
   spectatorMode: 0
 --- !u!114 &4316027073834798312
 MonoBehaviour:

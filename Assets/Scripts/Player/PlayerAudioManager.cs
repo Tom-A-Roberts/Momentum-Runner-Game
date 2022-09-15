@@ -8,6 +8,7 @@ public class PlayerAudioManager : NetworkBehaviour
 {
     private AudioSource mainAudioSource;
     public float startVolume = 1;
+    public float musicVolume = 1;
     public float rollingSoundSmoothAmount = 0.05f;
     public float wallRollingSoundSmoothAmount = 0.05f;
     public float windSoundSmoothAmount = 0.1f;
@@ -39,11 +40,20 @@ public class PlayerAudioManager : NetworkBehaviour
     public AudioClip airJump;
     public AudioClip overheatedGun;
     public AudioClip gunCoolingEffect;
+
+    public AudioClip countdownStart;
+    public AudioClip countdownBeep;
+    public AudioClip countdownEnd;
     // Start is called before the first frame update
 
     [SerializeField]
     public bool spectatorMode = false;
 
+    private AudioClip waitingToReadyUpSong;
+    private AudioClip levelSoundTracks;
+    private float previousCountdownProgress;
+
+    private AudioSource musicSource;
     private AudioSource ambianceSource;
     private AudioSource rollingSource;
     private AudioSource wallRollingSource;
@@ -75,6 +85,7 @@ public class PlayerAudioManager : NetworkBehaviour
 
         MenuUIScript.UpdateAudioStaticsFromPrefs();
         startVolume = MenuUIScript.effectsVolume;
+        musicVolume = MenuUIScript.musicVolume;
 
         if (IsOwner)
         {
@@ -121,6 +132,71 @@ public class PlayerAudioManager : NetworkBehaviour
 
         jumpingSource = gameObject.AddComponent<AudioSource>();
         jumpingSource.clip = jump;
+    }
+
+    public void SetupLevelSoundtracks(AudioClip _waitingToReadyUpSong, AudioClip _levelSoundTracks)
+    {
+        waitingToReadyUpSong = _waitingToReadyUpSong;
+        levelSoundTracks = _levelSoundTracks;
+        musicSource = gameObject.AddComponent<AudioSource>();
+        musicSource.clip = waitingToReadyUpSong;
+        musicSource.volume = musicVolume * 0.8f;
+        musicSource.loop = true;
+    }
+    public void SwitchToReadyUpMusic()
+    {
+        if (musicSource)
+        {
+            musicSource.clip = waitingToReadyUpSong;
+            musicSource.volume = musicVolume * 0.3f;
+            musicSource.loop = true;
+            musicSource.PlayDelayed(1);
+        }
+    }
+    public void SwitchToCountdown()
+    {
+        if (musicSource)
+        {
+            musicSource.Stop();
+        }
+        if (mainAudioSource != null)
+            mainAudioSource.PlayOneShot(countdownStart, startVolume * 0.4f);
+    }
+    public void SwitchToGameplaySoundtrack()
+    {
+        if (musicSource)
+        {
+            musicSource.clip = levelSoundTracks;
+            musicSource.volume = musicVolume * 0.6f;
+            musicSource.loop = true;
+            musicSource.PlayDelayed(0);
+        }
+        //if (mainAudioSource != null)
+        //    mainAudioSource.PlayOneShot(countdownEnd, startVolume * 0.3f);
+
+        previousCountdownProgress = 0;
+    }
+
+    public void PlaySoundsDuringCountdown(float countdownProgress)
+    {
+        if(countdownProgress < 5.5f && countdownProgress > 1.5f)
+        {
+            if (Mathf.FloorToInt(countdownProgress) != Mathf.FloorToInt(previousCountdownProgress))
+            {
+                if (mainAudioSource != null)
+                    mainAudioSource.PlayOneShot(countdownBeep, startVolume * 0.1f);
+            }
+        }
+        else if(countdownProgress < 1.5f && countdownProgress > 0.5f)
+        {
+            if (Mathf.FloorToInt(countdownProgress) != Mathf.FloorToInt(previousCountdownProgress))
+            {
+                if (mainAudioSource != null)
+                    mainAudioSource.PlayOneShot(countdownEnd, startVolume * 0.1f);
+            }
+        }
+
+        previousCountdownProgress = countdownProgress;
     }
 
     public void UpdateWindIntensity(float newIntensity)

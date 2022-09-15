@@ -51,11 +51,17 @@ public class GameStateManager : NetworkBehaviour
     public GameObject ReadyUpCube;
     public TMP_Text ReadyUpFloatingText;
     public GameObject ReadyUpBarrier;
+    public GameObject CountdownPanel;
+    public TMP_Text CountdownText;
+
+    [Header("Level Music Settings")]
+    //[Tooltip("When true: disables death")]
+    public AudioClip waitingToReadyUpSong;
+    public AudioClip levelSoundTracks;
 
     [Header("Dev settings")]
     [Tooltip("When true: disables death")]
     public bool DeveloperMode = true;
-
 
     /// <summary>
     /// The distance in meters between the fog wall and the death wall
@@ -72,6 +78,8 @@ public class GameStateManager : NetworkBehaviour
     [System.NonSerialized]
     public GameStateSwitcher gameStateSwitcher;
 
+    public HashSet<ulong> readiedPlayers;
+
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
     private float railwayLength = 0;
@@ -83,6 +91,7 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     private Material readyUpCubeMaterial;
     private float readyUpCubeOriginalHeight;
+    
 
     public enum GameState
     {
@@ -91,6 +100,8 @@ public class GameStateManager : NetworkBehaviour
         playingGame,
         someoneHasWon
     }
+
+    #region Startup Functions
 
     private void Awake()
     {
@@ -118,11 +129,14 @@ public class GameStateManager : NetworkBehaviour
         {
             //SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress);
         }
-
     }
 
     public void OnLocalPlayerNetworkSpawn()
     {
+        readiedPlayers = new HashSet<ulong>();
+
+        localPlayer.myPlayerStateController.playerAudioManager.SetupLevelSoundtracks(waitingToReadyUpSong, levelSoundTracks);
+
         if (ReadyUpCube)
         {
             readyUpCubeMaterial = ReadyUpCube.GetComponent<Renderer>().material;
@@ -158,6 +172,8 @@ public class GameStateManager : NetworkBehaviour
 
     }
 
+    #endregion
+
     /// <summary>
     /// Handles switching between different game states such as readied up
     /// </summary>
@@ -168,12 +184,43 @@ public class GameStateManager : NetworkBehaviour
 
         public GameStateManager parent;
 
+        public float readiedCountdownProgress = 0;
+
         public GameStateSwitcher(GameStateManager _parent)
         {
             parent = _parent;
             _gameState = GameState.waitingToReadyUp;
             //localPlayerNetworking = parent.localPlayer.playerNetworking;
             SwitchToWaitingToReadyUp(false);
+        }
+
+        public void Update()
+        {
+            if(_gameState == GameState.readiedUp)
+            {
+                readiedCountdownProgress -= Time.deltaTime;
+                UpdateCountdown();
+                if(readiedCountdownProgress < 0)
+                {
+                    readiedCountdownProgress = 0;
+                    SwitchToPlayingGame(true);
+                }
+            }
+            else
+            {
+                readiedCountdownProgress = 0;
+            }
+        }
+
+        /// <summary>
+        /// Updates the countdown visuals and audio, such as the counter on the player's screen
+        /// </summary>
+        public void UpdateCountdown()
+        {
+            if (parent.CountdownText)
+                parent.CountdownText.text = Mathf.FloorToInt(readiedCountdownProgress).ToString();
+            
+            parent.localPlayer.myPlayerStateController.playerAudioManager.PlaySoundsDuringCountdown(readiedCountdownProgress);
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
@@ -183,23 +230,33 @@ public class GameStateManager : NetworkBehaviour
             _gameState = GameState.waitingToReadyUp;
             if (parent.waitingToReadyUpPanel)
                 parent.waitingToReadyUpPanel.SetActive(true);
-            else
-            {
-                Debug.LogWarning("No 'waitingToReadyUpPanel' found in GameStateManager, please add this reference in the inspector");
-            }
 
             if (parent.ReadyUpBarrier)
                 parent.ReadyUpBarrier.SetActive(true);
+
+            if (!parent.DeveloperMode)
+                parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToReadyUpMusic();
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
         public void SwitchToReadiedUp(bool useEffects)
         {
+            readiedCountdownProgress = 5.99f;
+
             SwitchFromState(_gameState, useEffects);
             _gameState = GameState.readiedUp;
 
+            if (parent.CountdownPanel)
+                parent.CountdownPanel.SetActive(true);
+
+            if (parent.CountdownText)
+                parent.CountdownText.text = Mathf.FloorToInt(readiedCountdownProgress).ToString();
+
             if (parent.ReadyUpBarrier)
                 parent.ReadyUpBarrier.SetActive(true);
+
+            if (!parent.DeveloperMode)
+                parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToCountdown();
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
@@ -212,10 +269,9 @@ public class GameStateManager : NetworkBehaviour
             {
                 parent.ReadyUpBarrier.SetActive(false);
             }
-            else
-            {
-                Debug.LogWarning("No 'ready up barrier' found in GameStateManager, please add this reference in the inspector");
-            }
+
+            if (!parent.DeveloperMode)
+                parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToGameplaySoundtrack();
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
@@ -238,7 +294,9 @@ public class GameStateManager : NetworkBehaviour
             }
             else if(previousState == GameState.readiedUp)
             {
-
+                if (parent.CountdownPanel)
+                    parent.CountdownPanel.SetActive(false);
+                
             }
             else if (previousState == GameState.playingGame)
             {
@@ -351,6 +409,8 @@ public class GameStateManager : NetworkBehaviour
         {
             localPlayer.myPlayerStateController.UpdateDeathWallEffects(deathWall.transform, deathWallCollider);
         }
+
+        gameStateSwitcher.Update();
     }
 
     /// <summary>
@@ -367,7 +427,7 @@ public class GameStateManager : NetworkBehaviour
 
     /// <summary>
     /// Moves zoneProgress forward according to zoneSpeed.
-    /// Updates the physical positions of the walls according to zoneProgress
+    /// Updates the physical positions of the walls according to zoneProgress.
     /// </summary>
     void UpdateWallPositions()
     {

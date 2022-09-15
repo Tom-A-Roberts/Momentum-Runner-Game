@@ -64,12 +64,20 @@ MonoBehaviour:
   deathWall: {fileID: 0}
   fogWall: {fileID: 0}
   closingSpeed: 0
-  zoneProgress: 0.08
+  zoneProgress: 0.06
   zoneSpeed: 1
-  zoneStartWidth: 350
+  zoneStartWidth: 400
   respawnDuration: 2.5
   ScreenRedEdges: {fileID: 0}
-  DeveloperMode: 1
+  waitingToReadyUpPanel: {fileID: 0}
+  ReadyUpCube: {fileID: 0}
+  ReadyUpFloatingText: {fileID: 0}
+  ReadyUpBarrier: {fileID: 0}
+  CountdownPanel: {fileID: 0}
+  CountdownText: {fileID: 0}
+  waitingToReadyUpSong: {fileID: 8300000, guid: b5e931c362a3f9b419e1fd1765f1c8ec, type: 3}
+  levelSoundTracks: {fileID: 8300000, guid: f5fb869cd675e87448f76cf57a64707f, type: 3}
+  DeveloperMode: 0
 --- !u!114 &6462836443202579315
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -518,6 +518,19 @@ public class PlayerNetworking : NetworkBehaviour
         {
             // Display unready state above myPlayerStateManager's head
         }
+
+        // Track who's ready and who isn't:
+        if (!GameStateManager.Singleton.readiedPlayers.Contains(OwnerClientId))
+        {
+            GameStateManager.Singleton.readiedPlayers.Add(OwnerClientId);
+        }
+
+        // If everyone is ready and you are the host:
+        if (IsHost && GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
+        {
+            EveryoneHasReadiedUpServerRPC();
+            //EveryoneHasReadiedUpClientRPC();
+        }
     }
 
     public void ServerUnready()
@@ -530,6 +543,12 @@ public class PlayerNetworking : NetworkBehaviour
         else
         {
             // Display unready state above myPlayerStateManager's head
+        }
+
+        // Track who's ready and who isn't:
+        if (GameStateManager.Singleton.readiedPlayers.Contains(OwnerClientId))
+        {
+            GameStateManager.Singleton.readiedPlayers.Remove(OwnerClientId);
         }
     }
 
@@ -552,6 +571,18 @@ public class PlayerNetworking : NetworkBehaviour
     public void UnReadyUpClientRPC()
     {
         ServerUnready();
+    }
+
+    [ServerRpc(RequireOwnership =false)]
+    public void EveryoneHasReadiedUpServerRPC()
+    {
+        if(GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
+            EveryoneHasReadiedUpClientRPC();
+    }
+    [ClientRpc]
+    public void EveryoneHasReadiedUpClientRPC()
+    {
+        GameStateManager.Singleton.gameStateSwitcher.SwitchToReadiedUp(true);
     }
 
     #endregion

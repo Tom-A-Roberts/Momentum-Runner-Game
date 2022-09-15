@@ -8902,7 +8902,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: NeoCell
+  m_text: traversion
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b57c6c5735dec21428b0a8b099a4ce24, type: 2}
   m_sharedMaterial: {fileID: 2432416650542524799, guid: b57c6c5735dec21428b0a8b099a4ce24, type: 2}
@@ -10355,6 +10355,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotSpeed: 3
+  xSpeed: 1
+  xMagnitude: 1
+  zSpeed: 1
+  zMagnitude: 1
 --- !u!4 &2013371136
 Transform:
   m_ObjectHideFlags: 0
