@@ -433,10 +433,13 @@ public class GameStateManager : NetworkBehaviour
     {
         float metersToTravel = 0;
 
-        if(gameStateSwitcher.GameState == GameState.playingGame)
+        if (gameStateSwitcher != null)
         {
-            metersToTravel = zoneSpeed * Time.deltaTime;
-            zoneWidth -= Time.deltaTime * closingSpeed;
+            if (gameStateSwitcher.GameState == GameState.playingGame)
+            {
+                metersToTravel = zoneSpeed * Time.deltaTime;
+                zoneWidth -= Time.deltaTime * closingSpeed;
+            }
         }
 
         float widthInLapsUnits = convertMetersToLapsUnits(zoneWidth);
