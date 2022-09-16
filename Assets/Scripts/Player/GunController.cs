@@ -282,9 +282,9 @@ public class GunController : MonoBehaviour
         }
 
         myGunState.Update(Time.deltaTime);
-
+        bool inFinishedGameState = GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.someoneHasWon || GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.podium;
         bool canShoot = (myGunState.CanShootClientside && playerNetworking.IsOwner) || (myGunState.CanShootServerside && !playerNetworking.IsOwner);
-        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && canShoot && !IngameEscMenu.Singleton.curserUnlocked && !spectatorMode)
+        if (Input.GetButton("Shoot") && clientsideCooldownProgress <= 0 && canShoot && !IngameEscMenu.Singleton.curserUnlocked && !spectatorMode && !inFinishedGameState)
         {
             var shootDirection = Vector3.Slerp(Camera.main.transform.forward, Random.onUnitSphere, innacuracy);
             var shootStart = Camera.main.transform.position + Camera.main.transform.forward;

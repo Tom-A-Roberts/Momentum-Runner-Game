@@ -127,8 +127,9 @@ public class GrappleGun : MonoBehaviour
 
     private void ProcessGrappleInput(GrappleablePointInfo raypointInfo)
     {
+        bool inFinishedGameState = GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.someoneHasWon || GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.podium;
         // Check if grapple gun is being controlled by the owner. If yes, then process local player input
-        if (isGrappleOwner && !IngameEscMenu.Singleton.curserUnlocked)
+        if (isGrappleOwner && !IngameEscMenu.Singleton.curserUnlocked && !inFinishedGameState)
         {
             if (Input.GetButton("Grapple") && !grappleConnected && raypointInfo.targetFound && !spectatorMode)
             {
@@ -140,7 +141,7 @@ public class GrappleGun : MonoBehaviour
             }
         }
         // If switched to spectator, disconnect the grapple
-        if(spectatorMode && grappleConnected)
+        if((spectatorMode && grappleConnected))
         {
             DisconnectGrapple();
         }

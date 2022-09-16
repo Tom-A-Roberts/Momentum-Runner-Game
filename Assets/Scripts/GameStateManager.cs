@@ -7,6 +7,7 @@ using UnityEngine.Playables;
 using UnityEngine.UI;
 using TMPro;
 using static PlayerNetworking;
+using UnityEngine.Rendering.PostProcessing;
 
 /// <summary>
 /// This class handles the game state such as:
@@ -110,6 +111,8 @@ public class GameStateManager : NetworkBehaviour
     private float railwayLength = 0;
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
+
+
     
     /// <summary>
     /// Which game states the current level can be in
@@ -119,7 +122,8 @@ public class GameStateManager : NetworkBehaviour
         waitingToReadyUp,
         readiedUp,
         playingGame,
-        someoneHasWon
+        someoneHasWon,
+        podium
     }
 
     #region Startup Functions
@@ -324,10 +328,27 @@ public class GameStateManager : NetworkBehaviour
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-        public void SwitchToSomeoneHasWon(bool useEffects)
+        public void SwitchToSomeoneHasWon(bool localPlayerWon)
+        {
+            if(_gameState != GameState.someoneHasWon)
+            {
+                SwitchFromState(_gameState, false);
+                _gameState = GameState.someoneHasWon;
+
+                if (parent.ReadyUpBarrier)
+                    parent.ReadyUpBarrier.SetActive(false);
+
+                if (localPlayerWon)
+                    LocalPlayerWin();
+                else
+                    LocalPlayerLose();
+            }
+        }
+
+        public void SwitchToPodium(bool useEffects)
         {
             SwitchFromState(_gameState, useEffects);
-            _gameState = GameState.someoneHasWon;
+            _gameState = GameState.podium;
 
             if (parent.ReadyUpBarrier)
                 parent.ReadyUpBarrier.SetActive(false);
@@ -356,7 +377,29 @@ public class GameStateManager : NetworkBehaviour
             }
             else if (previousState == GameState.someoneHasWon)
             {
+                if (WinLoseEffects.Singleton)
+                    WinLoseEffects.Singleton.EndEffects();
+            }
+            else if(previousState == GameState.podium)
+            {
 
+            }
+        }
+
+
+        public void LocalPlayerWin()
+        {
+            if (WinLoseEffects.Singleton)
+            {
+                WinLoseEffects.Singleton.StartWinEffects();
+            }
+        }
+
+        public void LocalPlayerLose()
+        {
+            if (WinLoseEffects.Singleton)
+            {
+                WinLoseEffects.Singleton.StartLoseEffects();
             }
         }
 

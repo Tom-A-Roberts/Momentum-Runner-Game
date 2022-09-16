@@ -139,7 +139,22 @@ public class PlayerController : MonoBehaviour
 
         Tuple<float, float> axisValues = GetMovementAxis();
 
-        if (!spectatorMode)
+        float heightInput = Input.GetAxisRaw("HeightChange");
+
+        if (GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.someoneHasWon || GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.podium)
+        {
+            processFinishStateMotion(axisValues.Item1, axisValues.Item2, heightInput);
+
+        }
+        else if (respawningMode)
+        {
+            processRespawningMotion(axisValues.Item1, axisValues.Item2, heightInput);
+        }
+        else if (spectatorMode)
+        {
+            processSpectatorMotion(axisValues.Item1, axisValues.Item2, heightInput);
+        }
+        else
         {
             processMotion(axisValues.Item1, axisValues.Item2);
 
@@ -209,21 +224,9 @@ public class PlayerController : MonoBehaviour
             #endregion
         
         }
-        else
-        {
-            float heightInput = Input.GetAxisRaw("HeightChange");
-            //HeightChange
 
-            if (respawningMode)
-            {
-                processRespawningMotion(axisValues.Item1, axisValues.Item2, heightInput);
-            }
-            else
-            {
-                processSpectatorMotion(axisValues.Item1, axisValues.Item2, heightInput);
-            }
-            
-        }
+
+        
     }
 
     void processMotion(float xInput, float yInput)
@@ -381,6 +384,51 @@ public class PlayerController : MonoBehaviour
             bodyRigidBody.AddForce(Vector3.up * respawningUpwardsAcceleration, ForceMode.Acceleration);
 
         }
+    }
+
+    void processFinishStateMotion(float xInput, float yInput, float heightInput)
+    {
+        bodyRigidBody.useGravity = false;
+        feetRigidBody.useGravity = false;
+        bodyRigidBody.drag = 8;
+
+        audioManager.UpdateRunningIntensity(0);
+
+        //if (xInput != 0 || yInput != 0 || heightInput != 0)
+        //{
+        //    Vector3 input = new Vector3(xInput, heightInput, yInput).normalized;
+
+        //    // Calculate what directions the inputs mean in worldcoordinate terms
+        //    //Vector3 verticalInputWorldDirection = mainCamera.transform.forward * input.z;
+        //    //Vector3 horizontalInputWorldDirection = mainCamera.transform.right * input.x;
+        //    Vector3 verticalInputWorldDirection = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * input.z;
+        //    Vector3 horizontalInputWorldDirection = new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z).normalized * input.x;
+        //    Vector3 heightInputWorldDirection = Vector3.up * input.y;
+
+        //    // The direction that the player wishes to go in
+        //    Vector3 wishDirection = (verticalInputWorldDirection + horizontalInputWorldDirection).normalized;
+
+        //    // Current velocity without the y speed included
+        //    Vector3 currentPlanarVelocity = Vector3.ProjectOnPlane(bodyRigidBody.velocity, Vector3.up);
+
+        //    float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
+
+        //    // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
+        //    if (forwardsSpeed < 0)
+        //    {
+        //        float activeCancellationPower = CancellationPower;
+        //        if (!PlayerHasAirControl) activeCancellationPower /= 8;
+
+        //        bodyRigidBody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
+        //    }
+        //    else if (forwardsSpeed < movementSpeed * respawningControlMultiplier && (GroundDetector.IsOnGround || PlayerHasAirControl))
+        //    {
+        //        // How much required acceleration there is to reach the intended speed (walkingspeed).
+        //        float requiredAcc = (movementSpeed * respawningControlMultiplier - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
+
+        //        bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
+        //    }
+        //}
     }
 
     public void BoostForce(Vector3 boost, ForceMode boostType)

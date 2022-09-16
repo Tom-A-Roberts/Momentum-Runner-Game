@@ -57,7 +57,10 @@ public class CameraController : NetworkBehaviour
 
 	void Update()
 	{
-        if (!IngameEscMenu.Singleton.curserUnlocked)
+
+		bool inFinishedGameState = GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.someoneHasWon || GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.podium;
+
+        if (!IngameEscMenu.Singleton.curserUnlocked && !inFinishedGameState)
         {
 			rotation.x += Input.GetAxis(xAxis) * sensitivity;
 			rotation.y += Input.GetAxis(yAxis) * sensitivity;
