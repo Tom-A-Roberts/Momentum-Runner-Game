@@ -171,7 +171,7 @@ public class PlayerStateManager : MonoBehaviour
         if(!GameStateManager.Singleton.DeveloperMode && !playerNetworking._isDead.Value && NetworkManager.Singleton.IsHost)
             CheckForDeath();
 
-        if (IsRespawning && playerNetworking.IsOwner)
+        if (IsRespawning && NetworkManager.Singleton.IsHost)
         {
             respawningTimer += Time.deltaTime;
             if(respawningTimer > GameStateManager.Singleton.respawnDuration)
@@ -194,7 +194,7 @@ public class PlayerStateManager : MonoBehaviour
                 PlayerExitDeathLocally();
         }
 
-        if(isSpectatingLocally != playerNetworking._isSpectating.Value && !isRespawningLocally)
+        if(isSpectatingLocally != playerNetworking._isSpectating.Value)
         {
             if (playerNetworking._isSpectating.Value)
                 EnterSpectatorModeLocally();
@@ -218,10 +218,10 @@ public class PlayerStateManager : MonoBehaviour
     {
         // Server checks for respawning state:
         //if ((NetworkManager.Singleton.IsHost || playerNetworking.IsOwner) && !IsRespawning)
-        if ((playerNetworking.IsOwner) && !IsRespawning)
+        if ((NetworkManager.Singleton.IsHost) && !IsRespawning)
         {
             // Respawn player and teleport them to location:
-            if(NetworkManager.Singleton.IsHost && !playerNetworking._isRespawning.Value)
+            if(!playerNetworking._isRespawning.Value)
                 playerNetworking.ServerTeleportPlayer(playerBody.position);
             
             playerNetworking._isRespawning.Value = true;
@@ -443,10 +443,6 @@ public class PlayerStateManager : MonoBehaviour
                 playerNetworking._isSpectating.Value = false;
                 playerNetworking.ServerTeleportPlayer(playerBody.position);
             }
-               
-        }
-        if (NetworkManager.Singleton.IsHost || playerNetworking.IsOwner)
-        {
             respawningTimer = 0;
             playerNetworking._isRespawning.Value = false;
         }

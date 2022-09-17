@@ -17,7 +17,7 @@ public class PlayerNetworking : NetworkBehaviour
 
     public NetworkVariable<bool> _isDead = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> _isSpectating = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
-    public NetworkVariable<bool> _isRespawning = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> _isRespawning = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
 
     [Header("Known Objects")]
     public PlayerStateManager myPlayerStateController;
