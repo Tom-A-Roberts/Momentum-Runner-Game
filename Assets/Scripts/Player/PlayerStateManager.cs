@@ -99,7 +99,6 @@ public class PlayerStateManager : MonoBehaviour
         bodySpawnPosition = bodyStartPosition;
         feetSpawnPosition = feetStartPosition;
 
-        //Sobel sobelController = null;
         UnityEngine.Rendering.Volume[] sceneVolumes = GameObject.FindObjectsOfType<UnityEngine.Rendering.Volume>();
         foreach (var sceneVolume in sceneVolumes)
         {
@@ -110,19 +109,10 @@ public class PlayerStateManager : MonoBehaviour
                     if (sceneVolume.profile.components[componentID].name.Contains("Sobel"))
                     {
                         sceneVolume.profile.components[componentID].active = true;
-                        //FogManager.Instance.sobelRenderer = sceneVolume.profile.components[componentID];
-                        //sobelController = (Sobel)sceneVolume.profile.components[componentID];
-                        //Debug.Log("Here");
                     }
                 }
             }
         }
-        //// Let GameStateManager know who is the local player
-        //GameStateManager.Singleton.localPlayer = this;
-        //if (playerNetworking.IsOwner)
-        //{
-        //    InitializeFogwall();
-        //}
 
         if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
         {
@@ -181,7 +171,7 @@ public class PlayerStateManager : MonoBehaviour
         if(!GameStateManager.Singleton.DeveloperMode && !playerNetworking._isDead.Value && NetworkManager.Singleton.IsHost)
             CheckForDeath();
 
-        if (IsRespawning && playerNetworking.IsOwner)// NetworkManager.Singleton.IsHost)
+        if (IsRespawning && playerNetworking.IsOwner)
         {
             respawningTimer += Time.deltaTime;
             if(respawningTimer > GameStateManager.Singleton.respawnDuration)
@@ -211,8 +201,7 @@ public class PlayerStateManager : MonoBehaviour
             else
                 LeaveSpectatorModeLocally();
         }
-        //Debug.Log(playerNetworking._isRespawning.Value.ToString() + "   " + isRespawningLocally.ToString());
-        
+
         if (isRespawningLocally != playerNetworking._isRespawning.Value)
         {
             if (playerNetworking._isRespawning.Value)
@@ -248,7 +237,7 @@ public class PlayerStateManager : MonoBehaviour
         if(GameStateManager.Singleton.deathWallCollider && GameStateManager.Singleton.deathWall)
         {
             Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, GameStateManager.Singleton.deathWallCollider, GameStateManager.Singleton.deathWall.transform.position, GameStateManager.Singleton.deathWall.transform.rotation);
-            //float distance = Vector3.Distance(ClosestPoint, playerBody.position);
+
             float signedDistance = Vector3.Dot(playerBody.position - ClosestPoint, GameStateManager.Singleton.transform.forward);
             if(signedDistance < -0.2)
             {
@@ -289,9 +278,7 @@ public class PlayerStateManager : MonoBehaviour
     public void RespawnPlayerToBeginning()
     {
         TeleportPlayer(bodyStartPosition);
-        //playerBody.transform.position = bodySpawnPosition;
         playerBody.transform.rotation = bodyStartRotation;
-        //playerFeet.transform.position = feetSpawnPosition;
         playerFeet.transform.rotation = feetStartRotation;
     }
 
@@ -438,9 +425,6 @@ public class PlayerStateManager : MonoBehaviour
         if (playerNetworking.IsOwner && IngameEscMenu.Singleton)
             IngameEscMenu.Singleton.ShowRecoveringInfo();
 
-        //Debug.Log("here");
-
-        //TeleportPlayer(respawnLocation);
         isRespawningLocally = true;
         playerController.respawningMode = true;
 
@@ -488,7 +472,6 @@ public class PlayerStateManager : MonoBehaviour
         if (playerHitID != -1)
             Debug.Log("I think I ('" + this.gameObject.name + "') just shot player ID: " + playerHitID.ToString());
 
-        //playerNetworking.LeverFlicked();
     }
 
 

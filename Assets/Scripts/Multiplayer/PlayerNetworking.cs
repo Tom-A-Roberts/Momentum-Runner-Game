@@ -422,78 +422,6 @@ public class PlayerNetworking : NetworkBehaviour
         _isSpectating.Value = false;
     }
 
-    //[ClientRpc]
-    //public void EnterSpectatorModeClientRPC()
-    //{
-    //    // TR: this collider line should be moved to inside the EnterSpectatorMode function. The EnterSpectatorMode function is called
-    //    // from other places too.
-    //    MultiplayerCollider.enabled = false;
-    //    myPlayerStateController.EnterSpectatorMode();
-    //}
-    //[ClientRpc]
-    //public void LeaveSpectatorModeClientRPC()
-    //{
-    //    // TR: this collider line should be moved to inside the LeaveSpectatorMode function. The LeaveSpectatorMode function is called
-    //    // from other places too.
-    //    MultiplayerCollider.enabled = true;
-    //    myPlayerStateController.LeaveSpectatorMode();
-    //}
-
-    ///// <summary>
-    ///// Asks the server to produce a list of who are spectators and who aren't
-    ///// </summary>
-    //[ServerRpc]
-    //public void GetListOfSpectatorsServerRPC()
-    //{
-    //    List<ulong> playerIDs = new List<ulong>(ConnectedPlayers.Count);
-    //    List<bool> spectatorStatus = new List<bool>(ConnectedPlayers.Count);
-
-    //    foreach (KeyValuePair<ulong, GameObject> entry in ConnectedPlayers)
-    //    {
-    //        PlayerStateManager currentPlayerState;
-    //        if(entry.Value.TryGetComponent(out currentPlayerState))
-    //        {
-    //            playerIDs.Add(currentPlayerState.playerNetworking.OwnerClientId);
-    //            spectatorStatus.Add(currentPlayerState.SpectatorMode);
-    //        }
-    //    }
-    //    ReturnListOfSpectatorsClientRPC(playerIDs.ToArray(), spectatorStatus.ToArray());
-    //}
-    ///// <summary>
-    ///// Sends a list of who's spectators and who isn't to the connected clients, updating their states
-    ///// </summary>
-    //[ClientRpc]
-    //public void ReturnListOfSpectatorsClientRPC(ulong[] playerIDs, bool[] spectatorStatus)
-    //{
-    //    if (IsOwner && !IsHost)
-    //    {
-    //        Dictionary<ulong, bool> spectatorStatusDict = new Dictionary<ulong, bool>();
-    //        for (int index = 0; index < playerIDs.Length; index++)
-    //        {
-    //            spectatorStatusDict.Add(playerIDs[index], spectatorStatus[index]);
-    //        }
-
-    //        foreach (KeyValuePair<ulong, GameObject> entry in ConnectedPlayers)
-    //        {
-    //            PlayerStateManager currentPlayerState;
-    //            if (spectatorStatusDict.ContainsKey(entry.Key) && entry.Value.TryGetComponent(out currentPlayerState))
-    //            {
-    //                // If status is set to spectator = true:
-    //                if (spectatorStatusDict[entry.Key] == true)
-    //                {
-    //                    if (!currentPlayerState.SpectatorMode)
-    //                        currentPlayerState.EnterSpectatorMode();
-    //                }
-    //                else
-    //                {
-    //                    if (currentPlayerState.SpectatorMode)
-    //                        currentPlayerState.LeaveSpectatorMode();
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-
     #endregion
 
     #region ForceTeleporting
@@ -503,21 +431,11 @@ public class PlayerNetworking : NetworkBehaviour
         TeleportPlayerClientRPC(teleportLocation);
     }
 
-    //public void LeaveRespawningModeServer()
-    //{
-    //    LeaveRespawningModeClientRPC();
-    //}
-
     [ClientRpc]
     public void TeleportPlayerClientRPC(Vector3 teleportLocation)
     {
         myPlayerStateController.TeleportPlayer(teleportLocation);
     }
-    //[ClientRpc]
-    //public void LeaveRespawningModeClientRPC()
-    //{
-    //    myPlayerStateController.LeaveRespawningMode();
-    //}
 
     #endregion
 
@@ -630,35 +548,6 @@ public class PlayerNetworking : NetworkBehaviour
             GameStateManager.Singleton.gameStateSwitcher.SwitchToReadiedUp(true);
         }
     }
-
-    #endregion
-
-    #region Death
-
-    //public void StartDeath()
-    //{
-    //    //if(IsOwner || NetworkManager.Singleton.IsHost)
-    //    //{
-    //    //    PlayerDeathServerRPC();
-    //    //    myPlayerStateController.PlayerDeath();
-    //    //}
-    //}
-
-    //[ServerRpc]
-    //public void PlayerDeathServerRPC()
-    //{
-    //    PlayerDeathClientRPC();
-        
-    //    GameStateManager.Singleton.TestForWinState();
-    //}
-    //[ClientRpc]
-    //public void PlayerDeathClientRPC()
-    //{
-    //    if(!(IsOwner || NetworkManager.Singleton.IsHost))
-    //    {
-    //        myPlayerStateController.PlayerDeath();
-    //    }
-    //}
 
     #endregion
 
