@@ -226,118 +226,166 @@ public class PlayerNetworking : NetworkBehaviour
     {
         if (IsOwner)
         {
-            // who do we think we hit?
-            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, 0f);
-            int hitID = CheckForPlayerHit(hitObj);
-
-            if (hitID == -1)
-            {
-                Debug.Log("I missed");
-            }            
+            // animate the shot client side immediately
+            AnimateShot(shootStartPosition, shootDirection, 0f);
 
             float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;            
-            ShootServerRPC(shootTime, shootStartPosition, shootDirection, hitID);
+            ShootServerRPC(shootTime, shootStartPosition, shootDirection);
         }
     }
 
     [ServerRpc]
-    public void ShootServerRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection, int clientHitID)
+    public void ShootServerRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection)
     {
-        int serverHitID = clientHitID;
+        int serverHitHash;
 
-        if (!IsOwnedByServer)
-        {
-            ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);            
-            float timeToCheck = shootTime - rtt / 1000f;
+        // OR: not 100% sure that we need rtt here
+        ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);            
+        float timeToCheck = shootTime - rtt / 1000f;
 
-            // should probably rollback all players 
-            GameObject playerIThinkIHit;
-            if (clientHitID != -1)
-            {
-                if (ConnectedPlayers.TryGetValue((ulong)clientHitID, out playerIThinkIHit))
-                {
-                    PlayerNetworking playerNetworkingToRollback;
-                    if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
-                    {
-                        PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(timeToCheck, _cheapInterpolationTime);
+        // Reset player colliders then fire the shot serverside
+        RollbackPlayerColliders(timeToCheck, true);
 
-                        Vector3 originalColliderPosition = playerNetworkingToRollback.MultiplayerCollider.transform.localPosition;
+        GameObject hitObj = GetShotTarget(shootStartPosition, shootDirection); 
+        serverHitHash = GetHashOfHit(hitObj);
 
-                        playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;
+        ResetPlayerColliders();
 
-                        float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
-                        GameObject hitObj = LocalShoot(shootStartPosition, shootDirection, timeToWait);
-                        serverHitID = CheckForPlayerHit(hitObj);
+        //float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
 
-                        playerNetworkingToRollback.MultiplayerCollider.transform.localPosition = originalColliderPosition;
-
-                        if (clientHitID == serverHitID)
-                            Debug.Log("No discrepancy found - Hit registered");
-                        else
-                            Debug.LogWarning("Discrepancy found - Hit missed");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + clientHitID);
-                }
-            }
-            else
-            {
-                float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
-                LocalShoot(shootStartPosition, shootDirection, timeToWait);
-            }
-        }
-
-        ShootClientRPC(shootTime, shootStartPosition, shootDirection, serverHitID);
+        ShootClientRPC(shootTime, shootStartPosition, shootDirection, serverHitHash);
     }
 
     [ClientRpc]
-    public void ShootClientRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection, int playerHitID)
+    public void ShootClientRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection, int serverHitHash)
     {
-        if (!IsOwner)
-        {
-            float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+        float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
 
-            LocalShoot(shootStartPosition, shootDirection, timeToWait);
+        if (!IsOwner)
+        {            
+            AnimateShot(shootStartPosition, shootDirection, timeToWait);
         }
 
-        myPlayerStateController.ProcessPotentialHit(playerHitID);
+        TriggerShotResult(serverHitHash, timeToWait);
     }
 
-    public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
+    GameObject GetShotTarget(Vector3 shootStartPosition, Vector3 shootDirection)
     {
         GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
 
+        return hitObj;
+    }
+
+    void AnimateShot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
+    {
         // OR: fire instantly if client shooting
         if (timeToWait > 0)
         {
-            StartCoroutine(SyncedShoot(shootStartPosition, shootDirection, timeToWait));
+            StartCoroutine(SyncedShotAnimation(shootStartPosition, shootDirection, timeToWait));
         }
         else
         {
             myGunController.DoShoot(shootStartPosition, shootDirection);
         }
-
-        return hitObj;
     }
 
-    // TODO: sync shooting result too!
-    IEnumerator SyncedShoot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
+    IEnumerator SyncedShotAnimation(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
     {
-        if (timeToWait > 0)        
+        if (timeToWait > 0)
             yield return new WaitForSeconds(timeToWait);
 
         myGunController.DoShoot(shootStartPosition, shootDirection);
     }
 
+    void TriggerShotResult(int hitHash, float timeToWait)
+    {
+        if (timeToWait > 0)
+        {
+            StartCoroutine(SyncedShotResult(hitHash, timeToWait));
+        }
+        else
+        {
+            PerformShotResult(hitHash);
+        }
+    }
+
+    IEnumerator SyncedShotResult(int hitHash, float timeToWait)
+    {
+        if (timeToWait > 0)
+            yield return new WaitForSeconds(timeToWait);
+
+        PerformShotResult(hitHash);
+    }
+
+    void PerformShotResult(int hitHash)
+    {
+        if (hitHash != -1)
+        {
+            NetworkObject hitNetworkObject = GetNetworkObject((ulong)hitHash);
+
+            if (hitNetworkObject != null)
+            {
+                GameObject hitGameObject = hitNetworkObject.gameObject;
+
+                // run ALL hit checks in here please
+                if (hitGameObject)
+                {                    
+                    // first check player hit
+                    PlayerNetworking shotPlayerNetworking = CheckForPlayerHit(hitGameObject);
+                    if (shotPlayerNetworking != null)
+                    {
+                        shotPlayerNetworking.myPlayerStateController.ProcessHit();
+                        return;
+                    }
+
+                    // then switch
+                    Target hitTarget = hitGameObject.transform.gameObject.GetComponent<Target>();
+                    if (hitTarget != null)
+                    {
+                        hitTarget.OnHitByLaser();
+                        return;
+                    }
+
+                    // finally ready up
+                    if (hitGameObject.transform.tag == "Readyup")
+                    {
+                        ReadyUpStateChange();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// </summary>
     /// <param name="rayHitObject">The gameobject that was hit by the shoot raycast</param>
-    /// <returns>IF the ray hit a network player, returns OwnerClientID. ELSE, return -1</returns>
-    public int CheckForPlayerHit(GameObject rayHitObject)
+    /// <returns>IF the ray hit a network object, returns NetworkObjectID. ELSE, return -1</returns>
+    int GetHashOfHit(GameObject rayHitObject)
     {
-        int playerHitID = -1;
+        int hash = -1;
+        if (rayHitObject != null)
+        {
+            Transform prefabParent = rayHitObject.transform.root;
+            if (prefabParent != null)
+            {
+                NetworkObject hitNetworkObject;
+                if (prefabParent.TryGetComponent<NetworkObject>(out hitNetworkObject))
+                {
+                    hash = (int)hitNetworkObject.NetworkObjectId;
+                }    
+            }
+        }
+
+        return hash;
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="rayHitObject">The gameobject that was hit by the shoot raycast</param>
+    /// <returns>IF the ray hit a network player, returns its PlayerNetworking. ELSE, returns null</returns>
+    public PlayerNetworking CheckForPlayerHit(GameObject rayHitObject)
+    {
         if (rayHitObject != null)
         {
             Transform prefabParent = rayHitObject.transform.root;
@@ -346,12 +394,16 @@ public class PlayerNetworking : NetworkBehaviour
                 PlayerNetworking shotPlayerNetworkingScript;
                 if (prefabParent.TryGetComponent<PlayerNetworking>(out shotPlayerNetworkingScript))
                 {
-                    playerHitID = (int)shotPlayerNetworkingScript.OwnerClientId;
-
+                    return shotPlayerNetworkingScript;
+                }
+                else
+                {
+                    return null;
                 }
             }
         }
-        return playerHitID;
+        
+        return null;
     }
     #endregion
 
@@ -649,6 +701,62 @@ public class PlayerNetworking : NetworkBehaviour
         }
     }
 
+    #endregion
+
+    #region RollbackCode
+
+    // should maybe be in seperate manager that rolls back entire server state
+    /// <summary>
+    /// Rolls back all multiplayer colliders to be in a past game state
+    /// </summary>
+    /// <param name="time"></param> The time to rollback to 
+    /// <param name="ignoreMe"></param> Whether to disable the collider of the player calling this as well
+    void RollbackPlayerColliders(float time, bool ignoreMe)
+    {
+        // disable my own collider if requested
+        MultiplayerCollider.enabled = !ignoreMe;
+
+        foreach (ulong playerID in ConnectedPlayers.Keys)
+        {
+            GameObject playerObject;
+            if (ConnectedPlayers.TryGetValue(playerID, out playerObject))
+            {
+                PlayerNetworking playerNetworkingToRollback;
+                if (playerObject.TryGetComponent(out playerNetworkingToRollback))
+                {
+                    PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(time, _cheapInterpolationTime);
+
+                    playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("ConnectedPlayers contains players that don't exist!");
+            }
+        }
+    }
+
+    void ResetPlayerColliders()
+    {
+        MultiplayerCollider.enabled = true;
+
+        foreach (ulong playerID in ConnectedPlayers.Keys)
+        {
+            GameObject playerObject;
+            if (ConnectedPlayers.TryGetValue(playerID, out playerObject))
+            {
+                PlayerNetworking playerNetworkingToRollback;
+                if (playerObject.TryGetComponent(out playerNetworkingToRollback))
+                {
+                    playerNetworkingToRollback.MultiplayerCollider.transform.localPosition = Vector3.zero;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("ConnectedPlayers contains players that don't exist!");
+            }
+        }
+    }
     #endregion
 
     /// <summary>

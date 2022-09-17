@@ -320,7 +320,7 @@ public class GunController : MonoBehaviour
         bool hit;
         Vector3 shootDirectionAfterAimAssist = AdjustForAimAssist(startPos, shootDirection, out hit, out hitRaycastReferenceObj);
 
-        Shoot(shootDirectionAfterAimAssist, hit, hitRaycastReferenceObj);
+        AnimateShoot(shootDirectionAfterAimAssist, hit, hitRaycastReferenceObj);
     }
 
     public GameObject TryShoot(Vector3 startPos, Vector3 shootDirection)
@@ -436,7 +436,7 @@ public class GunController : MonoBehaviour
     /// Animates shooting the gun from a particlar start position and direction
     /// </summary>
     /// <returns>The gameobject that was shot. Is null if nothing is shot</returns>
-    public void Shoot(Vector3 shootDirection, bool hit, RaycastHit hitRaycastReferenceObj)
+    public void AnimateShoot(Vector3 shootDirection, bool hit, RaycastHit hitRaycastReferenceObj)
     {
         GameObject myLine = new GameObject();
         myLine.transform.position = muzzlePoint.position;
@@ -460,17 +460,6 @@ public class GunController : MonoBehaviour
         lr.SetPosition(0, muzzlePoint.position);
         if (hit)
         {
-            Target hitObject = hitRaycastReferenceObj.transform.gameObject.GetComponent<Target>();
-            if(!(hitObject == null))
-            {
-                
-                hitObject.OnHitByLaser();
-            }
-            if (hitRaycastReferenceObj.transform.tag == "Readyup")
-            {
-                playerNetworking.ReadyUpStateChange();
-            }
-
             lr.SetPosition(1, hitRaycastReferenceObj.point);
 
             GameObject ground_particle = Instantiate(groundHitParticlePrefab, hitRaycastReferenceObj.point, Quaternion.FromToRotation(Vector3.forward, hitRaycastReferenceObj.normal));

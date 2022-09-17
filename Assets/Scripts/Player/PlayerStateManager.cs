@@ -406,16 +406,8 @@ public class PlayerStateManager : MonoBehaviour
 
     }
 
-
-
-
-    public void ProcessPotentialHit(int playerHitID)
+    public void ProcessHit()
     {
-        if (playerHitID != -1)
-            Debug.Log("I think I ('" + this.gameObject.name + "') just shot player ID: " + playerHitID.ToString());
-
-        //playerNetworking.LeverFlicked();
+        Debug.Log("Ow I just got shot");        
     }
-
-
 }
