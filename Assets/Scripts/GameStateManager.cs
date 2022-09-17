@@ -20,7 +20,10 @@ public class GameStateManager : NetworkBehaviour
     /// <summary>
     /// The information about the game state that is passed around per tick
     /// </summary>
-    private NetworkVariable<GameStateData> _gameState = new NetworkVariable<GameStateData>(writePerm: NetworkVariableWritePermission.Server);
+    private NetworkVariable<ZoneStateData> _zoneState = new NetworkVariable<ZoneStateData>(writePerm: NetworkVariableWritePermission.Server);
+    private NetworkVariable<GameState> _gameState = new NetworkVariable<GameState>(writePerm: NetworkVariableWritePermission.Server);
+
+    private NetworkVariable<ushort> _networkedClosingSpeed = new NetworkVariable<ushort>(writePerm: NetworkVariableWritePermission.Server);
 
     public static GameStateManager Singleton { get; private set; }
 
@@ -112,8 +115,6 @@ public class GameStateManager : NetworkBehaviour
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
 
-
-    
     /// <summary>
     /// Which game states the current level can be in
     /// </summary>
@@ -173,14 +174,17 @@ public class GameStateManager : NetworkBehaviour
 
         _zoneWidth = zoneStartWidth;
         // Only need to update this once since it doesn't change throughout the game.
-        if (!IsHost)
+        if (!localPlayer.IsOwnedByServer)
         {
-            GetClosingSpeedServerRPC();
+            closingSpeed = _networkedClosingSpeed.Value;
 
             // Add callback function for when the game state is changed:
-            _gameState.OnValueChanged += ChangedGameState;
+            _zoneState.OnValueChanged += ChangedZoneState;
         }
-
+        else
+        {
+            _networkedClosingSpeed.Value = (ushort)closingSpeed;
+        }
 
         if (GameStateManager.Singleton.gameStateSwitcher.GameState != GameState.waitingToReadyUp)
         {
@@ -200,8 +204,13 @@ public class GameStateManager : NetworkBehaviour
         /// <summary>
         /// Maintains the current state of the game (the current level)
         /// </summary>
-        public GameState GameState => _gameState;
-        private GameState _gameState;
+        public GameState GameState => parent._gameState.Value;
+
+        /// <summary>
+        /// Sometimes localGameState may go out of sync with the server gamestate. The localGameState is tracked here so it
+        /// can resync where necessary.
+        /// </summary>
+        private GameState localGameState;
 
         /// <summary>
         /// The parent who owns this object
@@ -225,7 +234,7 @@ public class GameStateManager : NetworkBehaviour
         public GameStateSwitcher(GameStateManager _parent)
         {
             parent = _parent;
-            _gameState = GameState.waitingToReadyUp;
+            localGameState = GameState.waitingToReadyUp;
 
             if (parent.ReadyUpCube)
             {
@@ -243,14 +252,22 @@ public class GameStateManager : NetworkBehaviour
         /// </summary>
         public void Update()
         {
-            if(_gameState == GameState.readiedUp)
+            //Debug.Log(localGameState.ToString() + "  " + parent._gameState.Value.ToString());
+
+            if (localGameState != parent._gameState.Value)
+            {
+                LocallySwitchToGameState(parent._gameState.Value);
+            }
+
+            if(localGameState == GameState.readiedUp)
             {
                 readiedCountdownProgress -= Time.deltaTime;
                 UpdateCountdown();
                 if(readiedCountdownProgress < 0)
                 {
                     readiedCountdownProgress = 0;
-                    SwitchToPlayingGame(true);
+                    if(parent.localPlayer.IsOwnedByServer)
+                        SwitchToPlayingGame(true);
                 }
             }
             else
@@ -259,22 +276,16 @@ public class GameStateManager : NetworkBehaviour
             }
         }
 
-        /// <summary>
-        /// Updates the countdown visuals and audio, such as the counter on the player's screen
-        /// </summary>
-        public void UpdateCountdown()
-        {
-            if (parent.CountdownText)
-                parent.CountdownText.text = Mathf.FloorToInt(readiedCountdownProgress).ToString();
-            
-            parent.localPlayer.myPlayerStateController.playerAudioManager.PlaySoundsDuringCountdown(readiedCountdownProgress);
-        }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
         public void SwitchToWaitingToReadyUp(bool useEffects)
         {
-            SwitchFromState(_gameState, useEffects);
-            _gameState = GameState.waitingToReadyUp;
+            if (parent.localPlayer.IsOwnedByServer)
+                parent._gameState.Value = GameState.waitingToReadyUp;
+
+            SwitchFromState(localGameState, useEffects);
+            localGameState = GameState.waitingToReadyUp;
+            
             if (parent.waitingToReadyUpPanel)
                 parent.waitingToReadyUpPanel.SetActive(true);
 
@@ -288,10 +299,13 @@ public class GameStateManager : NetworkBehaviour
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
         public void SwitchToReadiedUp(bool useEffects)
         {
-            readiedCountdownProgress = 5.99f;
+            if (parent.localPlayer.IsOwnedByServer)
+                parent._gameState.Value = GameState.readiedUp;
 
-            SwitchFromState(_gameState, useEffects);
-            _gameState = GameState.readiedUp;
+            SwitchFromState(localGameState, useEffects);
+            localGameState = GameState.readiedUp;
+
+            readiedCountdownProgress = 5.99f;
 
             if (parent.CountdownPanel)
                 parent.CountdownPanel.SetActive(true);
@@ -312,8 +326,11 @@ public class GameStateManager : NetworkBehaviour
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
         public void SwitchToPlayingGame(bool useEffects)
         {
-            SwitchFromState(_gameState, useEffects);
-            _gameState = GameState.playingGame;
+            if (parent.localPlayer.IsOwnedByServer)
+                parent._gameState.Value = GameState.playingGame;
+
+            SwitchFromState(localGameState, useEffects);
+            localGameState = GameState.playingGame;
 
             if (parent.ReadyUpBarrier)
             {
@@ -328,27 +345,30 @@ public class GameStateManager : NetworkBehaviour
         }
 
         /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-        public void SwitchToSomeoneHasWon(bool localPlayerWon)
+        public void SwitchToSomeoneHasWon(bool useEffects)
         {
-            if(_gameState != GameState.someoneHasWon)
-            {
-                SwitchFromState(_gameState, false);
-                _gameState = GameState.someoneHasWon;
+            if (parent.localPlayer.IsOwnedByServer)
+                parent._gameState.Value = GameState.someoneHasWon;
 
-                if (parent.ReadyUpBarrier)
-                    parent.ReadyUpBarrier.SetActive(false);
+            SwitchFromState(localGameState, false);
+            localGameState = GameState.someoneHasWon;
 
-                if (localPlayerWon)
-                    LocalPlayerWin();
-                else
-                    LocalPlayerLose();
-            }
+            if (parent.ReadyUpBarrier)
+                parent.ReadyUpBarrier.SetActive(false);
+
+            //if (localPlayerWon)
+            //    LocalPlayerWin();
+            //else
+            //    LocalPlayerLose();
         }
 
         public void SwitchToPodium(bool useEffects)
         {
-            SwitchFromState(_gameState, useEffects);
-            _gameState = GameState.podium;
+            if (parent.localPlayer.IsOwnedByServer)
+                parent._gameState.Value = GameState.podium;
+            
+            SwitchFromState(localGameState, useEffects);
+            localGameState = GameState.podium;
 
             if (parent.ReadyUpBarrier)
                 parent.ReadyUpBarrier.SetActive(false);
@@ -386,6 +406,30 @@ public class GameStateManager : NetworkBehaviour
             }
         }
 
+        public void LocallySwitchToGameState(GameState newGameState)
+        {
+            if (newGameState == GameState.waitingToReadyUp && localGameState != GameState.waitingToReadyUp)
+                SwitchToWaitingToReadyUp(true);
+            else if (newGameState == GameState.readiedUp && localGameState != GameState.readiedUp)
+                SwitchToReadiedUp(true);
+            else if (newGameState == GameState.playingGame && localGameState != GameState.playingGame)
+                SwitchToPlayingGame(true);
+            else if (newGameState == GameState.someoneHasWon && localGameState != GameState.someoneHasWon)
+                SwitchToSomeoneHasWon(true);
+            else if (newGameState == GameState.podium && localGameState != GameState.podium)
+                SwitchToPodium(true);
+        }
+
+        /// <summary>
+        /// Updates the countdown visuals and audio, such as the counter on the player's screen
+        /// </summary>
+        public void UpdateCountdown()
+        {
+            if (parent.CountdownText)
+                parent.CountdownText.text = Mathf.FloorToInt(readiedCountdownProgress).ToString();
+
+            parent.localPlayer.myPlayerStateController.playerAudioManager.PlaySoundsDuringCountdown(readiedCountdownProgress);
+        }
 
         public void LocalPlayerWin()
         {
@@ -465,50 +509,25 @@ public class GameStateManager : NetworkBehaviour
         }
     }
 
-
-    #region RPC communications
-
-    /// <summary>
-    /// A way that a client can request to know the server's "closingSpeed" variable.
-    /// The client requests an update, which the server then broadcasts out to all clients, who then
-    /// update their variables.
-    /// </summary>
-    [ServerRpc(RequireOwnership = false)]
-    public void GetClosingSpeedServerRPC()
-    {
-        SetClosingSpeedClientRPC(closingSpeed);
-    }
-    /// <summary>
-    /// Updates all clients with a new closing speed, as determined only by the server
-    /// </summary>
-    /// <param name="newClosingSpeed">Closing speed to send to clients</param>
-    [ClientRpc]
-    public void SetClosingSpeedClientRPC(float newClosingSpeed)
-    {
-        closingSpeed = newClosingSpeed;
-    }
-
-    #endregion
-
     /// <summary>
     /// Update the game state data if host
     /// Then simply move the walls along as expected according to what the game state data says
     /// </summary>
     void Update()
     {
-        if (IsHost)
+        if (localPlayer.IsOwnedByServer)
         {
             // Modify variables here according to the progress of the game
             //zoneSpeed = fastestPlayer.Speed * (1 - playerEfficiencyRequirement);
             //zoneWidth -= 1 * Time.deltaTime;
 
-            GameStateData stateData = new GameStateData()
+            ZoneStateData stateData = new ZoneStateData()
             {
                 ZoneProgress = zoneProgress,
                 ZoneWidth = _zoneWidth,
                 ZoneSpeed = zoneSpeed
             };
-            _gameState.Value = stateData;
+            _zoneState.Value = stateData;
         }
         UpdateWallPositions();
 
@@ -518,16 +537,61 @@ public class GameStateManager : NetworkBehaviour
         }
 
         gameStateSwitcher.Update();
+
+        if (Input.GetKey(KeyCode.R))
+        {
+            gameStateSwitcher.SwitchToSomeoneHasWon(true);
+        }
     }
 
     /// <summary>
     /// Called whenever the 'non host' recieves new information from the host.
     /// </summary>
-    private void ChangedGameState(GameStateData oldGameState, GameStateData newGameState)
+    private void ChangedZoneState(ZoneStateData oldGameState, ZoneStateData newGameState)
     {
         zoneProgress = newGameState.ZoneProgress;
         _zoneWidth = newGameState.ZoneWidth;
         zoneSpeed = newGameState.ZoneSpeed;
+    }
+
+
+    #region ServerRPCs
+
+    public void SendPlayerWins()
+    {
+
+    }
+
+    #endregion
+
+    public void TestForWinState()
+    {
+
+        List<ulong> markedForWin = new List<ulong>();
+        List<ulong> markedForDefeat = new List<ulong>();
+
+        foreach (var keyValuePair in PlayerNetworking.ConnectedPlayers)
+        {
+            PlayerNetworking playerNetworking = keyValuePair.Value.GetComponent<PlayerNetworking>();
+
+            if (playerNetworking._isDead.Value)
+            {
+                markedForDefeat.Add(keyValuePair.Key);
+            }
+            else
+            {
+                markedForWin.Add(keyValuePair.Key);
+            }
+        }
+        if (markedForWin.Count == 0 && markedForDefeat.Count > 0)
+        {
+            Debug.LogWarning("Inconsistent State! nobody seems to have won somehow");
+        }
+        if (markedForWin.Count <= 1 && markedForDefeat.Count > 0)
+        {
+            // player has won
+
+        }
     }
 
     #region Wall Helper functions
@@ -654,7 +718,7 @@ public class GameStateManager : NetworkBehaviour
 /// <summary>
 /// Holds all continuous game state datas such as zone progress, zone width, and zone speed
 /// </summary>
-struct GameStateData : INetworkSerializable
+struct ZoneStateData : INetworkSerializable
 {
     private short _zoneSpeed;
     private float _zoneProgress, _zoneWidth;

@@ -393,42 +393,7 @@ public class PlayerController : MonoBehaviour
         bodyRigidBody.drag = 8;
 
         audioManager.UpdateRunningIntensity(0);
-
-        //if (xInput != 0 || yInput != 0 || heightInput != 0)
-        //{
-        //    Vector3 input = new Vector3(xInput, heightInput, yInput).normalized;
-
-        //    // Calculate what directions the inputs mean in worldcoordinate terms
-        //    //Vector3 verticalInputWorldDirection = mainCamera.transform.forward * input.z;
-        //    //Vector3 horizontalInputWorldDirection = mainCamera.transform.right * input.x;
-        //    Vector3 verticalInputWorldDirection = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * input.z;
-        //    Vector3 horizontalInputWorldDirection = new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z).normalized * input.x;
-        //    Vector3 heightInputWorldDirection = Vector3.up * input.y;
-
-        //    // The direction that the player wishes to go in
-        //    Vector3 wishDirection = (verticalInputWorldDirection + horizontalInputWorldDirection).normalized;
-
-        //    // Current velocity without the y speed included
-        //    Vector3 currentPlanarVelocity = Vector3.ProjectOnPlane(bodyRigidBody.velocity, Vector3.up);
-
-        //    float forwardsSpeed = Vector3.Dot(wishDirection, currentPlanarVelocity);
-
-        //    // Travelling in completely the wrong direction to the user input, so use CancellationDeceleration
-        //    if (forwardsSpeed < 0)
-        //    {
-        //        float activeCancellationPower = CancellationPower;
-        //        if (!PlayerHasAirControl) activeCancellationPower /= 8;
-
-        //        bodyRigidBody.AddForce(wishDirection * activeCancellationPower, ForceMode.Acceleration);
-        //    }
-        //    else if (forwardsSpeed < movementSpeed * respawningControlMultiplier && (GroundDetector.IsOnGround || PlayerHasAirControl))
-        //    {
-        //        // How much required acceleration there is to reach the intended speed (walkingspeed).
-        //        float requiredAcc = (movementSpeed * respawningControlMultiplier - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
-
-        //        bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
-        //    }
-        //}
+        audioManager.UpdateWindIntensity(0);
     }
 
     public void BoostForce(Vector3 boost, ForceMode boostType)

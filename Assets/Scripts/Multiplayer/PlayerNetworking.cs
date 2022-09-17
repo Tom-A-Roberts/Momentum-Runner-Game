@@ -1,20 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using Unity.Collections;
 using Unity.Netcode;
-using UnityEngine.Rendering;
-using System;
-using System.Linq;
-using System.Xml;
+using Unity.VisualScripting;
+using UnityEngine;
 using static GameStateManager;
 
 public class PlayerNetworking : NetworkBehaviour
 {
     /// <summary>
-    /// All continuously updated player state data, specifically for this one player
+    /// All continuously updated player state data, specifically for this one player.
     /// </summary>
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
+    private NetworkVariable<FixedString64Bytes> displayName = new NetworkVariable<FixedString64Bytes>(writePerm: NetworkVariableWritePermission.Owner);
+
+    public NetworkVariable<bool> _isDead = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> _isSpectating = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> _isRespawning = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
 
     [Header("Known Objects")]
     public PlayerStateManager myPlayerStateController;
@@ -45,11 +48,21 @@ public class PlayerNetworking : NetworkBehaviour
     /// is not the owner
     /// </summary>
     public ReadyUpState PlayerReadyUpState => _playerReadyUpState;
+
     /// <summary>
     /// Which ready up state this player is in. May not be accurate in all cases when the player
     /// is not the owner
     /// </summary>
     private ReadyUpState _playerReadyUpState = ReadyUpState.unready;
+
+    /// <summary>
+    /// My display name, as decided by the owner playerNetworking
+    /// </summary>
+    public string DisplayName => displayName.Value.ToSafeString();
+
+    /// <summary>
+    /// My display name, as decided by the owner playerNetworking
+    /// </summary>
 
     /// <summary>
     /// <para>unready and ready are what they say on the tin</para>
@@ -454,104 +467,26 @@ public class PlayerNetworking : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void EnterSpectatorModeServerRPC()
     {
-        EnterSpectatorModeClientRPC();
+        _isSpectating.Value = true;
     }
-    [ClientRpc]
-    public void EnterSpectatorModeClientRPC()
+    public void LeaveSpectatorMode()
     {
-        // TR: this collider line should be moved to inside the EnterSpectatorMode function. The EnterSpectatorMode function is called
-        // from other places too.
-        MultiplayerCollider.enabled = false;
-        myPlayerStateController.EnterSpectatorMode();
-    }
-    [ClientRpc]
-    public void LeaveSpectatorModeClientRPC()
-    {
-        // TR: this collider line should be moved to inside the LeaveSpectatorMode function. The LeaveSpectatorMode function is called
-        // from other places too.
-        MultiplayerCollider.enabled = true;
-        myPlayerStateController.LeaveSpectatorMode();
-    }
-
-    /// <summary>
-    /// Asks the server to produce a list of who are spectators and who aren't
-    /// </summary>
-    [ServerRpc]
-    public void GetListOfSpectatorsServerRPC()
-    {
-        List<ulong> playerIDs = new List<ulong>(ConnectedPlayers.Count);
-        List<bool> spectatorStatus = new List<bool>(ConnectedPlayers.Count);
-
-        foreach (KeyValuePair<ulong, GameObject> entry in ConnectedPlayers)
-        {
-            PlayerStateManager currentPlayerState;
-            if(entry.Value.TryGetComponent(out currentPlayerState))
-            {
-                playerIDs.Add(currentPlayerState.playerNetworking.OwnerClientId);
-                spectatorStatus.Add(currentPlayerState.SpectatorMode);
-            }
-        }
-        ReturnListOfSpectatorsClientRPC(playerIDs.ToArray(), spectatorStatus.ToArray());
-    }
-    /// <summary>
-    /// Sends a list of who's spectators and who isn't to the connected clients, updating their states
-    /// </summary>
-    [ClientRpc]
-    public void ReturnListOfSpectatorsClientRPC(ulong[] playerIDs, bool[] spectatorStatus)
-    {
-        if (IsOwner && !IsHost)
-        {
-            Dictionary<ulong, bool> spectatorStatusDict = new Dictionary<ulong, bool>();
-            for (int index = 0; index < playerIDs.Length; index++)
-            {
-                spectatorStatusDict.Add(playerIDs[index], spectatorStatus[index]);
-            }
-
-            foreach (KeyValuePair<ulong, GameObject> entry in ConnectedPlayers)
-            {
-                PlayerStateManager currentPlayerState;
-                if (spectatorStatusDict.ContainsKey(entry.Key) && entry.Value.TryGetComponent(out currentPlayerState))
-                {
-                    // If status is set to spectator = true:
-                    if (spectatorStatusDict[entry.Key] == true)
-                    {
-                        if (!currentPlayerState.SpectatorMode)
-                            currentPlayerState.EnterSpectatorMode();
-                    }
-                    else
-                    {
-                        if (currentPlayerState.SpectatorMode)
-                            currentPlayerState.LeaveSpectatorMode();
-                    }
-                }
-            }
-        }
+        _isSpectating.Value = false;
     }
 
     #endregion
 
-    #region Respawning
-    // respawning is completely handled by the server.
-    // The server tells clients when they should begin respawning AND end respawning
-    public void EnterRespawningModeServer(Vector3 respawnLocation)
+    #region ForceTeleporting
+    // Whenever the server wants to teleport a player, this is a useful command. Such as respawning etc
+    public void ServerTeleportPlayer(Vector3 teleportLocation)
     {
-        EnterRespawningModeClientRPC(respawnLocation);
-    }
-
-    public void LeaveRespawningModeServer()
-    {
-        LeaveRespawningModeClientRPC();
+        TeleportPlayerClientRPC(teleportLocation);
     }
 
     [ClientRpc]
-    public void EnterRespawningModeClientRPC(Vector3 respawnLocation)
+    public void TeleportPlayerClientRPC(Vector3 teleportLocation)
     {
-        myPlayerStateController.EnterRespawningMode(respawnLocation);
-    }
-    [ClientRpc]
-    public void LeaveRespawningModeClientRPC()
-    {
-        myPlayerStateController.LeaveRespawningMode();
+        myPlayerStateController.TeleportPlayer(teleportLocation);
     }
 
     #endregion
@@ -606,7 +541,6 @@ public class PlayerNetworking : NetworkBehaviour
         if (IsHost && GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
         {
             EveryoneHasReadiedUpServerRPC();
-            //EveryoneHasReadiedUpClientRPC();
         }
     }
 
@@ -662,42 +596,8 @@ public class PlayerNetworking : NetworkBehaviour
     public void EveryoneHasReadiedUpServerRPC()
     {
         if(GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
-            EveryoneHasReadiedUpClientRPC();
-    }
-
-    /// <summary>
-    /// Sent by the server to let all clients know the ready up has happened
-    /// </summary>
-    [ClientRpc]
-    public void EveryoneHasReadiedUpClientRPC()
-    {
-        GameStateManager.Singleton.gameStateSwitcher.SwitchToReadiedUp(true);
-    }
-
-    #endregion
-
-    #region Death
-
-    public void StartDeath()
-    {
-        if(IsOwner || NetworkManager.Singleton.IsHost)
         {
-            PlayerDeathServerRPC();
-            myPlayerStateController.PlayerDeath();
-        }
-    }
-
-    [ServerRpc]
-    public void PlayerDeathServerRPC()
-    {
-        PlayerDeathClientRPC();
-    }
-    [ClientRpc]
-    public void PlayerDeathClientRPC()
-    {
-        if(!(IsOwner || NetworkManager.Singleton.IsHost))
-        {
-            myPlayerStateController.PlayerDeath();
+            GameStateManager.Singleton.gameStateSwitcher.SwitchToReadiedUp(true);
         }
     }
 
@@ -829,7 +729,7 @@ public class PlayerNetworking : NetworkBehaviour
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
-            gameObject.name = "Player" + OwnerClientId.ToString() + " (Remote)";
+            gameObject.name = displayName.Value.ToSafeString() + " (Remote)";
         }
         else
         {
@@ -840,12 +740,22 @@ public class PlayerNetworking : NetworkBehaviour
             GameStateManager.Singleton.OnLocalPlayerNetworkSpawn();
 
             // Update who in the game is currently spectators or not
-            GetListOfSpectatorsServerRPC();
+            //GetListOfSpectatorsServerRPC();
 
             myPlayerStateController.HideMultiplayerRepresentation();
 
-            gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
+            displayName.Value = GetMyDisplayName();
+
+            gameObject.name = displayName.Value.ToSafeString() + " (Local)";
         }
+    }
+
+    public FixedString64Bytes GetMyDisplayName()
+    {
+        // If using steam, this is where we'd connect to the steam API
+        string name = "Player" + OwnerClientId.ToString();
+        FixedString64Bytes bytesName = new FixedString64Bytes(name);
+        return bytesName;
     }
 
     /// <summary>
