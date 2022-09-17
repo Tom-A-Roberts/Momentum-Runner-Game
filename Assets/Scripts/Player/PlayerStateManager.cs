@@ -30,24 +30,15 @@ public class PlayerStateManager : MonoBehaviour
     [Header("Effects settings")]
     public float deathwallRedStartDistance = 5;
 
-    [Header("Game States")]
-    [SerializeField]
-    private bool _spectatorMode = false;
-    public bool SpectatorMode => _spectatorMode;
+    public bool IsSpectating => playerNetworking._isSpectating.Value;
 
-    [SerializeField]
-    private bool _isRespawningAndIsHost = false;
-    public bool IsRespawningAndIsHost => _isRespawningAndIsHost;
+    public bool IsRespawning => playerNetworking._isRespawning.Value;
 
-    /// <summary>
-    /// WARNING! This property is ONLY consistent for the host and also owner. It may be wrong sometimes otherwise
-    /// </summary>
-    [SerializeField]
-    private bool _isRespawning = false;
-    /// <summary>
-    /// WARNING! This property is ONLY consistent for the host and also owner. It may be wrong sometimes otherwise
-    /// </summary>
-    public bool IsRespawning => _isRespawning;
+    public bool IsDead => playerNetworking._isDead.Value;
+
+    //[SerializeField]
+    //private bool _isRespawningAndIsHost = false;
+    //public bool IsRespawningAndIsHost => _isRespawningAndIsHost;
 
     [System.NonSerialized]
     public Vector3 bodySpawnPosition;
@@ -55,8 +46,24 @@ public class PlayerStateManager : MonoBehaviour
     public Vector3 feetSpawnPosition;
     [System.NonSerialized]
     public Vector3 bodyFeetOffset;
+
+    /// <summary>
+    /// Tracks what is locally happening. If this value differs from the network variable, then they are resynced within Update()
+    /// </summary>
     [System.NonSerialized]
-    public bool isDead = false;
+    public bool isRespawningLocally = false;
+
+    /// <summary>
+    /// Tracks what is locally happening. If this value differs from the network variable, then they are resynced within Update()
+    /// </summary>
+    [System.NonSerialized]
+    public bool isDeadLocally = false;
+
+    /// <summary>
+    /// Tracks what is locally happening. If this value differs from the network variable, then they are resynced within Update()
+    /// </summary>
+    [System.NonSerialized]
+    public bool isSpectatingLocally = false;
 
     // Privates
     private int fogInitDelayCounter = 0;
@@ -131,14 +138,6 @@ public class PlayerStateManager : MonoBehaviour
         playerBody.position = bodyStartPosition;
         playerFeet.position = feetStartPosition;
 
-        if (SpectatorMode)
-        {
-            EnterSpectatorMode();
-        }
-        else
-        {
-            LeaveSpectatorMode();
-        }
     }
 
     void InitializeFogwall()
@@ -179,18 +178,48 @@ public class PlayerStateManager : MonoBehaviour
                 InitializeFogwall();
             }
         }
-        if(!GameStateManager.Singleton.DeveloperMode && !isDead && (playerNetworking.IsOwner || NetworkManager.Singleton.IsHost))
+        if(!GameStateManager.Singleton.DeveloperMode && !playerNetworking._isDead.Value && NetworkManager.Singleton.IsHost)
             CheckForDeath();
 
-        if (_isRespawningAndIsHost)
+        if (IsRespawning && playerNetworking.IsOwner)// NetworkManager.Singleton.IsHost)
         {
             respawningTimer += Time.deltaTime;
             if(respawningTimer > GameStateManager.Singleton.respawnDuration)
             {
-                playerNetworking.LeaveRespawningModeServer();
+                playerNetworking._isRespawning.Value = false;
             }
         }
 
+        CheckForServerStateChanges();
+
+    }
+
+    public void CheckForServerStateChanges()
+    {
+        if (isDeadLocally != playerNetworking._isDead.Value)
+        {
+            if (playerNetworking._isDead.Value)
+                PlayerDeathLocally();
+            else
+                PlayerExitDeathLocally();
+        }
+
+        if(isSpectatingLocally != playerNetworking._isSpectating.Value && !isRespawningLocally)
+        {
+            if (playerNetworking._isSpectating.Value)
+                EnterSpectatorModeLocally();
+            else
+                LeaveSpectatorModeLocally();
+        }
+        //Debug.Log(playerNetworking._isRespawning.Value.ToString() + "   " + isRespawningLocally.ToString());
+        
+        if (isRespawningLocally != playerNetworking._isRespawning.Value)
+        {
+            if (playerNetworking._isRespawning.Value)
+                EnterRespawningModeLocally();
+            else
+                LeaveRespawningModeLocally();
+        }
     }
 
     /// <summary>
@@ -199,9 +228,14 @@ public class PlayerStateManager : MonoBehaviour
     public void CheckForRespawn()
     {
         // Server checks for respawning state:
-        if (NetworkManager.Singleton.IsHost && !_isRespawningAndIsHost)
+        //if ((NetworkManager.Singleton.IsHost || playerNetworking.IsOwner) && !IsRespawning)
+        if ((playerNetworking.IsOwner) && !IsRespawning)
         {
-            playerNetworking.EnterRespawningModeServer(playerBody.position);
+            // Respawn player and teleport them to location:
+            if(NetworkManager.Singleton.IsHost && !playerNetworking._isRespawning.Value)
+                playerNetworking.ServerTeleportPlayer(playerBody.position);
+            
+            playerNetworking._isRespawning.Value = true;
         }
     }
    
@@ -218,11 +252,10 @@ public class PlayerStateManager : MonoBehaviour
             float signedDistance = Vector3.Dot(playerBody.position - ClosestPoint, GameStateManager.Singleton.transform.forward);
             if(signedDistance < -0.2)
             {
-                playerNetworking.StartDeath();
+                playerNetworking._isDead.Value = true;
             }
         }
     }
-
 
     public void ShowMultiplayerRepresentation()
     {
@@ -270,14 +303,7 @@ public class PlayerStateManager : MonoBehaviour
         RespawnPlayerToBeginning();
         //reset any other variables changes during the level
     }
-    public void PlayerDeath()
-    {
-        if (!isDead)
-        {
-            EnterSpectatorMode();
-        }
-        isDead = true;
-    }
+
 
     public void TeleportPlayer(Vector3 newBodyPosition)
     {
@@ -310,13 +336,33 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
-    //public MeshRenderer spectatorRepresentation;
-    //public CapsuleCollider bodyCollider;
-    //public SphereCollider feetCollider;
-
-    public void EnterSpectatorMode()
+    public void PlayerDeathLocally()
     {
-        _spectatorMode = true;
+        if (!isDeadLocally)
+        {
+            EnterSpectatorModeLocally();
+        }
+        isDeadLocally = true;
+    }
+
+    public void PlayerExitDeathLocally()
+    {
+        if (isDeadLocally)
+        {
+            LeaveSpectatorModeLocally();
+        }
+        isDeadLocally = false;
+    }
+
+    /// <summary>
+    /// Plays out local animation for entering spectator mode locally. If is host, it also ensures the message is sent to the other players too
+    /// </summary>
+    public void EnterSpectatorModeLocally()
+    {
+        if (NetworkManager.Singleton.IsHost && !IsSpectating)
+        {
+            playerNetworking._isSpectating.Value = true;
+        }
 
         wallRunningScript.spectatorMode = true;
         grappleGunScript.spectatorMode = true;
@@ -339,10 +385,19 @@ public class PlayerStateManager : MonoBehaviour
             spectatorRepresentation.enabled = true;
             HideMultiplayerRepresentation();
         }
+
+        isSpectatingLocally = true;
     }
-    public void LeaveSpectatorMode()
+
+    /// <summary>
+    /// Plays out local animation for leaving spectator mode locally. If is host, it also ensures the message is sent to the other players too
+    /// </summary>
+    public void LeaveSpectatorModeLocally()
     {
-        _spectatorMode = false;
+        if (NetworkManager.Singleton.IsHost && IsSpectating && !IsDead && !IsRespawning)
+        {
+            playerNetworking._isSpectating.Value = false;
+        }
 
         wallRunningScript.spectatorMode = false;
         grappleGunScript.spectatorMode = false;
@@ -365,31 +420,54 @@ public class PlayerStateManager : MonoBehaviour
             spectatorRepresentation.enabled = false;
             ShowMultiplayerRepresentation();
         }
+
+        isSpectatingLocally = false;
     }
 
-    public void EnterRespawningMode(Vector3 respawnLocation)
+    /// <summary>
+    /// Plays out local animation for entering respawning mode locally. If is host, it also ensures the message is sent to the other players too
+    /// </summary>
+    public void EnterRespawningModeLocally()
     {
         if(NetworkManager.Singleton.IsHost)
         {
-            _isRespawningAndIsHost = true;
             respawningTimer = 0;
+            playerNetworking._isSpectating.Value = true;
+            playerNetworking._isRespawning.Value = true;
         }
         if (playerNetworking.IsOwner && IngameEscMenu.Singleton)
             IngameEscMenu.Singleton.ShowRecoveringInfo();
 
-        TeleportPlayer(respawnLocation);
-        _isRespawning = true;
+        //Debug.Log("here");
+
+        //TeleportPlayer(respawnLocation);
+        isRespawningLocally = true;
         playerController.respawningMode = true;
-        EnterSpectatorMode();
+
+        EnterSpectatorModeLocally();
     }
-    public void LeaveRespawningMode()
+
+    /// <summary>
+    /// Plays out local animation for leaving respawning mode locally. If is host, it also ensures the message is sent to the other players too
+    /// </summary>
+    public void LeaveRespawningModeLocally()
     {
         if (NetworkManager.Singleton.IsHost)
         {
-            _isRespawningAndIsHost = false;
-            respawningTimer = 0;
+            if (!playerNetworking._isDead.Value)
+            {
+                playerNetworking._isSpectating.Value = false;
+                playerNetworking.ServerTeleportPlayer(playerBody.position);
+            }
+               
         }
-        if (_isRespawning)
+        if (NetworkManager.Singleton.IsHost || playerNetworking.IsOwner)
+        {
+            respawningTimer = 0;
+            playerNetworking._isRespawning.Value = false;
+        }
+
+        if (isRespawningLocally)
         {
             playerBody.velocity = Vector3.zero;
             playerController.AddForce(10, playerBody.transform.forward, ForceMode.VelocityChange);
@@ -399,15 +477,11 @@ public class PlayerStateManager : MonoBehaviour
         if (playerNetworking.IsOwner && IngameEscMenu.Singleton)
             IngameEscMenu.Singleton.HideRecoveringInfo();
 
-        _isRespawning = false;
+        isRespawningLocally = false;
         playerController.respawningMode = false;
 
-        LeaveSpectatorMode();
-
+        LeaveSpectatorModeLocally();
     }
-
-
-
 
     public void ProcessPotentialHit(int playerHitID)
     {

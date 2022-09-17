@@ -574,7 +574,7 @@ public class GameStateManager : NetworkBehaviour
         {
             PlayerNetworking playerNetworking = keyValuePair.Value.GetComponent<PlayerNetworking>();
 
-            if (playerNetworking.myPlayerStateController.isDead)
+            if (playerNetworking._isDead.Value)
             {
                 markedForDefeat.Add(keyValuePair.Key);
             }
