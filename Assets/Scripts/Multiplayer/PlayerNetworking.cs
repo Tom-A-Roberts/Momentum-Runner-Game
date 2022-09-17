@@ -6,7 +6,9 @@ using UnityEngine.Rendering;
 using System;
 using System.Linq;
 using System.Xml;
+using Unity.Collections;
 using static GameStateManager;
+using Unity.VisualScripting;
 
 public class PlayerNetworking : NetworkBehaviour
 {
@@ -15,6 +17,7 @@ public class PlayerNetworking : NetworkBehaviour
     /// </summary>
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
+    private NetworkVariable<FixedString64Bytes> displayName = new NetworkVariable<FixedString64Bytes>(writePerm: NetworkVariableWritePermission.Owner);
 
     [Header("Known Objects")]
     public PlayerStateManager myPlayerStateController;
@@ -45,11 +48,21 @@ public class PlayerNetworking : NetworkBehaviour
     /// is not the owner
     /// </summary>
     public ReadyUpState PlayerReadyUpState => _playerReadyUpState;
+
     /// <summary>
     /// Which ready up state this player is in. May not be accurate in all cases when the player
     /// is not the owner
     /// </summary>
     private ReadyUpState _playerReadyUpState = ReadyUpState.unready;
+
+    /// <summary>
+    /// My display name, as decided by the owner playerNetworking
+    /// </summary>
+    public string DisplayName => displayName.Value.ToSafeString();
+
+    /// <summary>
+    /// My display name, as decided by the owner playerNetworking
+    /// </summary>
 
     /// <summary>
     /// <para>unready and ready are what they say on the tin</para>
@@ -554,7 +567,6 @@ public class PlayerNetworking : NetworkBehaviour
         if (IsHost && GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
         {
             EveryoneHasReadiedUpServerRPC();
-            //EveryoneHasReadiedUpClientRPC();
         }
     }
 
@@ -610,16 +622,9 @@ public class PlayerNetworking : NetworkBehaviour
     public void EveryoneHasReadiedUpServerRPC()
     {
         if(GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
-            EveryoneHasReadiedUpClientRPC();
-    }
-
-    /// <summary>
-    /// Sent by the server to let all clients know the ready up has happened
-    /// </summary>
-    [ClientRpc]
-    public void EveryoneHasReadiedUpClientRPC()
-    {
-        GameStateManager.Singleton.gameStateSwitcher.SwitchToReadiedUp(true);
+        {
+            GameStateManager.Singleton.gameStateSwitcher.SwitchToReadiedUp(true);
+        }
     }
 
     #endregion
@@ -639,6 +644,8 @@ public class PlayerNetworking : NetworkBehaviour
     public void PlayerDeathServerRPC()
     {
         PlayerDeathClientRPC();
+        
+        GameStateManager.Singleton.TestForWinState();
     }
     [ClientRpc]
     public void PlayerDeathClientRPC()
@@ -721,7 +728,7 @@ public class PlayerNetworking : NetworkBehaviour
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
-            gameObject.name = "Player" + OwnerClientId.ToString() + " (Remote)";
+            gameObject.name = displayName.Value.ToSafeString() + " (Remote)";
         }
         else
         {
@@ -736,8 +743,18 @@ public class PlayerNetworking : NetworkBehaviour
 
             myPlayerStateController.HideMultiplayerRepresentation();
 
-            gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
+            displayName.Value = GetMyDisplayName();
+
+            gameObject.name = displayName.Value.ToSafeString() + " (Local)";
         }
+    }
+
+    public FixedString64Bytes GetMyDisplayName()
+    {
+        // If using steam, this is where we'd connect to the steam API
+        string name = "Player" + OwnerClientId.ToString();
+        FixedString64Bytes bytesName = new FixedString64Bytes(name);
+        return bytesName;
     }
 
     /// <summary>
