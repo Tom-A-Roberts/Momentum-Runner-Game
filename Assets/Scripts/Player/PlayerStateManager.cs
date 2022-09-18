@@ -181,7 +181,6 @@ public class PlayerStateManager : MonoBehaviour
         }
 
         CheckForServerStateChanges();
-
     }
 
     public void CheckForServerStateChanges()
@@ -242,6 +241,8 @@ public class PlayerStateManager : MonoBehaviour
             if(signedDistance < -0.2)
             {
                 playerNetworking._isDead.Value = true;
+                if (NetworkManager.Singleton.IsHost)
+                    GameStateManager.Singleton.TestForWinState();
             }
         }
     }
@@ -322,6 +323,8 @@ public class PlayerStateManager : MonoBehaviour
             GameStateManager.Singleton.ScreenRedEdges.color = newcol;
         }
     }
+
+    #region Locally Entering and Leaving States
 
     public void PlayerDeathLocally()
     {
@@ -462,13 +465,12 @@ public class PlayerStateManager : MonoBehaviour
 
         LeaveSpectatorModeLocally();
     }
+    #endregion
 
     public void ProcessPotentialHit(int playerHitID)
     {
         if (playerHitID != -1)
             Debug.Log("I think I ('" + this.gameObject.name + "') just shot player ID: " + playerHitID.ToString());
-
     }
-
 
 }

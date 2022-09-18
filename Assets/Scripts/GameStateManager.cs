@@ -100,32 +100,13 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     public HashSet<ulong> readiedPlayers;
 
-    /// <summary>
-    /// The current game state within the level
-    /// </summary>
-    public static GameState CurrentGameState => Singleton.gameStateSwitcher.GameState;
-    /// <summary>
-    /// The current game state within the level
-    /// </summary>
-    public GameState currentGameState => gameStateSwitcher.GameState;
+    public GameState GameState => _gameState.Value;
 
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
     private float railwayLength = 0;
     private Vector3[] railwayPoints;
     private Quaternion[] railwayDirections;
-
-    /// <summary>
-    /// Which game states the current level can be in
-    /// </summary>
-    public enum GameState
-    {
-        waitingToReadyUp,
-        readiedUp,
-        playingGame,
-        someoneHasWon,
-        podium
-    }
 
     #region Startup Functions
 
@@ -167,14 +148,10 @@ public class GameStateManager : NetworkBehaviour
         localPlayer.myPlayerStateController.playerAudioManager.SetupLevelSoundtracks(waitingToReadyUpSong, levelSoundTracks);
 
         gameStateSwitcher = new GameStateSwitcher(this);
-        if (DeveloperMode)
-        {
-            gameStateSwitcher.SwitchToPlayingGame(false);
-        }
 
         _zoneWidth = zoneStartWidth;
         // Only need to update this once since it doesn't change throughout the game.
-        if (!localPlayer.IsOwnedByServer)
+        if (!NetworkManager.Singleton.IsHost)
         {
             closingSpeed = _networkedClosingSpeed.Value;
 
@@ -183,6 +160,11 @@ public class GameStateManager : NetworkBehaviour
         }
         else
         {
+            if (DeveloperMode)
+                _gameState.Value = GameState.playingGame;
+            else
+                _gameState.Value = GameState.waitingToReadyUp;
+
             _networkedClosingSpeed.Value = (ushort)closingSpeed;
         }
 
@@ -196,318 +178,6 @@ public class GameStateManager : NetworkBehaviour
     }
     #endregion
 
-    /// <summary>
-    /// Handles switching between different game states such as readied up
-    /// </summary>
-    public class GameStateSwitcher
-    {
-        /// <summary>
-        /// Maintains the current state of the game (the current level)
-        /// </summary>
-        public GameState GameState => parent._gameState.Value;
-
-        /// <summary>
-        /// Sometimes localGameState may go out of sync with the server gamestate. The localGameState is tracked here so it
-        /// can resync where necessary.
-        /// </summary>
-        private GameState localGameState;
-
-        /// <summary>
-        /// The parent who owns this object
-        /// </summary>
-        public GameStateManager parent;
-
-        /// <summary>
-        /// Gets set in NetworkSpawn to the material of the ready up cube
-        /// </summary>
-        private Material readyUpCubeMaterial;
-        /// <summary>
-        /// Records the original height of the readyup cube so that it can be pressed down and released using the height
-        /// </summary>
-        private float readyUpCubeOriginalHeight;
-
-        /// <summary>
-        /// Counts down from 5.99 to 0 when everyone is readied up
-        /// </summary>
-        public float readiedCountdownProgress = 0;
-
-        public GameStateSwitcher(GameStateManager _parent)
-        {
-            parent = _parent;
-            localGameState = GameState.waitingToReadyUp;
-
-            if (parent.ReadyUpCube)
-            {
-                readyUpCubeMaterial = parent.ReadyUpCube.GetComponent<Renderer>().material;
-                readyUpCubeOriginalHeight = parent.ReadyUpCube.transform.position.y;
-            }
-            else
-                Debug.LogWarning("No ready up cube found! please assign it in the GameStateManager inspector");
-
-            SwitchToWaitingToReadyUp(false);
-        }
-
-        /// <summary>
-        /// Called by GameStateManager.Update()
-        /// </summary>
-        public void Update()
-        {
-            //Debug.Log(localGameState.ToString() + "  " + parent._gameState.Value.ToString());
-
-            if (localGameState != parent._gameState.Value)
-            {
-                LocallySwitchToGameState(parent._gameState.Value);
-            }
-
-            if(localGameState == GameState.readiedUp)
-            {
-                readiedCountdownProgress -= Time.deltaTime;
-                UpdateCountdown();
-                if(readiedCountdownProgress < 0)
-                {
-                    readiedCountdownProgress = 0;
-                    if(parent.localPlayer.IsOwnedByServer)
-                        SwitchToPlayingGame(true);
-                }
-            }
-            else
-            {
-                readiedCountdownProgress = 0;
-            }
-        }
-
-
-        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-        public void SwitchToWaitingToReadyUp(bool useEffects)
-        {
-            if (parent.localPlayer.IsOwnedByServer)
-                parent._gameState.Value = GameState.waitingToReadyUp;
-
-            SwitchFromState(localGameState, useEffects);
-            localGameState = GameState.waitingToReadyUp;
-            
-            if (parent.waitingToReadyUpPanel)
-                parent.waitingToReadyUpPanel.SetActive(true);
-
-            if (parent.ReadyUpBarrier)
-                parent.ReadyUpBarrier.SetActive(true);
-
-            if (!parent.DeveloperMode)
-                parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToReadyUpMusic();
-        }
-
-        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-        public void SwitchToReadiedUp(bool useEffects)
-        {
-            if (parent.localPlayer.IsOwnedByServer)
-                parent._gameState.Value = GameState.readiedUp;
-
-            SwitchFromState(localGameState, useEffects);
-            localGameState = GameState.readiedUp;
-
-            readiedCountdownProgress = 5.99f;
-
-            if (parent.CountdownPanel)
-                parent.CountdownPanel.SetActive(true);
-
-            if (parent.CountdownText)
-                parent.CountdownText.text = Mathf.FloorToInt(readiedCountdownProgress).ToString();
-
-            if (parent.ReadyUpBarrier)
-                parent.ReadyUpBarrier.SetActive(true);
-
-            if (!parent.DeveloperMode)
-                parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToCountdown();
-
-            if (parent.ReadyUpFloatingText)
-                parent.ReadyUpFloatingText.text = "";
-        }
-
-        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-        public void SwitchToPlayingGame(bool useEffects)
-        {
-            if (parent.localPlayer.IsOwnedByServer)
-                parent._gameState.Value = GameState.playingGame;
-
-            SwitchFromState(localGameState, useEffects);
-            localGameState = GameState.playingGame;
-
-            if (parent.ReadyUpBarrier)
-            {
-                parent.ReadyUpBarrier.SetActive(false);
-            }
-
-            if (parent.ReadyUpFloatingText)
-                parent.ReadyUpFloatingText.text = "";
-
-            if (!parent.DeveloperMode)
-                parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToGameplaySoundtrack();
-        }
-
-        /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-        public void SwitchToSomeoneHasWon(bool useEffects)
-        {
-            if (parent.localPlayer.IsOwnedByServer)
-                parent._gameState.Value = GameState.someoneHasWon;
-
-            SwitchFromState(localGameState, false);
-            localGameState = GameState.someoneHasWon;
-
-            if (parent.ReadyUpBarrier)
-                parent.ReadyUpBarrier.SetActive(false);
-
-            //if (localPlayerWon)
-            //    LocalPlayerWin();
-            //else
-            //    LocalPlayerLose();
-        }
-
-        public void SwitchToPodium(bool useEffects)
-        {
-            if (parent.localPlayer.IsOwnedByServer)
-                parent._gameState.Value = GameState.podium;
-            
-            SwitchFromState(localGameState, useEffects);
-            localGameState = GameState.podium;
-
-            if (parent.ReadyUpBarrier)
-                parent.ReadyUpBarrier.SetActive(false);
-        }
-
-        /// <summary>
-        /// When switching out from a state, this function turns off previous state effects
-        /// </summary>
-        private void SwitchFromState(GameState previousState, bool useEffects)
-        {
-            if(previousState == GameState.waitingToReadyUp)
-            {
-                if (parent.waitingToReadyUpPanel)
-                    parent.waitingToReadyUpPanel.SetActive(false);
-
-            }
-            else if(previousState == GameState.readiedUp)
-            {
-                if (parent.CountdownPanel)
-                    parent.CountdownPanel.SetActive(false);
-                
-            }
-            else if (previousState == GameState.playingGame)
-            {
-
-            }
-            else if (previousState == GameState.someoneHasWon)
-            {
-                if (WinLoseEffects.Singleton)
-                    WinLoseEffects.Singleton.EndEffects();
-            }
-            else if(previousState == GameState.podium)
-            {
-
-            }
-        }
-
-        public void LocallySwitchToGameState(GameState newGameState)
-        {
-            if (newGameState == GameState.waitingToReadyUp && localGameState != GameState.waitingToReadyUp)
-                SwitchToWaitingToReadyUp(true);
-            else if (newGameState == GameState.readiedUp && localGameState != GameState.readiedUp)
-                SwitchToReadiedUp(true);
-            else if (newGameState == GameState.playingGame && localGameState != GameState.playingGame)
-                SwitchToPlayingGame(true);
-            else if (newGameState == GameState.someoneHasWon && localGameState != GameState.someoneHasWon)
-                SwitchToSomeoneHasWon(true);
-            else if (newGameState == GameState.podium && localGameState != GameState.podium)
-                SwitchToPodium(true);
-        }
-
-        /// <summary>
-        /// Updates the countdown visuals and audio, such as the counter on the player's screen
-        /// </summary>
-        public void UpdateCountdown()
-        {
-            if (parent.CountdownText)
-                parent.CountdownText.text = Mathf.FloorToInt(readiedCountdownProgress).ToString();
-
-            parent.localPlayer.myPlayerStateController.playerAudioManager.PlaySoundsDuringCountdown(readiedCountdownProgress);
-        }
-
-        public void LocalPlayerWin()
-        {
-            if (WinLoseEffects.Singleton)
-            {
-                WinLoseEffects.Singleton.StartWinEffects();
-            }
-        }
-
-        public void LocalPlayerLose()
-        {
-            if (WinLoseEffects.Singleton)
-            {
-                WinLoseEffects.Singleton.StartLoseEffects();
-            }
-        }
-
-        /// <summary>
-        /// Initiates local effects when player has begun the ready up phase
-        /// </summary>
-        public void LocalStartReadyUpEffects()
-        {
-            if (readyUpCubeMaterial)
-            {
-                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 1);
-                readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
-                float newHeight = readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
-                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
-            }
-            if (parent.ReadyUpFloatingText)
-                parent.ReadyUpFloatingText.text = "...";
-        }
-        /// <summary>
-        /// Initiates local effects when player has readied up (confirmed by the server)
-        /// </summary>
-        public void LocalServerReadyUpEffects()
-        {
-            if (readyUpCubeMaterial)
-            {
-                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(0, 1, 1) * 8);
-                readyUpCubeMaterial.SetColor("_BaseColor", new Color(0, 1, 1));
-                float newHeight = readyUpCubeOriginalHeight;
-                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
-            }
-            if (parent.ReadyUpFloatingText)
-                parent.ReadyUpFloatingText.text = "Readied up!";
-        }
-        /// <summary>
-        /// Initiates local effects when player has begun the unready up phase
-        /// </summary>
-        public void LocalStartUnreadyEffects()
-        {
-            if (readyUpCubeMaterial)
-            {
-                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 1);
-                readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
-                float newHeight = readyUpCubeOriginalHeight - parent.ReadyUpCube.transform.localScale.y / 2;
-                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
-            }
-            if (parent.ReadyUpFloatingText)
-                parent.ReadyUpFloatingText.text = "...";
-        }
-        /// <summary>
-        /// Initiates local effects when player has unreadied (confirmed by the server)
-        /// </summary>
-        public void LocalServerUnreadyEffects()
-        {
-            if (readyUpCubeMaterial)
-            {
-                readyUpCubeMaterial.SetColor("_EmissiveColor", new Color(1, 0, 0) * 4);
-                readyUpCubeMaterial.SetColor("_BaseColor", new Color(1, 0, 0));
-                float newHeight = readyUpCubeOriginalHeight;
-                parent.ReadyUpCube.transform.position = new Vector3(parent.ReadyUpCube.transform.position.x, newHeight, parent.ReadyUpCube.transform.position.z);
-            }
-            if (parent.ReadyUpFloatingText)
-                parent.ReadyUpFloatingText.text = "Shoot this button to ready up";
-        }
-    }
 
     /// <summary>
     /// Update the game state data if host
@@ -537,11 +207,6 @@ public class GameStateManager : NetworkBehaviour
         }
 
         gameStateSwitcher.Update();
-
-        if (Input.GetKey(KeyCode.R))
-        {
-            gameStateSwitcher.SwitchToSomeoneHasWon(true);
-        }
     }
 
     /// <summary>
@@ -557,18 +222,16 @@ public class GameStateManager : NetworkBehaviour
 
     #region ServerRPCs
 
-    public void SendPlayerWins()
+    public void HostForceChangeGameState(GameState newGamestate)
     {
-
+        if (NetworkManager.Singleton.IsHost)
+            _gameState.Value = newGamestate;
     }
-
-    #endregion
 
     public void TestForWinState()
     {
-
-        List<ulong> markedForWin = new List<ulong>();
-        List<ulong> markedForDefeat = new List<ulong>();
+        int winCount = 0;
+        int loseCount = 0;
 
         foreach (var keyValuePair in PlayerNetworking.ConnectedPlayers)
         {
@@ -576,23 +239,70 @@ public class GameStateManager : NetworkBehaviour
 
             if (playerNetworking._isDead.Value)
             {
-                markedForDefeat.Add(keyValuePair.Key);
+                loseCount += 1;
             }
             else
             {
-                markedForWin.Add(keyValuePair.Key);
+                winCount += 1;
             }
         }
-        if (markedForWin.Count == 0 && markedForDefeat.Count > 0)
+        if (winCount == 0 && loseCount > 0)
         {
             Debug.LogWarning("Inconsistent State! nobody seems to have won somehow");
         }
-        if (markedForWin.Count <= 1 && markedForDefeat.Count > 0)
+        if (winCount <= 1 && loseCount > 0)
         {
             // player has won
-
+            LeaderboardData leaderboardData = GatherWinData();
+            
         }
     }
+
+
+    public LeaderboardData GatherWinData()
+    {
+        ulong[] _playerIDs = new ulong[PlayerNetworking.ConnectedPlayers.Count];
+        ushort[] _distancesTravelled = new ushort[PlayerNetworking.ConnectedPlayers.Count];
+        bool[] _playersWon = new bool[PlayerNetworking.ConnectedPlayers.Count];
+
+        int i = 0;
+        foreach (var keyValuePair in PlayerNetworking.ConnectedPlayers)
+        {
+            PlayerNetworking playerNetworking = keyValuePair.Value.GetComponent<PlayerNetworking>();
+            _playerIDs[i] = playerNetworking.OwnerClientId;
+            _distancesTravelled[i] = (ushort)playerNetworking.bodyRigidbody.position.x;
+
+            if (playerNetworking._isDead.Value)
+            {
+                _playersWon[i] = false;
+            }
+            else
+            {
+                _playersWon[i] = true;
+            }
+            i += 1;
+        }
+
+        return new LeaderboardData()
+        {
+            playerIDs = _playerIDs,
+            distancesTravelled = _distancesTravelled,
+            playersWon = _playersWon,
+        };
+    }
+
+    [ServerRpc]
+    public void SendLeaderboardDataServerRPC(LeaderboardData leaderboardData)
+    {
+        SendLeaderboardDataClientRPC(leaderboardData);
+    }
+    [ClientRpc]
+    public void SendLeaderboardDataClientRPC(LeaderboardData leaderboardData)
+    {
+        gameStateSwitcher.latestLeaderboardData = leaderboardData;
+    }
+
+    #endregion
 
     #region Wall Helper functions
 
@@ -744,5 +454,31 @@ struct ZoneStateData : INetworkSerializable
         serializer.SerializeValue(ref _zoneSpeed);
         serializer.SerializeValue(ref _zoneWidth);
         serializer.SerializeValue(ref _zoneProgress);
+    }
+}
+public struct LeaderboardData: INetworkSerializable
+{
+    public ulong[] playerIDs;
+    public ushort[] distancesTravelled;
+    public bool[] playersWon;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref playerIDs);
+        serializer.SerializeValue(ref distancesTravelled);
+        serializer.SerializeValue(ref playersWon);
+    }
+
+    public static LeaderboardData Empty
+    {
+        get
+        {
+            return new LeaderboardData()
+            {
+                playerIDs = null,
+                distancesTravelled = null,
+                playersWon = null
+            };
+        }
     }
 }
