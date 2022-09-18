@@ -141,7 +141,7 @@ public class PlayerController : MonoBehaviour
 
         float heightInput = Input.GetAxisRaw("HeightChange");
 
-        if (GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.someoneHasWon || GameStateManager.Singleton.gameStateSwitcher.GameState == GameStateManager.GameState.podium)
+        if (GameStateManager.Singleton.GameState == GameState.winState || GameStateManager.Singleton.GameState == GameState.podium)
         {
             processFinishStateMotion(axisValues.Item1, axisValues.Item2, heightInput);
 

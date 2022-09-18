@@ -56435,7 +56435,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh196886
+  m_Name: pb_Mesh439244
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -61199,7 +61199,7 @@ PrefabInstance:
       objectReference: {fileID: 661366441}
     - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: zoneProgress
-      value: 0.092
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: CountdownText

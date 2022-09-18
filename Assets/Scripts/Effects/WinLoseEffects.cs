@@ -115,12 +115,15 @@ public class LeaderboardEntry: IComparer<LeaderboardEntry>
     public float DistanceTravelled => _distanceTravelled;
     private float _distanceTravelled;
 
+    public bool PlayerWon => _playerWon;
+    private bool _playerWon;
 
-    public LeaderboardEntry(ulong playerID, ushort distanceTravelled)
+    public LeaderboardEntry(ulong playerID, ushort distanceTravelled, bool playerWon)
     {
         _playerID = playerID;
         _distanceTravelled = distanceTravelled;
-        if(GameStateManager.Singleton && GameStateManager.Singleton.localPlayer)
+        _playerWon = playerWon;
+        if (GameStateManager.Singleton && GameStateManager.Singleton.localPlayer)
         {
             _displayName = GameStateManager.Singleton.localPlayer.DisplayName;
         }
@@ -136,7 +139,7 @@ public class LeaderboardEntry: IComparer<LeaderboardEntry>
 
         for (int i = 0; i < leaderboardData.playerIDs.Length; i++)
         {
-            dataOut[i] = new LeaderboardEntry(leaderboardData.playerIDs[i], leaderboardData.distancesTravelled[i]);
+            dataOut[i] = new LeaderboardEntry(leaderboardData.playerIDs[i], leaderboardData.distancesTravelled[i], leaderboardData.playersWon[i]);
         }
         Array.Sort(dataOut);
         return dataOut;
@@ -144,29 +147,28 @@ public class LeaderboardEntry: IComparer<LeaderboardEntry>
 
     public int Compare(LeaderboardEntry x, LeaderboardEntry y)
     {
-        if(x.DistanceTravelled > y.DistanceTravelled)
+        if(x.PlayerWon && !y.PlayerWon)
         {
             return 1;
         }
-        else if (x.DistanceTravelled == y.DistanceTravelled)
-        {
-            return 0;
-        }
-        else
+        else if(!x.PlayerWon && y.PlayerWon)
         {
             return -1;
         }
-    }
-}
-
-public struct LeaderboardData
-{
-    public ulong[] playerIDs;
-    public ushort[] distancesTravelled;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref playerIDs);
-        serializer.SerializeValue(ref distancesTravelled);
+        else
+        {
+            if (x.DistanceTravelled > y.DistanceTravelled)
+            {
+                return 1;
+            }
+            else if (x.DistanceTravelled == y.DistanceTravelled)
+            {
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
+        }
     }
 }

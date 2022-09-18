@@ -259,7 +259,7 @@ public class PlayerNetworking : NetworkBehaviour
         // Reset player colliders then fire the shot serverside
         RollbackPlayerColliders(timeToCheck, true);
 
-        GameObject hitObj = GetShotTarget(shootStartPosition, shootDirection); 
+        GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
         serverHitHash = GetHashOfHit(hitObj);
 
         ResetPlayerColliders();
@@ -279,14 +279,14 @@ public class PlayerNetworking : NetworkBehaviour
             AnimateShot(shootStartPosition, shootDirection, timeToWait);
         }
 
-        TriggerShotResult(serverHitHash, timeToWait);
-    }
-
-    GameObject GetShotTarget(Vector3 shootStartPosition, Vector3 shootDirection)
-    {
-        GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
-
-        return hitObj;
+        if (timeToWait > 0)
+        {
+            StartCoroutine(SyncedShotResult(serverHitHash, timeToWait));
+        }
+        else
+        {
+            PerformShotResult(serverHitHash);
+        }
     }
 
     void AnimateShot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
@@ -308,18 +308,6 @@ public class PlayerNetworking : NetworkBehaviour
             yield return new WaitForSeconds(timeToWait);
 
         myGunController.DoShoot(shootStartPosition, shootDirection);
-    }
-
-    void TriggerShotResult(int hitHash, float timeToWait)
-    {
-        if (timeToWait > 0)
-        {
-            StartCoroutine(SyncedShotResult(hitHash, timeToWait));
-        }
-        else
-        {
-            PerformShotResult(hitHash);
-        }
     }
 
     IEnumerator SyncedShotResult(int hitHash, float timeToWait)
@@ -364,6 +352,7 @@ public class PlayerNetworking : NetworkBehaviour
                     {                        
                         if (hitGameObject.transform.tag == "Readyup")
                         {
+                            Debug.Log("jere");
                             ReadyUpStateChange();
                             return;
                         }
@@ -505,6 +494,21 @@ public class PlayerNetworking : NetworkBehaviour
 
     #region ReadyingUp
 
+
+    /// <summary>
+    /// When a client (the server, really) thinks everyone has readied up, they can prompt the server to do a check. Usually the server
+    /// itself does this. If the server agrees everyone is ready, then it calls the client RPC to say everyone is ready. At this point
+    /// it cannot be undone
+    /// </summary>
+    [ServerRpc(RequireOwnership =false)]
+    public void EveryoneHasReadiedUpServerRPC()
+    {
+        if (GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
+        {
+            GameStateManager.Singleton.HostForceChangeGameState(GameState.readiedUp);
+        }
+    }
+
     /// <summary>
     /// Toggles the current ready up state, sending a request to change state to the server. In the meantime, the waiting effects are applied, such as the button
     /// being half pressed.
@@ -552,6 +556,7 @@ public class PlayerNetworking : NetworkBehaviour
         // If everyone is ready and you are the host:
         if (IsHost && GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
         {
+            //Debug.Log("here");
             EveryoneHasReadiedUpServerRPC();
         }
     }
@@ -597,20 +602,6 @@ public class PlayerNetworking : NetworkBehaviour
     public void UnReadyUpClientRPC()
     {
         ServerUnready();
-    }
-
-    /// <summary>
-    /// When a client (the server, really) thinks everyone has readied up, they can prompt the server to do a check. Usually the server
-    /// itself does this. If the server agrees everyone is ready, then it calls the client RPC to say everyone is ready. At this point
-    /// it cannot be undone
-    /// </summary>
-    [ServerRpc(RequireOwnership =false)]
-    public void EveryoneHasReadiedUpServerRPC()
-    {
-        if(GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
-        {
-            GameStateManager.Singleton.gameStateSwitcher.SwitchToReadiedUp(true);
-        }
     }
 
     #endregion
