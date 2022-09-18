@@ -352,7 +352,6 @@ public class PlayerNetworking : NetworkBehaviour
                     {                        
                         if (hitGameObject.transform.tag == "Readyup")
                         {
-                            Debug.Log("jere");
                             ReadyUpStateChange();
                             return;
                         }

@@ -56435,7 +56435,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh439244
+  m_Name: pb_Mesh498262
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -61207,7 +61207,7 @@ PrefabInstance:
       objectReference: {fileID: 112149360}
     - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: DeveloperMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: CountdownPanel

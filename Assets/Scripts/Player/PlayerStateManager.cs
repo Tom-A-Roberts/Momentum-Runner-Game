@@ -308,20 +308,30 @@ public class PlayerStateManager : MonoBehaviour
     /// </summary>
     public void UpdateDeathWallEffects(Transform deathwallTransform, BoxCollider deathWallCollider)
     {
-        if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+        if (deathwallTransform.gameObject.activeSelf)
         {
-            Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, deathWallCollider, deathwallTransform.position, deathwallTransform.rotation);
+            if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+            {
+                Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, deathWallCollider, deathwallTransform.position, deathwallTransform.rotation);
 
-            float distance = Vector3.Distance(ClosestPoint, playerBody.position);
+                float distance = Vector3.Distance(ClosestPoint, playerBody.position);
 
-            float power = Mathf.Clamp01((deathwallRedStartDistance - distance) / deathwallRedStartDistance);
+                float power = Mathf.Clamp01((deathwallRedStartDistance - distance) / deathwallRedStartDistance);
 
-            playerAudioManager.UpdateDeathwallIntensity(power);
+                playerAudioManager.UpdateDeathwallIntensity(power);
 
+                Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
+                newcol.a = power;
+                GameStateManager.Singleton.ScreenRedEdges.color = newcol;
+            }
+        }
+        else
+        {
             Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
-            newcol.a = power;
+            newcol.a = 0;
             GameStateManager.Singleton.ScreenRedEdges.color = newcol;
         }
+
     }
 
     #region Locally Entering and Leaving States
