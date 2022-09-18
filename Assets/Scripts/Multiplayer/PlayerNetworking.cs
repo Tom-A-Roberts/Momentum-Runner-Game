@@ -361,7 +361,7 @@ public class PlayerNetworking : NetworkBehaviour
 
                     // finally ready up - only if owner
                     if (IsOwner)
-                    {
+                    {                        
                         if (hitGameObject.transform.tag == "Readyup")
                         {
                             ReadyUpStateChange();
@@ -379,21 +379,30 @@ public class PlayerNetworking : NetworkBehaviour
     /// <returns>IF the ray hit a network object, returns NetworkObjectID. ELSE, return -1</returns>
     int GetHashOfHit(GameObject rayHitObject)
     {
-        int hash = -1;
         if (rayHitObject != null)
         {
-            Transform prefabParent = rayHitObject.transform.root;
-            if (prefabParent != null)
+            // first check whether the object we hit has a NetworkObject
+            NetworkObject hitNetworkObject;
+            if (rayHitObject.TryGetComponent<NetworkObject>(out hitNetworkObject))
             {
-                NetworkObject hitNetworkObject;
-                if (prefabParent.TryGetComponent<NetworkObject>(out hitNetworkObject))
+                return (int)hitNetworkObject.NetworkObjectId;
+            }
+            else
+            {
+                // if not then try the parent? (currently only necessary for players)
+                // searching in children would be an extremely bad idea
+                Transform prefabParent = rayHitObject.transform.root;
+                if (prefabParent != null)
                 {
-                    hash = (int)hitNetworkObject.NetworkObjectId;
-                }    
+                    if (prefabParent.TryGetComponent<NetworkObject>(out hitNetworkObject))
+                    {
+                        return (int)hitNetworkObject.NetworkObjectId;
+                    }
+                }
             }
         }
 
-        return hash;
+        return -1;
     }
 
     /// <summary>
