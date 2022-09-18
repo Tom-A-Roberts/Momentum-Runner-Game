@@ -359,11 +359,14 @@ public class PlayerNetworking : NetworkBehaviour
                         return;
                     }
 
-                    // finally ready up
-                    if (hitGameObject.transform.tag == "Readyup")
+                    // finally ready up - only if owner
+                    if (IsOwner)
                     {
-                        ReadyUpStateChange();
-                        return;
+                        if (hitGameObject.transform.tag == "Readyup")
+                        {
+                            ReadyUpStateChange();
+                            return;
+                        }
                     }
                 }
             }
