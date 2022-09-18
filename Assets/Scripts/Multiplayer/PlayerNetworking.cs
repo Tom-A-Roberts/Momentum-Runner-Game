@@ -279,7 +279,14 @@ public class PlayerNetworking : NetworkBehaviour
             AnimateShot(shootStartPosition, shootDirection, timeToWait);
         }
 
-        TriggerShotResult(serverHitHash, timeToWait);
+        if (timeToWait > 0)
+        {
+            StartCoroutine(SyncedShotResult(serverHitHash, timeToWait));
+        }
+        else
+        {
+            PerformShotResult(serverHitHash);
+        }
     }
 
     void AnimateShot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
@@ -301,18 +308,6 @@ public class PlayerNetworking : NetworkBehaviour
             yield return new WaitForSeconds(timeToWait);
 
         myGunController.DoShoot(shootStartPosition, shootDirection);
-    }
-
-    void TriggerShotResult(int hitHash, float timeToWait)
-    {
-        if (timeToWait > 0)
-        {
-            StartCoroutine(SyncedShotResult(hitHash, timeToWait));
-        }
-        else
-        {
-            PerformShotResult(hitHash);
-        }
     }
 
     IEnumerator SyncedShotResult(int hitHash, float timeToWait)
