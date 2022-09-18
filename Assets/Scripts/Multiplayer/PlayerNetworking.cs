@@ -259,7 +259,7 @@ public class PlayerNetworking : NetworkBehaviour
         // Reset player colliders then fire the shot serverside
         RollbackPlayerColliders(timeToCheck, true);
 
-        GameObject hitObj = GetShotTarget(shootStartPosition, shootDirection); 
+        GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
         serverHitHash = GetHashOfHit(hitObj);
 
         ResetPlayerColliders();
@@ -280,13 +280,6 @@ public class PlayerNetworking : NetworkBehaviour
         }
 
         TriggerShotResult(serverHitHash, timeToWait);
-    }
-
-    GameObject GetShotTarget(Vector3 shootStartPosition, Vector3 shootDirection)
-    {
-        GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
-
-        return hitObj;
     }
 
     void AnimateShot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
@@ -364,6 +357,7 @@ public class PlayerNetworking : NetworkBehaviour
                     {
                         if (hitGameObject.transform.tag == "Readyup")
                         {
+                            Debug.Log("jere");
                             ReadyUpStateChange();
                             return;
                         }
