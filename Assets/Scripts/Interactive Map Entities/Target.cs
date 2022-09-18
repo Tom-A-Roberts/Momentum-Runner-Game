@@ -12,7 +12,8 @@ public class Target: MonoBehaviour, IShootInterface
     public void OnHitByLaser()
     {
         foreach (GameObject gb in ObjectsToChange)
-        {            
+        {
+            Debug.Log("test");
             gb.SetActive(!gb.activeSelf);
         }
     }
