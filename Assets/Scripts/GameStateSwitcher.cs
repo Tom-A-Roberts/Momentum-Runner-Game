@@ -320,7 +320,7 @@ public class GameStateSwitcher
     {
         leaderboardShowing = true;
         if (LeaderboardUI.Singleton)
-            LeaderboardUI.Singleton.ShowLeaderboard();
+            LeaderboardUI.Singleton.ShowLeaderboard(latestLeaderboardData);
     }
     private void HideLeaderboard()
     {

@@ -39,6 +39,11 @@ public class PlayerNetworking : NetworkBehaviour
     public static Dictionary<ulong, GameObject> ConnectedPlayers;
 
     /// <summary>
+    /// Gets set to the local (IsOwner) PlayerNetworking instance
+    /// </summary>
+    public static PlayerNetworking localPlayer;
+
+    /// <summary>
     /// Holds past player states. If IsOwner, then time is local time. If data is recieved from remote, then time is recieved from the remote owner.
     /// </summary>
     private List<KeyValuePair<float, PositionData>> positionHistory = new List<KeyValuePair<float, PositionData>>();
@@ -81,6 +86,7 @@ public class PlayerNetworking : NetworkBehaviour
     /// How smoothed out a multiplayer player's movement should be. Higher = smoother
     /// </summary>
     [SerializeField] private float _cheapInterpolationTime = 0.05f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -752,6 +758,7 @@ public class PlayerNetworking : NetworkBehaviour
         else
         {
             GameStateManager.Singleton.localPlayer = this;
+            localPlayer = this;
 
             // Activate the game state manager initialization:
             // Sadly has to be done here as the GameStateManager OnNetworkSpawn is unreliable
