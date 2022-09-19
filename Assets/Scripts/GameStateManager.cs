@@ -207,6 +207,9 @@ public class GameStateManager : NetworkBehaviour
         }
 
         gameStateSwitcher.Update();
+
+        if (Input.GetKeyDown(KeyCode.R))
+            GameStateManager.Singleton.TestForWinState();
     }
 
     /// <summary>
@@ -220,7 +223,7 @@ public class GameStateManager : NetworkBehaviour
     }
 
 
-    #region ServerRPCs
+    #region Winning/Losing Game
 
     public void HostForceChangeGameState(GameState newGamestate)
     {
@@ -250,11 +253,12 @@ public class GameStateManager : NetworkBehaviour
         {
             Debug.LogWarning("Inconsistent State! nobody seems to have won somehow");
         }
-        if (winCount <= 1 && loseCount > 0)
+        if ((winCount <= 1 && loseCount > 0) || DeveloperMode)
         {
             // player has won
+            HostForceChangeGameState(GameState.winState);
             LeaderboardData leaderboardData = GatherWinData();
-            
+            localPlayer.SendLeaderboardDataServerRPC(leaderboardData);
         }
     }
 
@@ -270,7 +274,7 @@ public class GameStateManager : NetworkBehaviour
         {
             PlayerNetworking playerNetworking = keyValuePair.Value.GetComponent<PlayerNetworking>();
             _playerIDs[i] = playerNetworking.OwnerClientId;
-            _distancesTravelled[i] = (ushort)playerNetworking.bodyRigidbody.position.x;
+            _distancesTravelled[i] = (ushort)playerNetworking.bodyRigidbody.position.z;
 
             if (playerNetworking._isDead.Value)
             {
@@ -289,17 +293,6 @@ public class GameStateManager : NetworkBehaviour
             distancesTravelled = _distancesTravelled,
             playersWon = _playersWon,
         };
-    }
-
-    [ServerRpc]
-    public void SendLeaderboardDataServerRPC(LeaderboardData leaderboardData)
-    {
-        SendLeaderboardDataClientRPC(leaderboardData);
-    }
-    [ClientRpc]
-    public void SendLeaderboardDataClientRPC(LeaderboardData leaderboardData)
-    {
-        gameStateSwitcher.latestLeaderboardData = leaderboardData;
     }
 
     #endregion

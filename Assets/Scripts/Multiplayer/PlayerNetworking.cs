@@ -661,6 +661,22 @@ public class PlayerNetworking : NetworkBehaviour
     }
     #endregion
 
+    #region Winning/Losing Game
+
+    [ServerRpc]
+    public void SendLeaderboardDataServerRPC(LeaderboardData leaderboardData)
+    {
+        
+        SendLeaderboardDataClientRPC(leaderboardData);
+    }
+    [ClientRpc]
+    public void SendLeaderboardDataClientRPC(LeaderboardData leaderboardData)
+    {
+        GameStateManager.Singleton.gameStateSwitcher.RecieveLeaderboardData(leaderboardData);
+    }
+
+    #endregion
+
     /// <summary>
     /// Called by the player who joins, they modify the static list that persists across all playerNetworking instances locally.
     /// If the static instance doesn't exist, it is created
