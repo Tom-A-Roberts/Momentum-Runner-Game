@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LeaderboardUI : MonoBehaviour
 {
@@ -10,10 +12,10 @@ public class LeaderboardUI : MonoBehaviour
 
     public GameObject LeaderboardUIObject;
     public GameObject LeaderboardContentObject;
-    public GameObject TitleRow;
+    public Button ReplayLevelButton;
     public GameObject LocalPlayerDataRowTemplate;
     public GameObject RemotePlayerDataRowTemplate;
-
+   
     public bool IsShowing => _isShowing;
     private bool _isShowing = false;
 
@@ -53,6 +55,10 @@ public class LeaderboardUI : MonoBehaviour
 
         LeaderboardEntry[] leaderboardTable = LeaderboardEntry.CreateLeaderboardFromStruct(leaderboardData);
 
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            ReplayLevelButton.interactable = false;
+        }
 
         for (int row = 0; row < leaderboardTable.Length; row++)
         {

@@ -366,7 +366,7 @@ public class PlayerNetworking : NetworkBehaviour
                     // finally ready up - only if owner
                     if (IsOwner)
                     {                        
-                        if (hitGameObject.transform.tag == "Readyup")
+                        if (hitGameObject.transform.tag == "Readyup" && GameStateManager.Singleton.GameState == GameState.waitingToReadyUp)
                         {
                             ReadyUpStateChange();
                             return;
@@ -520,7 +520,7 @@ public class PlayerNetworking : NetworkBehaviour
     {
         if (GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
         {
-            GameStateManager.Singleton.HostForceChangeGameState(GameState.readiedUp);
+            GameStateManager.Singleton.ServerForceChangeGameState(GameState.readiedUp);
         }
     }
 
@@ -530,7 +530,7 @@ public class PlayerNetworking : NetworkBehaviour
     /// </summary>
     public void ReadyUpStateChange()
     {
-        if (IsOwner && GameStateManager.Singleton.gameStateSwitcher.GameState == GameState.waitingToReadyUp)
+        if (IsOwner)
         {
             if (_playerReadyUpState == ReadyUpState.ready)
             {
@@ -700,7 +700,9 @@ public class PlayerNetworking : NetworkBehaviour
     public void ResetPlayerClientRPC()
     {
         ResetPlayerLocally();
+
     }
+
     /// <summary>
     /// Resets them to the beginning of the map, and wipes their distance and speed stats
     /// </summary>
@@ -708,14 +710,25 @@ public class PlayerNetworking : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsHost)
         {
+            GameStateManager.Singleton.ServerForceChangeGameState(GameState.waitingToReadyUp);
+
             myStatsTracker.ResetStats();
             _isDead.Value = false;
             _isRespawning.Value = false;
             _isSpectating.Value = false;
-            ServerTeleportPlayer(myPlayerStateController.bodySpawnPosition);
+
+            //ServerTeleportPlayer(myPlayerStateController.bodySpawnPosition);
         }
 
+        if (IsOwner)
+        {
+            myPlayerStateController.TeleportPlayer(myPlayerStateController.bodySpawnPosition);
 
+            if (_playerReadyUpState == ReadyUpState.ready)
+            {
+                ReadyUpStateChange();
+            }
+        }
     }
 
     #endregion

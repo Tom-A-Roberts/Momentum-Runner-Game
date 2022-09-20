@@ -39,9 +39,9 @@ public class GameStateManager : NetworkBehaviour
     [Tooltip("The speed at which the playable zone gets smaller")]
     public float closingSpeed = 0;
     [Tooltip("The zone progress at the start of the game, measured in laps as the unit.")]
-    public float zoneProgress = 0;
+    public float zoneStartProgress = 0;
     [Tooltip("The speed of the zone at the start of the game, measured in meters per second")]
-    public float zoneSpeed = 1;
+    public float zoneStartSpeed = 1;
     [Tooltip("How wide the zone starts in meters")]
     public float zoneStartWidth = 350;
 
@@ -74,6 +74,10 @@ public class GameStateManager : NetworkBehaviour
     /// The distance in meters between the fog wall and the death wall
     /// </summary>
     private float _zoneWidth;
+
+    private float _zoneSpeed = 1;
+
+    private float _zoneProgress = 0;
 
     /// <summary>
     /// The local player who is playing this game (IsOwner = true).
@@ -124,7 +128,6 @@ public class GameStateManager : NetworkBehaviour
 
     void Start()
     {
-        _zoneWidth = zoneStartWidth;
         if (railwayPointsList == null)
         {
             throw new System.Exception("\"railwayPointsList is set to null.\\n Therefore no wall points found to use when moving the deathwall and fogwall!\"");
@@ -155,6 +158,8 @@ public class GameStateManager : NetworkBehaviour
         gameStateSwitcher = new GameStateSwitcher(this);
 
         _zoneWidth = zoneStartWidth;
+        _zoneSpeed = zoneStartSpeed;
+        _zoneProgress = zoneStartProgress;
         // Only need to update this once since it doesn't change throughout the game.
         if (!NetworkManager.Singleton.IsHost)
         {
@@ -173,23 +178,31 @@ public class GameStateManager : NetworkBehaviour
             _networkedClosingSpeed.Value = (ushort)closingSpeed;
         }
 
-        if (GameStateManager.Singleton.gameStateSwitcher.GameState != GameState.waitingToReadyUp)
-        {
-            if (localPlayer.PlayerReadyUpState == ReadyUpState.unready || localPlayer.PlayerReadyUpState == ReadyUpState.waitingToUnready)
-            {
-                localPlayer.ReadyUpStateChange();
-            }
-        }
+        //if (GameStateManager.Singleton.gameStateSwitcher.GameState != GameState.waitingToReadyUp)
+        //{
+        //    if (localPlayer.PlayerReadyUpState == ReadyUpState.unready || localPlayer.PlayerReadyUpState == ReadyUpState.waitingToUnready)
+        //    {
+        //        localPlayer.ReadyUpStateChange();
+        //    }
+        //}
     }
     #endregion
 
-    public void ResetAllPlayers()
+    public void ResetLevelToBeginning()
     {
         if (NetworkManager.IsHost)
         {
+            _zoneWidth = zoneStartWidth;
+            _zoneSpeed = zoneStartSpeed;
+            _zoneProgress = zoneStartProgress;
+
             foreach (GameObject player in PlayerNetworking.ConnectedPlayers.Values)
             {
-                player.GetComponent<PlayerNetworking>().ResetPlayerServerside();
+                PlayerNetworking currentNetworking = player.GetComponent<PlayerNetworking>();
+                currentNetworking.ResetPlayerServerside();
+
+                //Debug.Log(currentNetworking.myPlayerStateController.bodySpawnPosition);
+                currentNetworking.ServerTeleportPlayer(currentNetworking.myPlayerStateController.bodySpawnPosition);
             }
         }
     }
@@ -208,9 +221,9 @@ public class GameStateManager : NetworkBehaviour
 
             ZoneStateData stateData = new ZoneStateData()
             {
-                ZoneProgress = zoneProgress,
+                ZoneProgress = _zoneProgress,
                 ZoneWidth = _zoneWidth,
-                ZoneSpeed = zoneSpeed
+                ZoneSpeed = _zoneSpeed
             };
             _zoneState.Value = stateData;
         }
@@ -233,15 +246,15 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     private void ChangedZoneState(ZoneStateData oldGameState, ZoneStateData newGameState)
     {
-        zoneProgress = newGameState.ZoneProgress;
+        _zoneProgress = newGameState.ZoneProgress;
         _zoneWidth = newGameState.ZoneWidth;
-        zoneSpeed = newGameState.ZoneSpeed;
+        _zoneSpeed = newGameState.ZoneSpeed;
     }
 
 
     #region Winning/Losing Game
 
-    public void HostForceChangeGameState(GameState newGamestate)
+    public void ServerForceChangeGameState(GameState newGamestate)
     {
         if (NetworkManager.Singleton.IsHost)
             _gameState.Value = newGamestate;
@@ -272,7 +285,7 @@ public class GameStateManager : NetworkBehaviour
         if ((winCount <= 1 && loseCount > 0) || DeveloperMode)
         {
             // player has won
-            HostForceChangeGameState(GameState.winState);
+            ServerForceChangeGameState(GameState.winState);
             LeaderboardData leaderboardData = GatherWinData();
             localPlayer.SendLeaderboardDataServerRPC(leaderboardData);
         }
@@ -341,26 +354,26 @@ public class GameStateManager : NetworkBehaviour
         {
             if (gameStateSwitcher.GameState == GameState.playingGame)
             {
-                metersToTravel = zoneSpeed * Time.deltaTime;
+                metersToTravel = _zoneSpeed * Time.deltaTime;
                 _zoneWidth -= Time.deltaTime * closingSpeed;
             }
         }
 
         float widthInLapsUnits = convertMetersToLapsUnits(_zoneWidth);
-        zoneProgress += convertMetersToLapsUnits(metersToTravel);
+        _zoneProgress += convertMetersToLapsUnits(metersToTravel);
 
         // Move position of death wall along
         if (deathWall)
         {
             Quaternion deathwallRotationOffset = Quaternion.Euler(90, 0, 0);
-            SetWallPositionAndRotationToProgress(deathWall.transform, zoneProgress - (widthInLapsUnits / 2), deathwallRotationOffset);
+            SetWallPositionAndRotationToProgress(deathWall.transform, _zoneProgress - (widthInLapsUnits / 2), deathwallRotationOffset);
         }
 
         // Move position of fog wall along
         if (fogWall)
         {
             Quaternion fogwallRotationOffset = Quaternion.Euler(0, 180, 0);
-            SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress + (widthInLapsUnits / 2), fogwallRotationOffset);
+            SetWallPositionAndRotationToProgress(fogWall.transform, _zoneProgress + (widthInLapsUnits / 2), fogwallRotationOffset);
         }
     }
 

@@ -43,6 +43,7 @@ public class GameStateSwitcher
     /// Gets set in NetworkSpawn to the material of the ready up cube
     /// </summary>
     private Material readyUpCubeMaterial;
+
     /// <summary>
     /// Records the original height of the readyup cube so that it can be pressed down and released using the height
     /// </summary>
@@ -117,7 +118,7 @@ public class GameStateSwitcher
                 readiedCountdownProgress = 0;
                 if (NetworkManager.Singleton.IsHost)
                 {
-                    GameStateManager.Singleton.HostForceChangeGameState(GameState.playingGame);
+                    GameStateManager.Singleton.ServerForceChangeGameState(GameState.playingGame);
                 } 
             }
         }
@@ -152,7 +153,7 @@ public class GameStateSwitcher
         SwitchFromState(localGameState);
 
         if (localGameState != GameState.readiedUp && NetworkManager.Singleton.IsHost)
-            GameStateManager.Singleton.ResetAllPlayers();
+            GameStateManager.Singleton.ResetLevelToBeginning();
 
         localGameState = GameState.waitingToReadyUp;
 
@@ -172,7 +173,7 @@ public class GameStateSwitcher
         SwitchFromState(localGameState);
 
         if (localGameState != GameState.waitingToReadyUp && NetworkManager.Singleton.IsHost)
-            GameStateManager.Singleton.ResetAllPlayers();
+            GameStateManager.Singleton.ResetLevelToBeginning();
 
         localGameState = GameState.readiedUp;
 
@@ -255,21 +256,21 @@ public class GameStateSwitcher
         }
         else if (previousState == GameState.winState)
         {
+            if (localWinLoseEffectsActive && WinLoseEffects.Singleton)
+                WinLoseEffects.Singleton.EndEffects();
             hasRecievedLeaderboardData = false;
             localWinLoseEffectsActive = false;
             readiedCountdownProgress = 0;
-            if (localWinLoseEffectsActive && WinLoseEffects.Singleton)
-                WinLoseEffects.Singleton.EndEffects();
             if (leaderboardShowing)
                 HideLeaderboard();
         }
         else if (previousState == GameState.podium)
         {
+            if (localWinLoseEffectsActive && WinLoseEffects.Singleton)
+                WinLoseEffects.Singleton.EndEffects();
             hasRecievedLeaderboardData = false;
             localWinLoseEffectsActive = false;
             readiedCountdownProgress = 0;
-            if (localWinLoseEffectsActive && WinLoseEffects.Singleton)
-                WinLoseEffects.Singleton.EndEffects();
             if (leaderboardShowing)
                 HideLeaderboard();
         }

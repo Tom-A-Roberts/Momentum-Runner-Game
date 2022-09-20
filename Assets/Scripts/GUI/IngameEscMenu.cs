@@ -94,7 +94,8 @@ public class IngameEscMenu : MonoBehaviour
 
     public void ReplayLevelButton()
     {
-
+        if (NetworkManager.Singleton.IsHost)
+            GameStateManager.Singleton.ResetLevelToBeginning();
     }
 
     private void QuitApplication()

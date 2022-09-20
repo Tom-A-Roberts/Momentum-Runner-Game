@@ -150,6 +150,7 @@ public class PlayerAudioManager : NetworkBehaviour
     }
     public void SwitchToReadyUpMusic()
     {
+        
         if (musicSource)
         {
             musicSource.clip = waitingToReadyUpSong;

@@ -31,8 +31,6 @@ public class StatsTracker
         public int LapsCompleted;
         public float AverageSpeed;
         public float FastestSpeed;
-
-        public bool writtenTo;
     }
 
     public StatsTracker(PlayerNetworking _playerNetworking, PlayerStateManager _playerStateManager, Rigidbody _playerRigidbody)
