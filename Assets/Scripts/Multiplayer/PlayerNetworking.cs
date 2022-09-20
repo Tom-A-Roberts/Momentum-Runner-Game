@@ -34,9 +34,19 @@ public class PlayerNetworking : NetworkBehaviour
     private PlayerController myPlayerController;
 
     /// <summary>
+    /// Stats are ONLY tracked by the host
+    /// </summary>
+    public StatsTracker myStatsTracker;
+
+    /// <summary>
     /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
     /// </summary>
     public static Dictionary<ulong, GameObject> ConnectedPlayers;
+
+    /// <summary>
+    /// Gets set to the local (IsOwner) PlayerNetworking instance
+    /// </summary>
+    public static PlayerNetworking localPlayer;
 
     /// <summary>
     /// Holds past player states. If IsOwner, then time is local time. If data is recieved from remote, then time is recieved from the remote owner.
@@ -82,6 +92,7 @@ public class PlayerNetworking : NetworkBehaviour
     /// </summary>
     [SerializeField] private float _cheapInterpolationTime = 0.05f;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -104,6 +115,11 @@ public class PlayerNetworking : NetworkBehaviour
             {
                 HandlePositionData(serverTime);
             }
+        }
+
+        if (NetworkManager.Singleton.IsHost && myStatsTracker != null)
+        {
+            myStatsTracker.Update(_netState.Value.PositionData.Velocity);
         }
     }
 
@@ -661,6 +677,49 @@ public class PlayerNetworking : NetworkBehaviour
     }
     #endregion
 
+    #region Winning/Losing Game
+
+    [ServerRpc]
+    public void SendLeaderboardDataServerRPC(LeaderboardData leaderboardData)
+    {
+        
+        SendLeaderboardDataClientRPC(leaderboardData);
+    }
+    [ClientRpc]
+    public void SendLeaderboardDataClientRPC(LeaderboardData leaderboardData)
+    {
+        GameStateManager.Singleton.gameStateSwitcher.RecieveLeaderboardData(leaderboardData);
+    }
+
+    public void ResetPlayerServerside()
+    {
+        ResetPlayerClientRPC();
+    }
+
+    [ClientRpc]
+    public void ResetPlayerClientRPC()
+    {
+        ResetPlayerLocally();
+    }
+    /// <summary>
+    /// Resets them to the beginning of the map, and wipes their distance and speed stats
+    /// </summary>
+    public void ResetPlayerLocally()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            myStatsTracker.ResetStats();
+            _isDead.Value = false;
+            _isRespawning.Value = false;
+            _isSpectating.Value = false;
+            ServerTeleportPlayer(myPlayerStateController.bodySpawnPosition);
+        }
+
+
+    }
+
+    #endregion
+
     /// <summary>
     /// Called by the player who joins, they modify the static list that persists across all playerNetworking instances locally.
     /// If the static instance doesn't exist, it is created
@@ -709,6 +768,9 @@ public class PlayerNetworking : NetworkBehaviour
         // OR: not sure it matters if this is always on?
         MultiplayerCollider.enabled = true; //!IsOwner;
 
+        if (NetworkManager.Singleton.IsHost)
+            myStatsTracker = new StatsTracker(this, myPlayerStateController, bodyRigidbody);
+
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)
         {
@@ -736,6 +798,7 @@ public class PlayerNetworking : NetworkBehaviour
         else
         {
             GameStateManager.Singleton.localPlayer = this;
+            localPlayer = this;
 
             // Activate the game state manager initialization:
             // Sadly has to be done here as the GameStateManager OnNetworkSpawn is unreliable

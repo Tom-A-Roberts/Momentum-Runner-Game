@@ -242,10 +242,14 @@ public class PlayerStateManager : MonoBehaviour
             {
                 playerNetworking._isDead.Value = true;
                 if (NetworkManager.Singleton.IsHost)
+                {
                     GameStateManager.Singleton.TestForWinState();
+                }
             }
         }
     }
+
+
 
     public void ShowMultiplayerRepresentation()
     {
@@ -301,6 +305,15 @@ public class PlayerStateManager : MonoBehaviour
 
         playerBody.velocity = Vector3.zero;
         playerFeet.velocity = Vector3.zero;
+    }
+
+    /// <summary>
+    /// Activated every time this player completes a lap
+    /// </summary>
+    public void HasCompletedLap()
+    {
+        Debug.Log("Lap complete!");
+        // Not implemented yet
     }
 
     /// <summary>

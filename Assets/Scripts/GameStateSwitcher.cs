@@ -20,6 +20,9 @@ public enum GameState
 /// </summary>
 public class GameStateSwitcher
 {
+    const float readyUpCountdownTime = 5.99f;
+    const float victoryScreenTimeBeforeSwitch = 3f;
+
     /// <summary>
     /// Maintains the current state of the game (the current level)
     /// </summary>
@@ -45,16 +48,26 @@ public class GameStateSwitcher
     /// </summary>
     private float readyUpCubeOriginalHeight;
 
+    private LeaderboardData latestLeaderboardData;
+
+    private bool hasRecievedLeaderboardData = false;
+
+    private bool localWinLoseEffectsActive = false;
+
+    private bool leaderboardShowing = false;
+
+    public float TimeInPlayingState => _timeInPlayingState;
+    private float _timeInPlayingState = 0;
+
     /// <summary>
     /// Counts down from 5.99 to 0 when everyone is readied up
     /// </summary>
     public float readiedCountdownProgress = 0;
 
-    public LeaderboardData latestLeaderboardData;
-
-    private bool recievedLeaderboardData;
-
-    private bool localWinLoseEffectsActive = false;
+    /// <summary>
+    /// When a victory or defeat happens, this counter counts down from 5. When it reaches 0, the leaderboard is shown
+    /// </summary>
+    private float leaderboardShowTimerProgress = 0;
 
     public GameStateSwitcher(GameStateManager _parent)
     {
@@ -62,7 +75,10 @@ public class GameStateSwitcher
         localGameState = GameState.waitingToReadyUp;
 
         latestLeaderboardData = LeaderboardData.Empty;
-        recievedLeaderboardData = false;
+        hasRecievedLeaderboardData = false;
+        localWinLoseEffectsActive = false;
+        if (leaderboardShowing)
+            HideLeaderboard();
 
         if (parent.ReadyUpCube)
         {
@@ -72,7 +88,7 @@ public class GameStateSwitcher
         else
             Debug.LogWarning("No ready up cube found! please assign it in the GameStateManager inspector");
 
-        SwitchToWaitingToReadyUp(false);
+        SwitchToWaitingToReadyUp();
     }
 
     /// <summary>
@@ -87,48 +103,58 @@ public class GameStateSwitcher
             LocallySwitchToGameState(GameStateManager.Singleton.GameState);
         }
 
+        if(localGameState == GameState.playingGame)
+        {
+            _timeInPlayingState += Time.deltaTime;
+        }
+
         if (localGameState == GameState.readiedUp)
         {
             readiedCountdownProgress -= Time.deltaTime;
-            UpdateCountdown();
+            UpdateCountdownVisuals();
             if (readiedCountdownProgress < 0)
             {
                 readiedCountdownProgress = 0;
                 if (NetworkManager.Singleton.IsHost)
                 {
-
                     GameStateManager.Singleton.HostForceChangeGameState(GameState.playingGame);
-                }
-                    
+                } 
             }
         }
         else
-        {
             readiedCountdownProgress = 0;
+
+        if (hasRecievedLeaderboardData && localGameState == GameState.winState && localWinLoseEffectsActive && !leaderboardShowing)
+        {
+            leaderboardShowTimerProgress -= Time.deltaTime;
+            if (leaderboardShowTimerProgress < 0)
+            {
+                leaderboardShowTimerProgress = 0;
+                ShowLeaderboard();
+            }
         }
 
-        if (recievedLeaderboardData && localGameState == GameState.winState && !localWinLoseEffectsActive)
+        if (hasRecievedLeaderboardData && localGameState == GameState.winState && !localWinLoseEffectsActive)
         {
-
+            DecideIfLocalPlayerWonOrLost();
         }
     }
 
     public void RecieveLeaderboardData(LeaderboardData leaderboardData)
     {
-        recievedLeaderboardData = true;
+        hasRecievedLeaderboardData = true;
         latestLeaderboardData = leaderboardData;
     }
 
 
-    /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-    private void SwitchToWaitingToReadyUp(bool useEffects)
+    private void SwitchToWaitingToReadyUp()
     {
+        SwitchFromState(localGameState);
 
-        SwitchFromState(localGameState, useEffects);
+        if (localGameState != GameState.readiedUp && NetworkManager.Singleton.IsHost)
+            GameStateManager.Singleton.ResetAllPlayers();
+
         localGameState = GameState.waitingToReadyUp;
-
-        recievedLeaderboardData = false;
-
 
         if (parent.waitingToReadyUpPanel)
             parent.waitingToReadyUpPanel.SetActive(true);
@@ -141,15 +167,16 @@ public class GameStateSwitcher
     }
 
     /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-    private void SwitchToReadiedUp(bool useEffects)
+    private void SwitchToReadiedUp()
     {
+        SwitchFromState(localGameState);
 
-        SwitchFromState(localGameState, useEffects);
+        if (localGameState != GameState.waitingToReadyUp && NetworkManager.Singleton.IsHost)
+            GameStateManager.Singleton.ResetAllPlayers();
+
         localGameState = GameState.readiedUp;
 
-        recievedLeaderboardData = false;
-
-        readiedCountdownProgress = 5.99f;
+        readiedCountdownProgress = readyUpCountdownTime;
 
         if (parent.CountdownPanel)
             parent.CountdownPanel.SetActive(true);
@@ -168,12 +195,11 @@ public class GameStateSwitcher
     }
 
     /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-    private void SwitchToPlayingGame(bool useEffects)
+    private void SwitchToPlayingGame()
     {
-        SwitchFromState(localGameState, useEffects);
+        SwitchFromState(localGameState);
         localGameState = GameState.playingGame;
-
-        recievedLeaderboardData = false;
+        _timeInPlayingState = 0;
 
         if (parent.ReadyUpBarrier)
         {
@@ -188,18 +214,18 @@ public class GameStateSwitcher
     }
 
     /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
-    private void SwitchToSomeoneHasWon(bool useEffects)
+    private void SwitchToSomeoneHasWon()
     {
-        SwitchFromState(localGameState, false);
+        SwitchFromState(localGameState);
         localGameState = GameState.winState;
 
         if (parent.ReadyUpBarrier)
             parent.ReadyUpBarrier.SetActive(false);
     }
 
-    private void SwitchToPodium(bool useEffects)
+    private void SwitchToPodium()
     {
-        SwitchFromState(localGameState, useEffects);
+        SwitchFromState(localGameState);
         localGameState = GameState.podium;
 
         if (parent.ReadyUpBarrier)
@@ -209,7 +235,7 @@ public class GameStateSwitcher
     /// <summary>
     /// When switching out from a state, this function turns off previous state effects
     /// </summary>
-    private void SwitchFromState(GameState previousState, bool useEffects)
+    private void SwitchFromState(GameState previousState)
     {
         if (previousState == GameState.waitingToReadyUp)
         {
@@ -225,37 +251,48 @@ public class GameStateSwitcher
         }
         else if (previousState == GameState.playingGame)
         {
-
+            
         }
         else if (previousState == GameState.winState)
         {
-            if (WinLoseEffects.Singleton)
+            hasRecievedLeaderboardData = false;
+            localWinLoseEffectsActive = false;
+            readiedCountdownProgress = 0;
+            if (localWinLoseEffectsActive && WinLoseEffects.Singleton)
                 WinLoseEffects.Singleton.EndEffects();
+            if (leaderboardShowing)
+                HideLeaderboard();
         }
         else if (previousState == GameState.podium)
         {
-
+            hasRecievedLeaderboardData = false;
+            localWinLoseEffectsActive = false;
+            readiedCountdownProgress = 0;
+            if (localWinLoseEffectsActive && WinLoseEffects.Singleton)
+                WinLoseEffects.Singleton.EndEffects();
+            if (leaderboardShowing)
+                HideLeaderboard();
         }
     }
 
     private void LocallySwitchToGameState(GameState newGameState)
     {
         if (newGameState == GameState.waitingToReadyUp && localGameState != GameState.waitingToReadyUp)
-            SwitchToWaitingToReadyUp(true);
+            SwitchToWaitingToReadyUp();
         else if (newGameState == GameState.readiedUp && localGameState != GameState.readiedUp)
-            SwitchToReadiedUp(true);
+            SwitchToReadiedUp();
         else if (newGameState == GameState.playingGame && localGameState != GameState.playingGame)
-            SwitchToPlayingGame(true);
+            SwitchToPlayingGame();
         else if (newGameState == GameState.winState && localGameState != GameState.winState)
-            SwitchToSomeoneHasWon(true);
+            SwitchToSomeoneHasWon();
         else if (newGameState == GameState.podium && localGameState != GameState.podium)
-            SwitchToPodium(true);
+            SwitchToPodium();
     }
 
     /// <summary>
     /// Updates the countdown visuals and audio, such as the counter on the player's screen
     /// </summary>
-    private void UpdateCountdown()
+    private void UpdateCountdownVisuals()
     {
         if (parent.CountdownText)
         {
@@ -264,11 +301,48 @@ public class GameStateSwitcher
                 parent.CountdownText.text = value.ToString();
             else
                 parent.CountdownText.text = "...";
-
         }
-            
-
         parent.localPlayer.myPlayerStateController.playerAudioManager.PlaySoundsDuringCountdown(readiedCountdownProgress);
+    }
+
+    private void DecideIfLocalPlayerWonOrLost()
+    {
+        leaderboardShowTimerProgress = victoryScreenTimeBeforeSwitch;
+        bool playerFound = false;
+        for (int i = 0; i < latestLeaderboardData.playerIDs.Length; i++)
+        {
+            if (latestLeaderboardData.playerIDs[i] == parent.localPlayer.OwnerClientId)
+            {
+                if (latestLeaderboardData.playersWon[i])
+                {
+                    LocalPlayerWin();
+                }
+                else
+                {
+                    LocalPlayerLose();
+                }
+                playerFound = true;
+                break;
+            }
+        }
+        // If player wasn't in the leaderboard information, still make them lose
+        if (!playerFound)
+        {
+            LocalPlayerLose();
+        }
+    }
+
+    private void ShowLeaderboard()
+    {
+        leaderboardShowing = true;
+        if (LeaderboardUI.Singleton)
+            LeaderboardUI.Singleton.ShowLeaderboard(latestLeaderboardData);
+    }
+    private void HideLeaderboard()
+    {
+        leaderboardShowing = false;
+        if (LeaderboardUI.Singleton)
+            LeaderboardUI.Singleton.HideLeaderboard();
     }
 
     private void LocalPlayerWin()

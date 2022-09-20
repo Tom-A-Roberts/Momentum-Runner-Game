@@ -70,7 +70,9 @@ public class IngameEscMenu : MonoBehaviour
     {
         escapeMenuUIObject.SetActive(false);
         isEscMenuShowing = false;
-        LockCursor();
+
+        if(!LeaderboardUI.Singleton.IsShowing)
+            LockCursor();
     }
 
     private delegate void OnNetworkShutdown();
@@ -88,6 +90,11 @@ public class IngameEscMenu : MonoBehaviour
     public void QuitToDesktop()
     {
         StartCoroutine(NetworkShutdown(QuitApplication));
+    }
+
+    public void ReplayLevelButton()
+    {
+
     }
 
     private void QuitApplication()
