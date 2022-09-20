@@ -299,6 +299,8 @@ public class PlayerStateManager : MonoBehaviour
 
     public void TeleportPlayer(Vector3 newBodyPosition)
     {
+        playerBody.position = newBodyPosition;
+        playerFeet.position = newBodyPosition - bodyFeetOffset;
         playerBody.transform.position = newBodyPosition;
         playerFeet.transform.position = newBodyPosition - bodyFeetOffset;
         playerFeet.transform.rotation = feetStartRotation;

@@ -44,6 +44,8 @@ public class PlayerAudioManager : NetworkBehaviour
     public AudioClip countdownStart;
     public AudioClip countdownBeep;
     public AudioClip countdownEnd;
+    public AudioClip victorySound;
+    public AudioClip defeatSound;
     // Start is called before the first frame update
 
     [SerializeField]
@@ -156,9 +158,20 @@ public class PlayerAudioManager : NetworkBehaviour
             musicSource.volume = musicVolume * 0.9f;
             musicSource.loop = true;
             musicSource.PlayDelayed(1);
-
         }
     }
+
+    public void VictorySound()
+    {
+        if (mainAudioSource != null)
+            mainAudioSource.PlayOneShot(victorySound, startVolume * 0.9f);
+    }
+    public void DefeatSound()
+    {
+        if (mainAudioSource != null)
+            mainAudioSource.PlayOneShot(defeatSound, startVolume * 0.7f);
+    }
+
     public void SwitchToCountdown()
     {
         if (musicSource)
