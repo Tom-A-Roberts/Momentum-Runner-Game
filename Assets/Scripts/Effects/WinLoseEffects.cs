@@ -33,6 +33,8 @@ public class WinLoseEffects : MonoBehaviour
 
     public void StartWinEffects()
     {
+        PlayerNetworking.localPlayer.myPlayerStateController.playerAudioManager.VictorySound();
+
         victoryImage.SetActive(true);
         if (!depthEffect.active)
             depthEffect.active = true;
@@ -46,6 +48,8 @@ public class WinLoseEffects : MonoBehaviour
 
     public void StartLoseEffects()
     {
+        PlayerNetworking.localPlayer.myPlayerStateController.playerAudioManager.DefeatSound();
+
         defeatImage.SetActive(true);
         if (!depthEffect.active)
             depthEffect.active = true;

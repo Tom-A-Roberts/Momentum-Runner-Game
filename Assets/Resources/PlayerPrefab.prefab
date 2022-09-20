@@ -912,6 +912,8 @@ MonoBehaviour:
   countdownStart: {fileID: 8300000, guid: 550365b304244ed4383b68179575d377, type: 3}
   countdownBeep: {fileID: 8300000, guid: b29eee395940cf747bb20893856b58f0, type: 3}
   countdownEnd: {fileID: 8300000, guid: fceb26558f3f80648af6f75d568a35e5, type: 3}
+  victorySound: {fileID: 8300000, guid: c4697ab5bf84cdd4d86abeb0c373554b, type: 3}
+  defeatSound: {fileID: 8300000, guid: 4dfe236a74e02e34cbfc54b04b3a2597, type: 3}
   spectatorMode: 0
 --- !u!114 &4316027073834798312
 MonoBehaviour:
@@ -1751,9 +1753,6 @@ MonoBehaviour:
   bodyCollider: {fileID: 4316027074644905777}
   feetCollider: {fileID: 4316027073947639283}
   deathwallRedStartDistance: 15
-  _spectatorMode: 0
-  _isRespawningAndIsHost: 0
-  _isRespawning: 0
 --- !u!114 &1445570255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1766,6 +1765,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 884aac00e318e124e84a2498b2d3280b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isDead:
+    m_InternalValue: 0
+  _isSpectating:
+    m_InternalValue: 0
+  _isRespawning:
+    m_InternalValue: 0
   myPlayerStateController: {fileID: 153934500}
   myCamera: {fileID: 4316027073834798100}
   grappleGun: {fileID: 8853182101087441441}
