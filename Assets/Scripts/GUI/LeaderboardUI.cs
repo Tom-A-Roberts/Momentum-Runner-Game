@@ -56,7 +56,7 @@ public class LeaderboardUI : MonoBehaviour
 
         for (int row = 0; row < leaderboardTable.Length; row++)
         {
-            Debug.Log(leaderboardTable[row].DisplayName + " - " + leaderboardTable[row].PlayerID.ToString() + " - " + PlayerNetworking.localPlayer.OwnerClientId.ToString() + " - " + leaderboardTable[row].DistanceTravelled.ToString());
+            //Debug.Log(leaderboardTable[row].DisplayName + " - " + leaderboardTable[row].PlayerID.ToString() + " - " + PlayerNetworking.localPlayer.OwnerClientId.ToString() + " - " + leaderboardTable[row].DistanceTravelled.ToString());
 
             GameObject rowPrefabToSpawn;
             if (leaderboardTable[row].PlayerID == PlayerNetworking.localPlayer.OwnerClientId)
@@ -77,6 +77,7 @@ public class LeaderboardUI : MonoBehaviour
             spawnedRow.transform.Find("PositionText").GetComponent<TMP_Text>().text = positionString;
             spawnedRow.transform.Find("PlayerText").GetComponent<TMP_Text>().text = leaderboardTable[row].DisplayName;
             spawnedRow.transform.Find("DistanceText").GetComponent<TMP_Text>().text = String.Format("{0:n0}", leaderboardTable[row].DistanceTravelled) + " m";
+            spawnedRow.transform.Find("LapsCompletedText").GetComponent<TMP_Text>().text = String.Format("{0:n0}", leaderboardTable[row].LapsCompleted);
             spawnedRow.transform.Find("AvSpeedText").GetComponent<TMP_Text>().text = String.Format("{0:n0}", leaderboardTable[row].AverageSpeed) + " m/s";
             spawnedRow.transform.Find("FastestSpeedText").GetComponent<TMP_Text>().text = String.Format("{0:n0}", leaderboardTable[row].FastestSpeed) + " m/s";
             spawnedRow.SetActive(true);
@@ -114,14 +115,20 @@ public class LeaderboardEntry : IComparer<LeaderboardEntry>, IComparable<Leaderb
     public float FastestSpeed => _fastestSpeed;
     private float _fastestSpeed;
 
+    public int LapsCompleted => _lapsCompleted;
+    private int _lapsCompleted;
+
     public bool PlayerWon => _playerWon;
     private bool _playerWon;
 
-    public LeaderboardEntry(ulong playerID, ushort distanceTravelled, bool playerWon)
+    public LeaderboardEntry(ulong playerID, ushort distanceTravelled, ushort averageSpeed, ushort fastestSpeed, int lapsCompleted, bool playerWon)
     {
         _playerID = playerID;
         _distanceTravelled = distanceTravelled;
         _playerWon = playerWon;
+        _averageSpeed = averageSpeed;
+        _fastestSpeed = fastestSpeed;
+        _lapsCompleted = lapsCompleted;
         if (GameStateManager.Singleton && GameStateManager.Singleton.localPlayer)
         {
             _displayName = PlayerNetworking.ConnectedPlayers[playerID].GetComponent<PlayerNetworking>().DisplayName;
@@ -138,9 +145,15 @@ public class LeaderboardEntry : IComparer<LeaderboardEntry>, IComparable<Leaderb
 
         for (int i = 0; i < leaderboardData.playerIDs.Length; i++)
         {
-            dataOut[i] = new LeaderboardEntry(leaderboardData.playerIDs[i], leaderboardData.distancesTravelled[i], leaderboardData.playersWon[i]);
+            dataOut[i] = new LeaderboardEntry(leaderboardData.playerIDs[i], 
+                leaderboardData.distancesTravelled[i], 
+                leaderboardData.averageSpeeds[i], 
+                leaderboardData.fastestSpeeds[i], 
+                leaderboardData.lapsCompleted[i], 
+                leaderboardData.playersWon[i]);
         }
         Array.Sort(dataOut);
+        Array.Reverse(dataOut);
         return dataOut;
     }
 

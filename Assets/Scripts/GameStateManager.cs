@@ -105,8 +105,13 @@ public class GameStateManager : NetworkBehaviour
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
     private float railwayLength = 0;
-    private Vector3[] railwayPoints;
-    private Quaternion[] railwayDirections;
+    public float RailwayLength => railwayLength;
+
+    [System.NonSerialized]
+    public Vector3[] railwayPoints;
+
+    [System.NonSerialized]
+    public Quaternion[] railwayDirections;
 
     #region Startup Functions
 
@@ -210,6 +215,7 @@ public class GameStateManager : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
             GameStateManager.Singleton.TestForWinState();
+
     }
 
     /// <summary>
@@ -267,14 +273,23 @@ public class GameStateManager : NetworkBehaviour
     {
         ulong[] _playerIDs = new ulong[PlayerNetworking.ConnectedPlayers.Count];
         ushort[] _distancesTravelled = new ushort[PlayerNetworking.ConnectedPlayers.Count];
+        ushort[] _averageSpeeds = new ushort[PlayerNetworking.ConnectedPlayers.Count];
+        ushort[] _fastestSpeeds = new ushort[PlayerNetworking.ConnectedPlayers.Count];
+        int[] _lapsCompleted = new int[PlayerNetworking.ConnectedPlayers.Count];
         bool[] _playersWon = new bool[PlayerNetworking.ConnectedPlayers.Count];
 
         int i = 0;
         foreach (var keyValuePair in PlayerNetworking.ConnectedPlayers)
         {
             PlayerNetworking playerNetworking = keyValuePair.Value.GetComponent<PlayerNetworking>();
+
+            StatsTracker.StatsSummary stats = playerNetworking.myStatsTracker.ProduceLeaderboardStats();
+
             _playerIDs[i] = playerNetworking.OwnerClientId;
-            _distancesTravelled[i] = (ushort)playerNetworking.bodyRigidbody.position.z;
+            _distancesTravelled[i] = (ushort)stats.DistanceTravelled;
+            _averageSpeeds[i] = (ushort)stats.AverageSpeed;
+            _fastestSpeeds[i] = (ushort)stats.FastestSpeed;
+            _lapsCompleted[i] = (int)stats.LapsCompleted;
 
             if (playerNetworking._isDead.Value)
             {
@@ -291,6 +306,9 @@ public class GameStateManager : NetworkBehaviour
         {
             playerIDs = _playerIDs,
             distancesTravelled = _distancesTravelled,
+            averageSpeeds = _averageSpeeds,
+            fastestSpeeds = _fastestSpeeds,
+            lapsCompleted = _lapsCompleted,
             playersWon = _playersWon,
         };
     }
@@ -329,7 +347,7 @@ public class GameStateManager : NetworkBehaviour
         // Move position of fog wall along
         if (fogWall)
         {
-            Quaternion fogwallRotationOffset = Quaternion.Euler(0, 0, 0);
+            Quaternion fogwallRotationOffset = Quaternion.Euler(0, 180, 0);
             SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress + (widthInLapsUnits / 2), fogwallRotationOffset);
         }
     }
@@ -387,6 +405,16 @@ public class GameStateManager : NetworkBehaviour
     public float convertMetersToLapsUnits(float meters)
     {
         return meters / railwayLength;
+    }
+
+    public float convertRailwayPointToDistance(int railwayPoint)
+    {
+        return ((float)railwayPoint / (float)railwayPoints.Length) * railwayLength;
+    }
+
+    public float convertRailwayPointToLaps(int railwayPoint)
+    {
+        return ((float)railwayPoint / (float)railwayPoints.Length);
     }
 
     /// <summary>
@@ -453,12 +481,18 @@ public struct LeaderboardData: INetworkSerializable
 {
     public ulong[] playerIDs;
     public ushort[] distancesTravelled;
+    public ushort[] averageSpeeds;
+    public ushort[] fastestSpeeds;
+    public int[] lapsCompleted;
     public bool[] playersWon;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref playerIDs);
         serializer.SerializeValue(ref distancesTravelled);
+        serializer.SerializeValue(ref averageSpeeds);
+        serializer.SerializeValue(ref fastestSpeeds);
+        serializer.SerializeValue(ref lapsCompleted);
         serializer.SerializeValue(ref playersWon);
     }
 

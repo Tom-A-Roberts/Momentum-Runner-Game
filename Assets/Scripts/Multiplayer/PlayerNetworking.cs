@@ -34,6 +34,11 @@ public class PlayerNetworking : NetworkBehaviour
     private PlayerController myPlayerController;
 
     /// <summary>
+    /// Stats are ONLY tracked by the host
+    /// </summary>
+    public StatsTracker myStatsTracker;
+
+    /// <summary>
     /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
     /// </summary>
     public static Dictionary<ulong, GameObject> ConnectedPlayers;
@@ -110,6 +115,11 @@ public class PlayerNetworking : NetworkBehaviour
             {
                 HandlePositionData(serverTime);
             }
+        }
+
+        if (NetworkManager.Singleton.IsHost && myStatsTracker != null)
+        {
+            myStatsTracker.Update(_netState.Value.PositionData.Velocity);
         }
     }
 
@@ -730,6 +740,9 @@ public class PlayerNetworking : NetworkBehaviour
 
         // OR: not sure it matters if this is always on?
         MultiplayerCollider.enabled = true; //!IsOwner;
+
+        if (NetworkManager.Singleton.IsHost)
+            myStatsTracker = new StatsTracker(this, myPlayerStateController, bodyRigidbody);
 
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)

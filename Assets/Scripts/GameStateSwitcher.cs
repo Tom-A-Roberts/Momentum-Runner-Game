@@ -56,6 +56,9 @@ public class GameStateSwitcher
 
     private bool leaderboardShowing = false;
 
+    public float TimeInPlayingState => _timeInPlayingState;
+    private float _timeInPlayingState = 0;
+
     /// <summary>
     /// Counts down from 5.99 to 0 when everyone is readied up
     /// </summary>
@@ -98,6 +101,11 @@ public class GameStateSwitcher
         if (localGameState != GameStateManager.Singleton.GameState)
         {
             LocallySwitchToGameState(GameStateManager.Singleton.GameState);
+        }
+
+        if(localGameState == GameState.playingGame)
+        {
+            _timeInPlayingState += Time.deltaTime;
         }
 
         if (localGameState == GameState.readiedUp)
@@ -184,6 +192,7 @@ public class GameStateSwitcher
     {
         SwitchFromState(localGameState);
         localGameState = GameState.playingGame;
+        _timeInPlayingState = 0;
 
         if (parent.ReadyUpBarrier)
         {
@@ -235,7 +244,7 @@ public class GameStateSwitcher
         }
         else if (previousState == GameState.playingGame)
         {
-
+            
         }
         else if (previousState == GameState.winState)
         {

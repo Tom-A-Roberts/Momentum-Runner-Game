@@ -304,6 +304,15 @@ public class PlayerStateManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Activated every time this player completes a lap
+    /// </summary>
+    public void HasCompletedLap()
+    {
+        Debug.Log("Lap complete!");
+        // Not implemented yet
+    }
+
+    /// <summary>
     /// As the deathwall gets closer to the player, the effects show up on the screen more
     /// </summary>
     public void UpdateDeathWallEffects(Transform deathwallTransform, BoxCollider deathWallCollider)
