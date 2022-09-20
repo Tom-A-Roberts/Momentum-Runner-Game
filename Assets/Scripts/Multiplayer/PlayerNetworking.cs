@@ -691,6 +691,33 @@ public class PlayerNetworking : NetworkBehaviour
         GameStateManager.Singleton.gameStateSwitcher.RecieveLeaderboardData(leaderboardData);
     }
 
+    public void ResetPlayerServerside()
+    {
+        ResetPlayerClientRPC();
+    }
+
+    [ClientRpc]
+    public void ResetPlayerClientRPC()
+    {
+        ResetPlayerLocally();
+    }
+    /// <summary>
+    /// Resets them to the beginning of the map, and wipes their distance and speed stats
+    /// </summary>
+    public void ResetPlayerLocally()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            myStatsTracker.ResetStats();
+            _isDead.Value = false;
+            _isRespawning.Value = false;
+            _isSpectating.Value = false;
+            ServerTeleportPlayer(myPlayerStateController.bodySpawnPosition);
+        }
+
+
+    }
+
     #endregion
 
     /// <summary>

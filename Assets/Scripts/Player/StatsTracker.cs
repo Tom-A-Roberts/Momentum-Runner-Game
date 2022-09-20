@@ -22,12 +22,17 @@ public class StatsTracker
 
     private float fastestSpeed = 0;
 
+    private float latestTimeWhenAlive = 0;
+    private Vector3 latestPositionWhenAlive;
+
     public struct StatsSummary
     {
         public float DistanceTravelled;
         public int LapsCompleted;
         public float AverageSpeed;
         public float FastestSpeed;
+
+        public bool writtenTo;
     }
 
     public StatsTracker(PlayerNetworking _playerNetworking, PlayerStateManager _playerStateManager, Rigidbody _playerRigidbody)
@@ -37,40 +42,55 @@ public class StatsTracker
         myPlayerRigidbody = _playerRigidbody;
         latestLapInt = 0;
         fastestSpeed = 0;
+        latestTimeWhenAlive = 0;
+        latestPositionWhenAlive = _playerRigidbody.position;
+}
+
+    public void ResetStats()
+    {
+        latestLapInt = 0;
+        fastestSpeed = 0;
+        latestTimeWhenAlive = 0;
+        latestPositionWhenAlive = myPlayerRigidbody.position;
     }
 
     public void Update(Vector3 currentVelocity)
     {
-        Vector2 currentPlanarSpeed = new Vector2(currentVelocity.x, currentVelocity.z);
-        float currentSpeed = currentPlanarSpeed.magnitude;
+        if (!myPlayerStateManager.IsDead)
+        {
+            Vector2 currentPlanarSpeed = new Vector2(currentVelocity.x, currentVelocity.z);
+            float currentSpeed = currentPlanarSpeed.magnitude;
 
-        if (currentSpeed > fastestSpeed)
-        {
-            fastestSpeed = currentSpeed;
-        }
+            if (currentSpeed > fastestSpeed)
+            {
+                fastestSpeed = currentSpeed;
+            }
 
-        int LapInt = GetLapIntAroundTrack(myPlayerRigidbody.position);
-        if(LapInt > latestLapInt && LapInt < latestLapInt + lapLeeway)
-        {
-            latestLapInt = LapInt;
+            int LapInt = GetLapIntAroundTrack(myPlayerRigidbody.position);
+            if (LapInt > latestLapInt && LapInt < latestLapInt + lapLeeway)
+            {
+                latestLapInt = LapInt;
+            }
+            if (LapInt < lapLeeway && latestLapInt > GameStateManager.Singleton.railwayPoints.Length - lapLeeway)
+            {
+                latestLapInt = LapInt;
+                HasCompletedLap();
+            }
+
+            latestTimeWhenAlive = GameStateManager.Singleton.gameStateSwitcher.TimeInPlayingState;
+            latestPositionWhenAlive = myPlayerRigidbody.position;
         }
-        if(LapInt < lapLeeway && latestLapInt > GameStateManager.Singleton.railwayPoints.Length - lapLeeway)
-        {
-            latestLapInt = LapInt;
-            HasCompletedLap();
-        }
-        
     }
 
     public StatsSummary ProduceLeaderboardStats()
     {
-        float _distanceTravelled = GetLapDistanceAroundTrack(myPlayerRigidbody.position) + numberOfLaps * GameStateManager.Singleton.RailwayLength;
+        float _distanceTravelled = GetLapDistanceAroundTrack(latestPositionWhenAlive) + numberOfLaps * GameStateManager.Singleton.RailwayLength;
         if (latestLapInt == 0 && numberOfLaps == 0)
             _distanceTravelled = 0;
 
         float _averageSpeed = 0;
         if (GameStateManager.Singleton.gameStateSwitcher.TimeInPlayingState > 0)
-            _averageSpeed = _distanceTravelled / GameStateManager.Singleton.gameStateSwitcher.TimeInPlayingState;
+            _averageSpeed = _distanceTravelled / latestTimeWhenAlive;
         return new StatsSummary()
         {
             DistanceTravelled = _distanceTravelled,

@@ -150,6 +150,10 @@ public class GameStateSwitcher
     private void SwitchToWaitingToReadyUp()
     {
         SwitchFromState(localGameState);
+
+        if (localGameState != GameState.readiedUp && NetworkManager.Singleton.IsHost)
+            GameStateManager.Singleton.ResetAllPlayers();
+
         localGameState = GameState.waitingToReadyUp;
 
         if (parent.waitingToReadyUpPanel)
@@ -165,8 +169,11 @@ public class GameStateSwitcher
     /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
     private void SwitchToReadiedUp()
     {
-
         SwitchFromState(localGameState);
+
+        if (localGameState != GameState.waitingToReadyUp && NetworkManager.Singleton.IsHost)
+            GameStateManager.Singleton.ResetAllPlayers();
+
         localGameState = GameState.readiedUp;
 
         readiedCountdownProgress = readyUpCountdownTime;

@@ -183,6 +183,16 @@ public class GameStateManager : NetworkBehaviour
     }
     #endregion
 
+    public void ResetAllPlayers()
+    {
+        if (NetworkManager.IsHost)
+        {
+            foreach (GameObject player in PlayerNetworking.ConnectedPlayers.Values)
+            {
+                player.GetComponent<PlayerNetworking>().ResetPlayerServerside();
+            }
+        }
+    }
 
     /// <summary>
     /// Update the game state data if host
@@ -314,6 +324,8 @@ public class GameStateManager : NetworkBehaviour
     }
 
     #endregion
+
+
 
     #region Wall Helper functions
 

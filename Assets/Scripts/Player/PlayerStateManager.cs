@@ -242,10 +242,14 @@ public class PlayerStateManager : MonoBehaviour
             {
                 playerNetworking._isDead.Value = true;
                 if (NetworkManager.Singleton.IsHost)
+                {
                     GameStateManager.Singleton.TestForWinState();
+                }
             }
         }
     }
+
+
 
     public void ShowMultiplayerRepresentation()
     {
