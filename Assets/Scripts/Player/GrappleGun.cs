@@ -173,12 +173,16 @@ public class GrappleGun : MonoBehaviour
         const float initialSpherecastDeadzone = 2;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
-            return new GrappleablePointInfo()
+            if (hit.transform.CompareTag("Grappleable"))
             {
-                targetFound = true,
-                grapplePoint = hit.point,
-                grappleDistance = hit.distance,
-            };
+                Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
+                return new GrappleablePointInfo()
+                {
+                    targetFound = true,
+                    grapplePoint = hit.point,
+                    grappleDistance = hit.distance,
+                };
+            }
         }
         else 
         {
@@ -186,12 +190,16 @@ public class GrappleGun : MonoBehaviour
             float spherecastLength = MaxGrappleLength - (AimAssistRadius/1) - initialSpherecastDeadzone;
             if (Physics.SphereCast(spherecastStart, (AimAssistRadius/1), PlayerCamera.transform.forward, out hit, spherecastLength, LayerMask.GetMask("Terrain")))
             {
-                return new GrappleablePointInfo()
+                if (hit.transform.CompareTag("Grappleable"))
                 {
-                    targetFound = true,
-                    grapplePoint = hit.point,
-                    grappleDistance = Vector3.Distance(hit.point, PlayerCamera.transform.position),
-                };
+                    Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
+                    return new GrappleablePointInfo()
+                    {
+                        targetFound = true,
+                        grapplePoint = hit.point,
+                        grappleDistance = Vector3.Distance(hit.point, PlayerCamera.transform.position),
+                    };
+                }
             }
             //else
             //{

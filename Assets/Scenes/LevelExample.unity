@@ -2962,7 +2962,7 @@ GameObject:
   - component: {fileID: 179959095}
   m_Layer: 6
   m_Name: Cube (4)
-  m_TagString: Untagged
+  m_TagString: Grappleable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -9751,7 +9751,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh419734
+  m_Name: pb_Mesh36296
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -12019,7 +12019,7 @@ GameObject:
   - component: {fileID: 751274316}
   m_Layer: 6
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: Grappleable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -13579,7 +13579,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh420576
+  m_Name: pb_Mesh36562
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -15306,7 +15306,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh422134
+  m_Name: pb_Mesh36990
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
