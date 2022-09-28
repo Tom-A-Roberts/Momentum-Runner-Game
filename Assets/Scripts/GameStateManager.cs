@@ -189,7 +189,13 @@ public class GameStateManager : NetworkBehaviour
         else
         {
             if (DeveloperMode)
+            {
                 _gameState.Value = GameState.playingGame;
+                if(fogWall)
+                    fogWall.SetActive(false);
+                if(deathWall)
+                    deathWall.SetActive(false);
+            }
             else
                 _gameState.Value = GameState.waitingToReadyUp;
 

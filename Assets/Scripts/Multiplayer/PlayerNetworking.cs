@@ -753,7 +753,7 @@ public class PlayerNetworking : NetworkBehaviour
 
         ConnectedPlayers[OwnerClientId] = gameObject;
         ConnectedPlayerNetworkingScripts[OwnerClientId] = gameObject.GetComponent<PlayerNetworking>();
-        Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayerNetworkingScripts.Keys.Count.ToString() + " players.");
     }
 
     /// <summary>
@@ -763,7 +763,7 @@ public class PlayerNetworking : NetworkBehaviour
     {
         ConnectedPlayers.Remove(OwnerClientId);
         ConnectedPlayerNetworkingScripts.Remove(OwnerClientId);
-        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayerNetworkingScripts.Keys.Count.ToString() + " players.");
 
         if (IsOwner)
         {
