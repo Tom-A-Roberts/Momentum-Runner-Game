@@ -18,12 +18,16 @@ public class StatsTracker
 
     public int numberOfLaps = 0;
 
+    public float LatestPosition => latestPosition;
+
     private int latestLapInt = 0;
 
     private float fastestSpeed = 0;
 
     private float latestTimeWhenAlive = 0;
     private Vector3 latestPositionWhenAlive;
+
+    private float latestPosition = 0;
 
     public struct StatsSummary
     {
@@ -64,7 +68,7 @@ public class StatsTracker
                 fastestSpeed = currentSpeed;
             }
 
-            int LapInt = GetLapIntAroundTrack(myPlayerRigidbody.position);
+            int LapInt = GetLapIntAroundTrack(myPlayerRigidbody.position, ref latestPosition);
             if (LapInt > latestLapInt && LapInt < latestLapInt + lapLeeway)
             {
                 latestLapInt = LapInt;
@@ -82,7 +86,8 @@ public class StatsTracker
 
     public StatsSummary ProduceLeaderboardStats()
     {
-        float _distanceTravelled = GetLapDistanceAroundTrack(latestPositionWhenAlive) + numberOfLaps * GameStateManager.Singleton.RailwayLength;
+        GetLapIntAroundTrack(latestPositionWhenAlive, ref latestPosition);
+        float _distanceTravelled = latestPosition + numberOfLaps * GameStateManager.Singleton.RailwayLength;
         if (latestLapInt == 0 && numberOfLaps == 0)
             _distanceTravelled = 0;
 
@@ -104,56 +109,56 @@ public class StatsTracker
         PlayerNetworking.localPlayer.myPlayerStateController.HasCompletedLap();
     }
 
-    public static int GetLapIntAroundTrack(Vector3 pos)
-    {
-        if (GameStateManager.Singleton.railwayPoints != null && GameStateManager.Singleton.railwayPoints.Length > 1)
-        {
-            Vector3 closestPointPosition = GameStateManager.Singleton.railwayPoints[0];
-            int closestPoint = 0;
-            float closestDistance = Vector3.Distance(pos, closestPointPosition);
+    //public static int GetLapIntAroundTrack(Vector3 pos)
+    //{
+    //    if (GameStateManager.Singleton.railwayPoints != null && GameStateManager.Singleton.railwayPoints.Length > 1)
+    //    {
+    //        Vector3 closestPointPosition = GameStateManager.Singleton.railwayPoints[0];
+    //        int closestPoint = 0;
+    //        float closestDistance = Vector3.Distance(pos, closestPointPosition);
 
-            for (int i = 1; i < GameStateManager.Singleton.railwayPoints.Length; i++)
-            {
-                float dist = Vector3.Distance(pos, GameStateManager.Singleton.railwayPoints[i]);
-                if (dist < closestDistance)
-                {
-                    closestPoint = i;
-                    closestDistance = dist;
-                    closestPointPosition = GameStateManager.Singleton.railwayPoints[i];
-                }
-            }
-            int pointA;
+    //        for (int i = 1; i < GameStateManager.Singleton.railwayPoints.Length; i++)
+    //        {
+    //            float dist = Vector3.Distance(pos, GameStateManager.Singleton.railwayPoints[i]);
+    //            if (dist < closestDistance)
+    //            {
+    //                closestPoint = i;
+    //                closestDistance = dist;
+    //                closestPointPosition = GameStateManager.Singleton.railwayPoints[i];
+    //            }
+    //        }
+    //        int pointA;
 
-            int pointAfter = closestPoint + 1;
-            int pointBefore = closestPoint - 1;
-            if (pointAfter >= GameStateManager.Singleton.railwayPoints.Length)
-                pointAfter -= GameStateManager.Singleton.railwayPoints.Length;
-            if (pointBefore <= -1)
-                pointBefore += GameStateManager.Singleton.railwayPoints.Length;
+    //        int pointAfter = closestPoint + 1;
+    //        int pointBefore = closestPoint - 1;
+    //        if (pointAfter >= GameStateManager.Singleton.railwayPoints.Length)
+    //            pointAfter -= GameStateManager.Singleton.railwayPoints.Length;
+    //        if (pointBefore <= -1)
+    //            pointBefore += GameStateManager.Singleton.railwayPoints.Length;
 
-            float afterPointDistance = Vector3.Distance(pos, GameStateManager.Singleton.railwayPoints[pointAfter]);
-            float beforePointDistance = Vector3.Distance(pos, GameStateManager.Singleton.railwayPoints[pointBefore]);
-            if (afterPointDistance < beforePointDistance)
-            {
-                pointA = closestPoint;
-            }
-            else
-            {
-                pointA = pointBefore;
-            }
-            // Flip result:
-            int result = GameStateManager.Singleton.railwayPoints.Length - pointA;
-            //if (result == GameStateManager.Singleton.railwayPoints.Length)
-            //    result = 0;
+    //        float afterPointDistance = Vector3.Distance(pos, GameStateManager.Singleton.railwayPoints[pointAfter]);
+    //        float beforePointDistance = Vector3.Distance(pos, GameStateManager.Singleton.railwayPoints[pointBefore]);
+    //        if (afterPointDistance < beforePointDistance)
+    //        {
+    //            pointA = closestPoint;
+    //        }
+    //        else
+    //        {
+    //            pointA = pointBefore;
+    //        }
+    //        // Flip result:
+    //        int result = GameStateManager.Singleton.railwayPoints.Length - pointA;
+    //        //if (result == GameStateManager.Singleton.railwayPoints.Length)
+    //        //    result = 0;
 
 
 
-            return result - 1;
-        }
-        return 0;
-    }
+    //        return result - 1;
+    //    }
+    //    return 0;
+    //}
 
-    public static float GetLapDistanceAroundTrack(Vector3 pos)
+    public static int GetLapIntAroundTrack(Vector3 pos, ref float distance)
     {
         if(GameStateManager.Singleton.railwayPoints != null && GameStateManager.Singleton.railwayPoints.Length > 1)
         {
@@ -201,10 +206,6 @@ public class StatsTracker
             Vector3 pointAForwards = GameStateManager.Singleton.railwayDirections[pointA] * Vector3.forward;
             //Vector3 pointAForwards = (pointBPos - pointAPos).normalized;
 
-            //Debug.DrawLine(pointAPos, pointAPos + (pointBPos - pointAPos), Color.red, Time.deltaTime);
-            //Debug.DrawLine(pointAPos, pos, Color.green, Time.deltaTime);
-            //Debug.DrawLine(pointBPos, pos, Color.blue, Time.deltaTime);
-
             float distanceAlongPointAForwards = Vector3.Dot(pos - pointAPos, pointAForwards);
             if (distanceAlongPointAForwards < 0)
                 distanceAlongPointAForwards = 0;
@@ -215,7 +216,10 @@ public class StatsTracker
             if (finalDistanceAlong <= 0)
                 finalDistanceAlong = 0;
             // Flip result:
-            return finalDistanceAlong;
+            distance = finalDistanceAlong;
+
+            int result = GameStateManager.Singleton.railwayPoints.Length - pointA;
+            return result;
         }
         return 0;
     }

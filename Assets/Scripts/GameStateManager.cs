@@ -40,10 +40,25 @@ public class GameStateManager : NetworkBehaviour
     public float closingSpeed = 0;
     [Tooltip("The zone progress at the start of the game, measured in laps as the unit.")]
     public float zoneStartProgress = 0;
-    [Tooltip("The speed of the zone at the start of the game, measured in meters per second")]
-    public float zoneStartSpeed = 1;
     [Tooltip("How wide the zone starts in meters")]
     public float zoneStartWidth = 350;
+    [Tooltip("The zone's 'center' is offset by this bias, where 0.5 is the middle of the available zone")]
+    [Range(0, 1)]
+    public float zoneCenterBias = 0.25f;
+    [Tooltip("The speed of the zone at the start of the game, measured in meters per second")]
+    public float zoneBaseSpeed = 1;
+    [Tooltip("As you get closer to the fogwall, the zone speed increases faster and faster according to this polynomial power")]
+    public int zoneSpeedIncreasePolynomial = 2;
+    [Tooltip("As players (average position) gets closer to the fogwall, this is how much faster the wall moves. if 5, then the zoneSpeed would be baseSpeed+5 when players are in fogwall.")]
+    public float zoneSpeedIncrease = 1;
+    [Tooltip("The zone does not instantly change speed, it does so smoothly according to this smoothing variable. Higher = more smoothing")]
+    public float zoneSpeedChangeSmoothing = 1;
+    [Tooltip("If true, then when players (average position) are behind the zone centroid, the zone can slow below base speed")]
+    public bool zoneSlowsIfPlayersAreSlow = false;
+
+    [Tooltip("0.1 = slow AND sluggish, 1 = fast AND adaptive.")]
+    [Range(0, 2)]
+    public float zoneDifficultyChanger = 1;
 
     [Header("Gameplay settings")]
     [Tooltip("How many seconds you are floating upwards for. See PlayerController for more settings")]
@@ -73,11 +88,11 @@ public class GameStateManager : NetworkBehaviour
     /// <summary>
     /// The distance in meters between the fog wall and the death wall
     /// </summary>
-    private float _zoneWidth;
+    public float _zoneWidth;
 
-    private float _zoneSpeed = 1;
+    public float _zoneSpeed = 1;
 
-    private float _zoneProgress = 0;
+    public float _zoneProgress = 0;
 
     /// <summary>
     /// The local player who is playing this game (IsOwner = true).
@@ -105,6 +120,9 @@ public class GameStateManager : NetworkBehaviour
     public HashSet<ulong> readiedPlayers;
 
     public GameState GameState => _gameState.Value;
+
+    private float zoneSpeedTarget = 0;
+    private float zoneSpeedDeriv = 0;
 
     // These three variables get set during populateRailwayPoints(). They store information about
     // how the zone should move around the map
@@ -158,7 +176,7 @@ public class GameStateManager : NetworkBehaviour
         gameStateSwitcher = new GameStateSwitcher(this);
 
         _zoneWidth = zoneStartWidth;
-        _zoneSpeed = zoneStartSpeed;
+        _zoneSpeed = zoneBaseSpeed;
         _zoneProgress = zoneStartProgress;
         // Only need to update this once since it doesn't change throughout the game.
         if (!NetworkManager.Singleton.IsHost)
@@ -177,14 +195,6 @@ public class GameStateManager : NetworkBehaviour
 
             _networkedClosingSpeed.Value = (ushort)closingSpeed;
         }
-
-        //if (GameStateManager.Singleton.gameStateSwitcher.GameState != GameState.waitingToReadyUp)
-        //{
-        //    if (localPlayer.PlayerReadyUpState == ReadyUpState.unready || localPlayer.PlayerReadyUpState == ReadyUpState.waitingToUnready)
-        //    {
-        //        localPlayer.ReadyUpStateChange();
-        //    }
-        //}
     }
     #endregion
 
@@ -193,16 +203,15 @@ public class GameStateManager : NetworkBehaviour
         if (NetworkManager.IsHost)
         {
             _zoneWidth = zoneStartWidth;
-            _zoneSpeed = zoneStartSpeed;
+            _zoneSpeed = zoneBaseSpeed;
             _zoneProgress = zoneStartProgress;
 
-            foreach (GameObject player in PlayerNetworking.ConnectedPlayers.Values)
+            foreach (PlayerNetworking player in ConnectedPlayerNetworkingScripts.Values)
             {
-                PlayerNetworking currentNetworking = player.GetComponent<PlayerNetworking>();
-                currentNetworking.ResetPlayerServerside();
+                player.ResetPlayerServerside();
 
                 //Debug.Log(currentNetworking.myPlayerStateController.bodySpawnPosition);
-                currentNetworking.ServerTeleportPlayer(currentNetworking.myPlayerStateController.bodySpawnPosition);
+                player.ServerTeleportPlayer(player.myPlayerStateController.bodySpawnPosition);
             }
         }
     }
@@ -213,11 +222,12 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     void Update()
     {
-        if (localPlayer.IsOwnedByServer)
+        if (NetworkManager.Singleton.IsHost)
         {
             // Modify variables here according to the progress of the game
             //zoneSpeed = fastestPlayer.Speed * (1 - playerEfficiencyRequirement);
-            //zoneWidth -= 1 * Time.deltaTime;
+
+            ServerUpdateWallSpeed();
 
             ZoneStateData stateData = new ZoneStateData()
             {
@@ -240,6 +250,7 @@ public class GameStateManager : NetworkBehaviour
             GameStateManager.Singleton.TestForWinState();
 
     }
+
 
     /// <summary>
     /// Called whenever the 'non host' recieves new information from the host.
@@ -265,9 +276,9 @@ public class GameStateManager : NetworkBehaviour
         int winCount = 0;
         int loseCount = 0;
 
-        foreach (var keyValuePair in PlayerNetworking.ConnectedPlayers)
+        foreach (var keyValuePair in ConnectedPlayerNetworkingScripts)
         {
-            PlayerNetworking playerNetworking = keyValuePair.Value.GetComponent<PlayerNetworking>();
+            PlayerNetworking playerNetworking = keyValuePair.Value;
 
             if (playerNetworking._isDead.Value)
             {
@@ -294,17 +305,17 @@ public class GameStateManager : NetworkBehaviour
 
     public LeaderboardData GatherWinData()
     {
-        ulong[] _playerIDs = new ulong[PlayerNetworking.ConnectedPlayers.Count];
-        ushort[] _distancesTravelled = new ushort[PlayerNetworking.ConnectedPlayers.Count];
-        ushort[] _averageSpeeds = new ushort[PlayerNetworking.ConnectedPlayers.Count];
-        ushort[] _fastestSpeeds = new ushort[PlayerNetworking.ConnectedPlayers.Count];
-        int[] _lapsCompleted = new int[PlayerNetworking.ConnectedPlayers.Count];
-        bool[] _playersWon = new bool[PlayerNetworking.ConnectedPlayers.Count];
+        ulong[] _playerIDs = new ulong[ConnectedPlayers.Count];
+        ushort[] _distancesTravelled = new ushort[ConnectedPlayers.Count];
+        ushort[] _averageSpeeds = new ushort[ConnectedPlayers.Count];
+        ushort[] _fastestSpeeds = new ushort[ConnectedPlayers.Count];
+        int[] _lapsCompleted = new int[ConnectedPlayers.Count];
+        bool[] _playersWon = new bool[ConnectedPlayers.Count];
 
         int i = 0;
-        foreach (var keyValuePair in PlayerNetworking.ConnectedPlayers)
+        foreach (var keyValuePair in ConnectedPlayerNetworkingScripts)
         {
-            PlayerNetworking playerNetworking = keyValuePair.Value.GetComponent<PlayerNetworking>();
+            PlayerNetworking playerNetworking = keyValuePair.Value;
 
             StatsTracker.StatsSummary stats = playerNetworking.myStatsTracker.ProduceLeaderboardStats();
 
@@ -343,6 +354,64 @@ public class GameStateManager : NetworkBehaviour
     #region Wall Helper functions
 
     /// <summary>
+    /// SERVER ONLY
+    /// <para>Returns the central (average) point of where the group is in lap units</para>
+    /// </summary>
+    public float ServerGetPeopleCentroid()
+    {
+        float averageProgress = 0;
+        foreach (var keyValue in ConnectedPlayerNetworkingScripts)
+        {
+            averageProgress += keyValue.Value.myStatsTracker.LatestPosition;
+        }
+        if(ConnectedPlayerNetworkingScripts.Count > 0)
+        {
+            averageProgress /= ConnectedPlayerNetworkingScripts.Count;
+        }
+        return averageProgress;
+    }
+
+    /// <summary>
+    /// SERVER ONLY
+    /// <para>Changes the speed of the wall according to player progress</para>
+    /// </summary>
+    void ServerUpdateWallSpeed()
+    {
+        float playerCentroid = convertMetersToLapsUnits(ServerGetPeopleCentroid());
+
+        float centroidOffset = ((zoneCenterBias - 0.5f) * _zoneWidth);
+        float zoneCentroid = _zoneProgress + convertMetersToLapsUnits(centroidOffset);
+
+        float lapDistance = signedDistanceBetweenPoints(playerCentroid, zoneCentroid);
+        float metersDistance = convertLapsUnitsToMeters(lapDistance);
+
+        // value = 0 if player centroid is at the zone centroid
+        // Value = 1 if player centroid is in the fog wall.
+        float playerDistFromCentroidToFogWall01 = metersDistance / (_zoneWidth - (zoneCenterBias * _zoneWidth));
+        if (playerDistFromCentroidToFogWall01 < 0 && !zoneSlowsIfPlayersAreSlow)
+            playerDistFromCentroidToFogWall01 = 0;
+
+        float forceApplied01 = Mathf.Pow(playerDistFromCentroidToFogWall01, zoneSpeedIncreasePolynomial);
+        float forceAppliedSpeed = forceApplied01 * zoneSpeedIncrease;
+
+        zoneSpeedTarget = (zoneBaseSpeed + forceAppliedSpeed) * zoneDifficultyChanger;
+
+        // DEBUG CODE START
+        Vector3 playersPos = GetWorldPosFromProgress(playerCentroid);
+        Vector3 zonePos = GetWorldPosFromProgress(zoneCentroid);
+        playersPos.y = localPlayer.bodyRigidbody.transform.position.y;
+        zonePos.y = localPlayer.bodyRigidbody.transform.position.y;
+        Color lCol = Color.gray;
+        if (lapDistance > 0)
+            lCol = Color.green;
+        Debug.DrawLine(playersPos, zonePos, lCol, Time.deltaTime);
+        // DEBUG CODE END
+
+        _zoneSpeed = Mathf.SmoothDamp(_zoneSpeed, zoneSpeedTarget, ref zoneSpeedDeriv, zoneSpeedChangeSmoothing);
+        //Debug.Log(_zoneSpeed.ToString() + "   " + zoneSpeedTarget.ToString());
+    }
+
+    /// <summary>
     /// Moves zoneProgress forward according to zoneSpeed.
     /// Updates the physical positions of the walls according to zoneProgress.
     /// </summary>
@@ -356,10 +425,12 @@ public class GameStateManager : NetworkBehaviour
             {
                 metersToTravel = _zoneSpeed * Time.deltaTime;
                 _zoneWidth -= Time.deltaTime * closingSpeed;
+                if (_zoneWidth < 0)
+                    _zoneWidth = 0;
             }
         }
 
-        float widthInLapsUnits = convertMetersToLapsUnits(_zoneWidth);
+        float widthInLapsUnits = convertMetersToLapsUnits(_zoneWidth) * (2 - zoneDifficultyChanger);
         _zoneProgress += convertMetersToLapsUnits(metersToTravel);
 
         // Move position of death wall along
@@ -403,7 +474,26 @@ public class GameStateManager : NetworkBehaviour
         Quaternion targetQuaternion = Quaternion.Lerp(railwayDirections[lowestPoint], railwayDirections[highestPoint], interpAmount);
 
         wall.rotation = targetQuaternion * rotationOffset;
-        
+    }
+
+    /// <summary>
+    /// Converts progress in meters into a real-world 3D position
+    /// </summary>
+    /// <param name="progress">Progress in meters</param>
+    /// <returns>The absolute position in world space</returns>
+    public static Vector3 GetWorldPosFromProgress(float progress)
+    {
+        float progressSimplified = convertProgressToBetween01(progress);
+        float interpProgress = progressSimplified * Singleton.railwayPoints.Length;
+        // Calculate which points to interpolate between
+        int lowestPoint = Mathf.FloorToInt(interpProgress);
+        int highestPoint = Mathf.CeilToInt(interpProgress);
+        // Wrap around to 0
+        if (highestPoint == Singleton.railwayPoints.Length)
+            highestPoint = 0;
+        // Calculate the interpolation amount:
+        float interpAmount = interpProgress - Mathf.Floor(interpProgress);
+        return Vector3.Lerp(Singleton.railwayPoints[lowestPoint], Singleton.railwayPoints[highestPoint], interpAmount);
     }
 
     /// <summary>
@@ -432,6 +522,11 @@ public class GameStateManager : NetworkBehaviour
         return meters / railwayLength;
     }
 
+    public float convertLapsUnitsToMeters(float laps)
+    {
+        return laps * railwayLength;
+    }
+
     public float convertRailwayPointToDistance(int railwayPoint)
     {
         return ((float)railwayPoint / (float)railwayPoints.Length) * railwayLength;
@@ -440,6 +535,16 @@ public class GameStateManager : NetworkBehaviour
     public float convertRailwayPointToLaps(int railwayPoint)
     {
         return ((float)railwayPoint / (float)railwayPoints.Length);
+    }
+
+    /// <summary>
+    /// Returns the signed distance between two points in a lap, given in lap units
+    /// </summary>
+    public float signedDistanceBetweenPoints(float progressA, float progressB)
+    {
+        float A_angle = convertProgressToBetween01(progressA) * Mathf.PI * 2;
+        float B_angle = convertProgressToBetween01(progressB) * Mathf.PI * 2;
+        return Mathf.Atan2(Mathf.Sin(B_angle - A_angle), Mathf.Cos(B_angle - A_angle)) / (MathF.PI * 2);
     }
 
     /// <summary>
