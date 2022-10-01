@@ -157,9 +157,9 @@ public class MenuUIScript : NetworkBehaviour
     {
         GameModePanel.SetActive(false);
         ButtonClicked();
-        ConnectingToServerText.SetActive(false);
-
+        CancelConnectingState();
     }
+
     public void DisableMainPanel()
     {
         MainMenuPanel.SetActive(false);
@@ -197,16 +197,26 @@ public class MenuUIScript : NetworkBehaviour
         SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
         //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
     }
-    public void LoadExampleLevel2AsHost()
+
+    public void LoadMultiplayerLevel1AsHost()
     {
         joinAsClient = false;
         startNetworkingOnSpawn = true;
 
-        SceneManager.LoadScene("LevelExample 2", LoadSceneMode.Single);
+        SceneManager.LoadScene("MultiplayerLevel1", LoadSceneMode.Single);
         //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
     }
 
-    
+    public void LoadMultiplayerLevel2AsHost()
+    {
+        joinAsClient = false;
+        startNetworkingOnSpawn = true;
+
+        SceneManager.LoadScene("MultiplayerLevel 2", LoadSceneMode.Single);
+        //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
+    }
+
+
     public void SingleplayerLevelSelect()
     {
         DisableGamePanel();
@@ -244,6 +254,8 @@ public class MenuUIScript : NetworkBehaviour
         transportScript.ConnectionData.Port = ushort.Parse(clientingPort);
         transportScript.ConnectionData.ServerListenAddress = "0.0.0.0";
 
+        isMultiplayerHosting = false;
+
         PlayerPrefs.SetString("clientingIp", clientingIp);
         PlayerPrefs.SetString("clientingPort", clientingPort);
         PlayerPrefs.Save();
@@ -254,7 +266,20 @@ public class MenuUIScript : NetworkBehaviour
         NetworkManager.Singleton.StartClient();
 
         ConnectingToServerText.SetActive(true);
-        
+    }
+
+    public void CancelConnectingState()
+    {
+
+        joinAsClient = false;
+        startNetworkingOnSpawn = false;
+
+        isMultiplayerHosting = false;
+
+        NetworkManager.Singleton.Shutdown();
+
+        ConnectingToServerText.SetActive(false);
+
     }
 
 

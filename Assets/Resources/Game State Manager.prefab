@@ -65,7 +65,7 @@ MonoBehaviour:
   fogWall: {fileID: 0}
   closingSpeed: 0
   zoneStartProgress: 0
-  zoneStartWidth: 400
+  zoneStartWidth: 200
   zoneCenterBias: 0.4
   zoneBaseSpeed: 8
   zoneSpeedIncreasePolynomial: 1

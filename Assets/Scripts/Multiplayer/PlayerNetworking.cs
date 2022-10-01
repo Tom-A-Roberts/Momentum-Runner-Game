@@ -259,6 +259,11 @@ public class PlayerNetworking : NetworkBehaviour
             // animate the shot client side immediately
             AnimateShot(shootStartPosition, shootDirection, 0f);
 
+            if (!IsHost)
+            {
+                myGunController.myGunState.Shoot();
+            }
+
             float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;            
             ShootServerRPC(shootTime, shootStartPosition, shootDirection);
         }
@@ -347,11 +352,18 @@ public class PlayerNetworking : NetworkBehaviour
 
                 // run ALL hit checks in here please
                 if (hitGameObject)
-                {                    
+                {
+                    
+                    if (IsOwner)// && (hitGameObject.tag == "Player" || hitGameObject.tag == "Target"))
+                    {
+                        myPlayerStateController.StartHitmarker();
+                    }
+
                     // first check player hit
                     PlayerNetworking shotPlayerNetworking = CheckForPlayerHit(hitGameObject);
                     if (shotPlayerNetworking != null)
                     {
+
                         shotPlayerNetworking.myPlayerStateController.ProcessHit();
                         return;
                     }

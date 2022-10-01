@@ -13,7 +13,6 @@ public class Target: MonoBehaviour, IShootInterface
     {
         foreach (GameObject gb in ObjectsToChange)
         {
-            Debug.Log("test");
             gb.SetActive(!gb.activeSelf);
         }
     }

@@ -29,6 +29,7 @@ public class PlayerStateManager : MonoBehaviour
 
     [Header("Effects settings")]
     public float deathwallRedStartDistance = 5;
+    public float hitmarkerDuration = 0.1f;
 
     public bool IsSpectating => playerNetworking._isSpectating.Value;
 
@@ -72,6 +73,8 @@ public class PlayerStateManager : MonoBehaviour
     private Quaternion bodyStartRotation;
     private Vector3 feetStartPosition;
     private Quaternion feetStartRotation;
+
+    private float hitmarkerTimer = 0;
 
     private float respawningTimer = 0;
 
@@ -180,6 +183,16 @@ public class PlayerStateManager : MonoBehaviour
             }
         }
 
+        if(hitmarkerTimer > 0)
+        {
+            hitmarkerTimer -= Time.deltaTime;
+            if(hitmarkerTimer < 0)
+            {
+                hitmarkerTimer = 0;
+                EndHitmarker();
+            }
+        }
+
         CheckForServerStateChanges();
     }
 
@@ -249,7 +262,36 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
-
+    public void StartHitmarker()
+    {
+        if (playerNetworking.IsOwner)
+        {
+            playerAudioManager.HitmarkerSound();
+            if (IngameEscMenu.Singleton.hitmarkerUIElement)
+            {
+                hitmarkerTimer = hitmarkerDuration;
+                IngameEscMenu.Singleton.hitmarkerUIElement.SetActive(true);
+            }
+            else
+            {
+                Debug.LogWarning("No hitmarker UI element found");
+            }
+        }
+    }
+    public void EndHitmarker()
+    {
+        if (playerNetworking.IsOwner)
+        {
+            if (IngameEscMenu.Singleton.hitmarkerUIElement)
+            {
+                IngameEscMenu.Singleton.hitmarkerUIElement.SetActive(false);
+            }
+            else
+            {
+                Debug.LogWarning("No hitmarker UI element found");
+            }
+        }
+    }
 
     public void ShowMultiplayerRepresentation()
     {
