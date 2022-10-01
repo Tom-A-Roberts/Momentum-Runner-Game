@@ -76,6 +76,8 @@ public class PlayerStateManager : MonoBehaviour
 
     private float hitmarkerTimer = 0;
 
+    private float slowdownTimer = 0;
+
     private float respawningTimer = 0;
 
     void Start()
@@ -186,14 +188,42 @@ public class PlayerStateManager : MonoBehaviour
         if(hitmarkerTimer > 0)
         {
             hitmarkerTimer -= Time.deltaTime;
-            if(hitmarkerTimer < 0)
+            if(hitmarkerTimer <= 0)
             {
                 hitmarkerTimer = 0;
                 EndHitmarker();
             }
         }
 
+        if(slowdownTimer > 0)
+        {
+            slowdownTimer -= Time.deltaTime / GameStateManager.Singleton.slowdownTime;
+
+            if(slowdownTimer <=0){
+                slowdownTimer = 0;
+                EndSlowdown();
+            }
+            else
+            {
+                ProcessSlowdown(1 - slowdownTimer);
+            }
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            ProcessHit();
+        }
+
         CheckForServerStateChanges();
+    }
+
+    private void FixedUpdate()
+    {
+        if (slowdownTimer > 0)
+        {
+            ProcessSlowdownFixedUpdate(1 - slowdownTimer);
+        }
     }
 
     public void CheckForServerStateChanges()
@@ -536,6 +566,70 @@ public class PlayerStateManager : MonoBehaviour
 
     public void ProcessHit()
     {
-        Debug.Log("Ow I just got shot");        
+        Debug.Log("Ow I just got shot");
+
+        StartSlowdown();
+
+    }
+
+    [System.NonSerialized]
+    public Vector3 slowdownStartVelocity;
+
+    public void StartSlowdown()
+    {
+        slowdownTimer = 1;
+
+        slowdownStartVelocity = playerBody.velocity;
+
+        playerController.BoostForce(-slowdownStartVelocity, ForceMode.VelocityChange);
+    }
+
+    /// <summary>
+    /// Changes the slowdown state for this player. Called even if it's a remote player
+    /// </summary>
+    /// <param name="t">Percentage through the slowdown, from 0 to 1</param>
+    public void ProcessSlowdown(float t)
+    {
+
+        if (playerNetworking.IsOwner)
+        {
+            if (GameStateManager.Singleton.SlowdownBorder)
+            {
+                Color newcol = GameStateManager.Singleton.SlowdownBorder.color;
+                newcol.a = 1 - t;
+                GameStateManager.Singleton.SlowdownBorder.color = newcol;
+            }
+
+        }
+    }
+
+    public void ProcessSlowdownFixedUpdate(float t)
+    {
+        const float percentageOfSlowdown = 1f;
+
+        float newT = Mathf.Clamp01(t / percentageOfSlowdown);
+
+        if(newT <= 1)
+        {
+            Vector3 GravityForce = Physics.gravity * 1f * (1 - newT);// * (1- newT);// + pc.CharacterFallingWeight * Vector3.down;
+            playerController.BoostForce(-GravityForce, ForceMode.Acceleration);
+            playerController.playerControlFactor = newT;
+
+            playerController.BoostForce((slowdownStartVelocity * (1 + GameStateManager.Singleton.slowdownAdditionalVelocityMultiplier)) / GameStateManager.Singleton.slowdownTime, ForceMode.Acceleration);
+        }
+    }
+
+    public void EndSlowdown()
+    {
+
+        if (playerNetworking.IsOwner)
+        {
+            if (GameStateManager.Singleton.SlowdownBorder)
+            {
+                Color newcol = GameStateManager.Singleton.SlowdownBorder.color;
+                newcol.a = 0;
+                GameStateManager.Singleton.SlowdownBorder.color = newcol;
+            }
+        }
     }
 }

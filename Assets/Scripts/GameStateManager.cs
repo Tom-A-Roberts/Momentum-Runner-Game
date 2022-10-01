@@ -63,9 +63,15 @@ public class GameStateManager : NetworkBehaviour
     [Header("Gameplay settings")]
     [Tooltip("How many seconds you are floating upwards for. See PlayerController for more settings")]
     public float respawnDuration = 3;
+    [Tooltip("When you get shot, how long the slowing lasts")]
+    public float slowdownTime = 1;
+    [Tooltip("When leaving slowdown, you get additional speed to counteract the drag during slowing.")]
+    public float slowdownAdditionalVelocityMultiplier = 0.3f;
+
 
     [Header("Effects settings")]
     public Image ScreenRedEdges;
+    public Image SlowdownBorder;
     public GameObject waitingToReadyUpPanel;
     public GameObject ReadyUpCube;
     public TMP_Text ReadyUpFloatingText;

@@ -1452,6 +1452,7 @@ MonoBehaviour:
   audioManager: {fileID: 8008624713252837793}
   feetRigidBody: {fileID: 4316027073947639282}
   GroundDetector: {fileID: 1371572323}
+  playerStateManager: {fileID: 153934500}
   WalkingSpeed: 8
   SprintMultiplier: 1.5
   Acceleration: 0.8

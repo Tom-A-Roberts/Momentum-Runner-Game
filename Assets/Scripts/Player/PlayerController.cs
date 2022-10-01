@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     public CollisionDetector GroundDetector;
     private Rigidbody bodyRigidBody;
     private WallRunning wallRunning;
+    public PlayerStateManager playerStateManager;
     [Header("----------------")]
     [Header("Movement Settings")]
     [Tooltip("The maximum speed the player will accelerate to when on the ground as a result of key-presses.")]
@@ -71,6 +72,9 @@ public class PlayerController : MonoBehaviour
 
     [System.NonSerialized]
     public bool respawningMode = false;
+
+    [System.NonSerialized]
+    public float playerControlFactor = 1;
 
     //[Header("----------------")]
     //[Header("Dash Settings")]
@@ -184,7 +188,10 @@ public class PlayerController : MonoBehaviour
 
                 if (yVelocity < 0) currentJumpForce -= yVelocity; //if falling cancel out falling velocity
 
-                bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
+                Vector3 jumpForce = transform.up * currentJumpForce;
+                playerStateManager.slowdownStartVelocity += jumpForce * (1 - playerControlFactor);
+                bodyRigidBody.AddForce(jumpForce * playerControlFactor, ForceMode.Impulse);
+                //bodyRigidBody.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
 
                 // force end coyote time due to jump
                 GroundDetector.EndCoyoteTime();
@@ -207,8 +214,13 @@ public class PlayerController : MonoBehaviour
                     float wallKickRatio = (1f - dot) / 2f; // kick hardest when facing into wall
                     float wallBoostRatio = 1f - Mathf.Abs(dot); // boost hardest when facing along direction of the wall
 
-                    bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
-                    bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
+                    Vector3 additionalForce = Vector3.zero;
+                    additionalForce += wallNormal * MaxWallKickoffForce * wallKickRatio;
+                    additionalForce += transform.forward * MaxWallBoostForce * wallBoostRatio;
+                    playerStateManager.slowdownStartVelocity += additionalForce * (1 - playerControlFactor);
+                    bodyRigidBody.AddForce(additionalForce * playerControlFactor, ForceMode.Impulse);
+                    //bodyRigidBody.AddForce(wallNormal * MaxWallKickoffForce * wallKickRatio, ForceMode.Impulse); // sideways kick                 
+                    //bodyRigidBody.AddForce(transform.forward * MaxWallBoostForce * wallBoostRatio, ForceMode.Impulse); // forwards boost
 
                 }
 
@@ -270,15 +282,15 @@ public class PlayerController : MonoBehaviour
                 // How much required acceleration there is to reach the intended speed (walkingspeed).
                 float requiredAcc = (movementSpeed - forwardsSpeed) / (Time.fixedDeltaTime * ((1 - Acceleration) * 25 + 1));
 
-                bodyRigidBody.AddForce(wishDirection * requiredAcc, ForceMode.Acceleration);
+                bodyRigidBody.AddForce(wishDirection * requiredAcc * playerControlFactor, ForceMode.Acceleration);
             }
 
-            bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration, ForceMode.Acceleration);
+            bodyRigidBody.AddForce(-sidewaysVelocity * SidewaysDeceleration * playerControlFactor, ForceMode.Acceleration);
         }
 
         if (xInput == 0 && yInput == 0 && GroundDetector.IsOnGround)
         {
-            bodyRigidBody.drag = DragWhenNoKeysPressed;
+            bodyRigidBody.drag = DragWhenNoKeysPressed * (playerControlFactor);
         }
         else
         {
@@ -287,7 +299,7 @@ public class PlayerController : MonoBehaviour
 
         if (!GroundDetector.IsOnGround)
         {
-            bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight, ForceMode.Acceleration);
+            bodyRigidBody.AddForce(Vector3.down * CharacterFallingWeight * playerControlFactor, ForceMode.Acceleration);
             audioManager.UpdateRunningIntensity(0);
         }
         else
@@ -338,6 +350,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
     void processRespawningMotion(float xInput, float yInput, float heightInput)
     {
         bodyRigidBody.useGravity = false;

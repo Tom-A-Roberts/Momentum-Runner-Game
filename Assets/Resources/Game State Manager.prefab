@@ -74,7 +74,10 @@ MonoBehaviour:
   zoneSlowsIfPlayersAreSlow: 0
   zoneDifficultyChanger: 1
   respawnDuration: 2.5
+  slowdownTime: 1
+  slowdownAdditionalVelocityMultiplier: 0.2
   ScreenRedEdges: {fileID: 0}
+  SlowdownBorder: {fileID: 0}
   waitingToReadyUpPanel: {fileID: 0}
   ReadyUpCube: {fileID: 0}
   ReadyUpFloatingText: {fileID: 0}
