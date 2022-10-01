@@ -203,7 +203,15 @@ public class GameStateManager : NetworkBehaviour
                     deathWall.SetActive(false);
             }
             else
+            {
+                if (fogWall)
+                    fogWall.SetActive(true);
+                if (deathWall)
+                    deathWall.SetActive(true);
+
                 _gameState.Value = GameState.waitingToReadyUp;
+            }
+               
 
             _networkedClosingSpeed.Value = (ushort)closingSpeed;
         }
