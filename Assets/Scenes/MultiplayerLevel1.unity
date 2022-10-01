@@ -8426,6 +8426,7 @@ GameObject:
   - component: {fileID: 661366444}
   - component: {fileID: 661366443}
   - component: {fileID: 661366442}
+  - component: {fileID: 661366446}
   m_Layer: 6
   m_Name: Ready Up Cube
   m_TagString: Readyup
@@ -8511,6 +8512,22 @@ Transform:
   m_Father: {fileID: 1927422591}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &661366446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 661366441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2658177142
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!4 &667973401 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4566452781913596953, guid: 4c4b340c26b578f469cb4c62f07a93e5, type: 3}
@@ -14246,7 +14263,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-2444
+  m_Name: pb_Mesh-2964
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -21148,7 +21165,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32964
+  m_Name: pb_Mesh34374
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
