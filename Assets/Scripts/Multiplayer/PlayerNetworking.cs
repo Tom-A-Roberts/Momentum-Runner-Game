@@ -352,7 +352,6 @@ public class PlayerNetworking : NetworkBehaviour
                     if (IsOwner)// && (hitGameObject.tag == "Player" || hitGameObject.tag == "Target"))
                     {
                         myPlayerStateController.StartHitmarker();
-                        Debug.Log("here");
                     }
 
                     // first check player hit
