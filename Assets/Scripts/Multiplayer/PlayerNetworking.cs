@@ -347,11 +347,19 @@ public class PlayerNetworking : NetworkBehaviour
 
                 // run ALL hit checks in here please
                 if (hitGameObject)
-                {                    
+                {
+                    
+                    if (IsOwner)// && (hitGameObject.tag == "Player" || hitGameObject.tag == "Target"))
+                    {
+                        myPlayerStateController.StartHitmarker();
+                        Debug.Log("here");
+                    }
+
                     // first check player hit
                     PlayerNetworking shotPlayerNetworking = CheckForPlayerHit(hitGameObject);
                     if (shotPlayerNetworking != null)
                     {
+
                         shotPlayerNetworking.myPlayerStateController.ProcessHit();
                         return;
                     }

@@ -12,6 +12,7 @@ public class IngameEscMenu : MonoBehaviour
 
     public GameObject recoveringText;
     public GameObject escapeMenuUIObject;
+    public GameObject hitmarkerUIElement;
     public bool isEscMenuShowing = false;
     public bool curserUnlocked = false;
 
@@ -122,8 +123,8 @@ public class IngameEscMenu : MonoBehaviour
         }
 
         // :/ just for pressing stop in editor
-        //if (this)
-        //    OnShutdown();
+        if (this)
+            OnShutdown();
     }
 
     public static void LockCursor()

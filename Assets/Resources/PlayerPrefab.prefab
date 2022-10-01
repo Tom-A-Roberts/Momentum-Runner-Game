@@ -909,6 +909,7 @@ MonoBehaviour:
   airJump: {fileID: 8300000, guid: 9a23d35c636de9847b279f19cf598354, type: 3}
   overheatedGun: {fileID: 8300000, guid: cd9fe50eeb6c0fd42aafbb1c603e6081, type: 3}
   gunCoolingEffect: {fileID: 8300000, guid: 364ae69753be8fb44a33c87dd1fe0825, type: 3}
+  hitmarkerSound: {fileID: 8300000, guid: 3fc5c8bd6d1f84e41892826508dc7a77, type: 3}
   countdownStart: {fileID: 8300000, guid: 550365b304244ed4383b68179575d377, type: 3}
   countdownBeep: {fileID: 8300000, guid: b29eee395940cf747bb20893856b58f0, type: 3}
   countdownEnd: {fileID: 8300000, guid: fceb26558f3f80648af6f75d568a35e5, type: 3}
@@ -1753,6 +1754,7 @@ MonoBehaviour:
   bodyCollider: {fileID: 4316027074644905777}
   feetCollider: {fileID: 4316027073947639283}
   deathwallRedStartDistance: 15
+  hitmarkerDuration: 0.1
 --- !u!114 &1445570255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1942,7 +1944,7 @@ MonoBehaviour:
   aimAssistAngle: 0
   optimalAimAssistDistance: 15
   maximumAimAssistDistance: 50
-  raycastDistance: 100
+  raycastDistance: 400
   animationDuration: 0.8
   kickbackAngle: 20
   slidebackDistance: 0.16
