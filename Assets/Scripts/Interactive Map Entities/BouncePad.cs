@@ -9,13 +9,17 @@ public class BouncePad : MonoBehaviour
     private void OnTriggerEnter(Collider collision)
     {
         PlayerController pc = collision.GetComponent<PlayerController>();
-        Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
+        Rigidbody rb = pc.bodyRigidBody;
         if (pc != null)
         {
             Vector3 bounceYForce = new Vector3 ( 0,(rb.velocity.y * VerticalForceMultiplier * -1f),0);
             Vector3 bounceForwardForce = collision.gameObject.transform.forward * HorizontalForcceApplied;
             Vector3 totalForce = bounceForwardForce + bounceYForce; 
             rb.AddForce(totalForce,ForceMode.Impulse);
+            if(pc.JumpCount < 2)
+            {
+                pc.JumpCount++;
+            }
         }
     }
 }

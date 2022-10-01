@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     public PlayerAudioManager audioManager;
     public Rigidbody feetRigidBody;
     public CollisionDetector GroundDetector;
-    private Rigidbody bodyRigidBody;
+    public Rigidbody bodyRigidBody;
     private WallRunning wallRunning;
     [Header("----------------")]
     [Header("Movement Settings")]

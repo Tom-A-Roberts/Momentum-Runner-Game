@@ -50,7 +50,6 @@ public class SpeedBoost : MonoBehaviour
                 pc.BoostForce(boostVector, boostType);
                 pc.BoostForce(verticalCompensationForce, ForceMode.Force);
                 pc.BoostForce(sidewaysCompensationForce, ForceMode.Force);
-                pc.JumpCount += 1;
             }
         }
 
