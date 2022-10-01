@@ -175,7 +175,7 @@ public class GrappleGun : MonoBehaviour
         {
             if (hit.transform.CompareTag("Grappleable"))
             {
-                Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
+                //Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
                 return new GrappleablePointInfo()
                 {
                     targetFound = true,
@@ -192,7 +192,7 @@ public class GrappleGun : MonoBehaviour
             {
                 if (hit.transform.CompareTag("Grappleable"))
                 {
-                    Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
+                    //Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
                     return new GrappleablePointInfo()
                     {
                         targetFound = true,

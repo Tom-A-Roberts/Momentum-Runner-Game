@@ -122,8 +122,8 @@ public class IngameEscMenu : MonoBehaviour
         }
 
         // :/ just for pressing stop in editor
-        if (this)
-            OnShutdown();
+        //if (this)
+        //    OnShutdown();
     }
 
     public static void LockCursor()

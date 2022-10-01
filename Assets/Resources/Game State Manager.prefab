@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6462836443202579317
 MonoBehaviour:
@@ -64,9 +64,15 @@ MonoBehaviour:
   deathWall: {fileID: 0}
   fogWall: {fileID: 0}
   closingSpeed: 0
-  zoneProgress: 0.06
-  zoneSpeed: 1
+  zoneStartProgress: 0
   zoneStartWidth: 400
+  zoneCenterBias: 0.4
+  zoneBaseSpeed: 8
+  zoneSpeedIncreasePolynomial: 1
+  zoneSpeedIncrease: 50
+  zoneSpeedChangeSmoothing: 3
+  zoneSlowsIfPlayersAreSlow: 0
+  zoneDifficultyChanger: 1
   respawnDuration: 2.5
   ScreenRedEdges: {fileID: 0}
   waitingToReadyUpPanel: {fileID: 0}
@@ -77,7 +83,10 @@ MonoBehaviour:
   CountdownText: {fileID: 0}
   waitingToReadyUpSong: {fileID: 8300000, guid: b5e931c362a3f9b419e1fd1765f1c8ec, type: 3}
   levelSoundTracks: {fileID: 8300000, guid: f5fb869cd675e87448f76cf57a64707f, type: 3}
-  DeveloperMode: 0
+  DeveloperMode: 1
+  _zoneWidth: 0
+  _zoneSpeed: 1
+  _zoneProgress: 0
 --- !u!114 &6462836443202579315
 MonoBehaviour:
   m_ObjectHideFlags: 0

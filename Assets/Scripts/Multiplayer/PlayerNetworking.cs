@@ -42,6 +42,7 @@ public class PlayerNetworking : NetworkBehaviour
     /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
     /// </summary>
     public static Dictionary<ulong, GameObject> ConnectedPlayers;
+    public static Dictionary<ulong, PlayerNetworking> ConnectedPlayerNetworkingScripts;
 
     /// <summary>
     /// Gets set to the local (IsOwner) PlayerNetworking instance
@@ -742,6 +743,7 @@ public class PlayerNetworking : NetworkBehaviour
         if (ConnectedPlayers == null || (IsOwner && IsHost))
         {
             ConnectedPlayers = new Dictionary<ulong, GameObject>();
+            ConnectedPlayerNetworkingScripts = new Dictionary<ulong, PlayerNetworking>();
         }
 
         if (ConnectedPlayers.ContainsKey(OwnerClientId))
@@ -750,7 +752,8 @@ public class PlayerNetworking : NetworkBehaviour
         }
 
         ConnectedPlayers[OwnerClientId] = gameObject;
-        Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        ConnectedPlayerNetworkingScripts[OwnerClientId] = gameObject.GetComponent<PlayerNetworking>();
+        Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayerNetworkingScripts.Keys.Count.ToString() + " players.");
     }
 
     /// <summary>
@@ -759,7 +762,8 @@ public class PlayerNetworking : NetworkBehaviour
     private void PlayerDisconnect()
     {
         ConnectedPlayers.Remove(OwnerClientId);
-        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        ConnectedPlayerNetworkingScripts.Remove(OwnerClientId);
+        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayerNetworkingScripts.Keys.Count.ToString() + " players.");
 
         if (IsOwner)
         {
