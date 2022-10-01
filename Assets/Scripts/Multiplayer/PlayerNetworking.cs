@@ -259,6 +259,11 @@ public class PlayerNetworking : NetworkBehaviour
             // animate the shot client side immediately
             AnimateShot(shootStartPosition, shootDirection, 0f);
 
+            if (!IsHost)
+            {
+                myGunController.myGunState.Shoot();
+            }
+
             float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;            
             ShootServerRPC(shootTime, shootStartPosition, shootDirection);
         }

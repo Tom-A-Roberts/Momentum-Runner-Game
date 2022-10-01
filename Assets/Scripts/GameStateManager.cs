@@ -259,7 +259,7 @@ public class GameStateManager : NetworkBehaviour
 
 
     /// <summary>
-    /// Called whenever the 'non host' recieves new information from the host.
+    /// Called whenever the 'non host' recieves new information from the host. 
     /// </summary>
     private void ChangedZoneState(ZoneStateData oldGameState, ZoneStateData newGameState)
     {
