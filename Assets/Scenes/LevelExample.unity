@@ -61561,7 +61561,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Game State Manager
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6396416393272679532, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
 --- !u!33 &6528347989115419806

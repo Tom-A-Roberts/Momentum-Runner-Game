@@ -568,6 +568,7 @@ public class PlayerStateManager : MonoBehaviour
     {
         Debug.Log("Ow I just got shot");
 
+        playerAudioManager.HitSound();
         StartSlowdown();
 
     }

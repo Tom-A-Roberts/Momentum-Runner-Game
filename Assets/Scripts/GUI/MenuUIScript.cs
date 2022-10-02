@@ -7,6 +7,8 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using System.Text;
 using UnityEngine.UI;
+using Lexic;
+
 public class MenuUIScript : NetworkBehaviour
 {
     public AudioClip clickSoundEffect;
@@ -18,6 +20,8 @@ public class MenuUIScript : NetworkBehaviour
     public GameObject ConnectingToServerText;
 
     // Text inputs:
+    public TMP_InputField displayName;
+
     public TMP_InputField hostingIpText;
     public TMP_InputField hostingPortText;
     public TMP_InputField clientingIpText;
@@ -39,6 +43,8 @@ public class MenuUIScript : NetworkBehaviour
     public static bool joinAsClient = false;
     public static bool startNetworkingOnSpawn = true;
 
+    public static string localDisplayName = "";
+
     public static float musicVolume = 1;
     public static float effectsVolume = 1;
 
@@ -50,9 +56,32 @@ public class MenuUIScript : NetworkBehaviour
         myAudioSource = GameObject.FindObjectOfType<AudioSource>();
         effectsAudioSource = myAudioSource.gameObject.AddComponent<AudioSource>();
         effectsAudioSource.volume = 1;
+        UpdateDisplayName();
         UpdatePortFieldsFromPrefs();
-        UpdateAudioSlidersFromPrefs();
+        UpdateSettingsFromPrefs();
         joinAsClient = false;
+    }
+
+    public static void UpdateDisplayName(string newName = "")
+    {
+        if(newName.Length == 0)
+        {
+            localDisplayName = PlayerPrefs.GetString("displayName");
+            if (localDisplayName.Length == 0)
+            {
+                localDisplayName = NameGen.GetNextRandomName();
+                PlayerPrefs.SetString("displayName", localDisplayName);
+                PlayerPrefs.Save();
+            }
+        }
+        else
+        {
+            localDisplayName = newName;
+            PlayerPrefs.SetString("displayName", localDisplayName);
+            PlayerPrefs.Save();
+        }
+
+
     }
 
     public void ButtonClicked()
@@ -89,6 +118,20 @@ public class MenuUIScript : NetworkBehaviour
         PlayerPrefs.Save();
     }
 
+    public void DisplayNameChanged()
+    {
+        UpdateDisplayName(displayName.text);
+        displayName.text = localDisplayName;
+    }
+    public void RegenerateName()
+    {
+        localDisplayName = "";
+        PlayerPrefs.SetString("displayName", localDisplayName);
+        PlayerPrefs.Save();
+        UpdateDisplayName();
+        displayName.text = localDisplayName;
+    }
+
     public static void UpdateAudioStaticsFromPrefs()
     {
         if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
@@ -104,7 +147,7 @@ public class MenuUIScript : NetworkBehaviour
 
     }
 
-    private void UpdateAudioSlidersFromPrefs()
+    private void UpdateSettingsFromPrefs()
     {
         if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
         {
@@ -122,7 +165,10 @@ public class MenuUIScript : NetworkBehaviour
             PlayerPrefs.Save();
         }
 
+        UpdateDisplayName();
+        displayName.text = localDisplayName;
     }
+
     public void UpdateVolumes()
     {
         effectsAudioSource.volume = effectsVolume;
@@ -138,7 +184,6 @@ public class MenuUIScript : NetworkBehaviour
     public void EnableGamePanel()
     {
         GameModePanel.SetActive(true);
-
         UpdatePortFieldsFromPrefs();
     }
     public void EnableMainPanel()
@@ -149,7 +194,7 @@ public class MenuUIScript : NetworkBehaviour
     public void EnableSettingsPanel()
     {
         SettingsPanel.SetActive(true);
-        UpdateAudioSlidersFromPrefs();
+        UpdateSettingsFromPrefs();
     }
 
 
