@@ -67,6 +67,8 @@ public class GameStateManager : NetworkBehaviour
     public float slowdownTime = 1;
     [Tooltip("When leaving slowdown, you get additional speed to counteract the drag during slowing.")]
     public float slowdownAdditionalVelocityMultiplier = 0.3f;
+    [Tooltip("When you get shot, how long the shield afterwards lasts")]
+    public float slowdownTimeShield = 1;
 
 
     [Header("Effects settings")]
@@ -194,7 +196,7 @@ public class GameStateManager : NetworkBehaviour
         _zoneWidth = zoneStartWidth;
         _zoneSpeed = zoneBaseSpeed;
         _zoneProgress = zoneStartProgress;
-        // Only need to update this once since it doesn't change throughout the game.
+        // Only need to update this once since it doesn't change throughout the game. 
         if (!NetworkManager.Singleton.IsHost)
         {
             closingSpeed = _networkedClosingSpeed.Value;
@@ -272,7 +274,8 @@ public class GameStateManager : NetworkBehaviour
             // Modify variables here according to the progress of the game
             //zoneSpeed = fastestPlayer.Speed * (1 - playerEfficiencyRequirement);
 
-            ServerUpdateWallSpeed();
+            if(GameState == GameState.playingGame)
+                ServerUpdateWallSpeed();
 
             ZoneStateData stateData = new ZoneStateData()
             {

@@ -73,7 +73,7 @@ public class Nameplate : MonoBehaviour
         health = Mathf.Clamp01(health);
 
         healthbar.transform.localScale = new Vector3(originalWidth * health, healthbar.transform.localScale.y, healthbar.transform.localScale.z);
-        healthbar.transform.localPosition = new Vector3(-5 * health, healthbar.transform.localPosition.y, healthbar.transform.localPosition.z);
+        healthbar.transform.localPosition = new Vector3(-5 * (1-health), healthbar.transform.localPosition.y, healthbar.transform.localPosition.z);
     }
 
 }

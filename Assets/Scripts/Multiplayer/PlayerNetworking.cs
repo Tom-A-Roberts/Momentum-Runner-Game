@@ -354,20 +354,26 @@ public class PlayerNetworking : NetworkBehaviour
                 // run ALL hit checks in here please
                 if (hitGameObject)
                 {
-                    
-                    if (IsOwner)// && (hitGameObject.tag == "Player" || hitGameObject.tag == "Target"))
-                    {
-                        myPlayerStateController.StartHitmarker();
-                    }
-
                     // first check player hit
                     PlayerNetworking shotPlayerNetworking = CheckForPlayerHit(hitGameObject);
                     if (shotPlayerNetworking != null)
                     {
+                        if (shotPlayerNetworking.myPlayerStateController.SlowdownShieldTimer > 0)
+                        {
+                            
+                        }
+                        else
+                        {
+                            if (IsOwner)
+                                myPlayerStateController.StartHitmarker();
+                        }
 
                         shotPlayerNetworking.myPlayerStateController.ProcessHit();
                         return;
                     }
+
+                    if (IsOwner)
+                        myPlayerStateController.StartHitmarker();
 
                     // then switch
                     Target hitTarget = hitGameObject.transform.gameObject.GetComponent<Target>();
@@ -385,6 +391,8 @@ public class PlayerNetworking : NetworkBehaviour
                             ReadyUpStateChange();
                             return;
                         }
+
+                        
                     }
                 }
             }

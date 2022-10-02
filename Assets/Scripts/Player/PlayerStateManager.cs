@@ -78,6 +78,9 @@ public class PlayerStateManager : MonoBehaviour
 
     private float slowdownTimer = 0;
 
+    public float SlowdownShieldTimer => slowdownShieldTimer;
+    private float slowdownShieldTimer = 0;
+
     private float respawningTimer = 0;
 
     void Start()
@@ -207,7 +210,18 @@ public class PlayerStateManager : MonoBehaviour
             {
                 ProcessSlowdown(1 - slowdownTimer);
             }
+        }
 
+        if(slowdownShieldTimer > 0)
+        {
+            slowdownShieldTimer -= Time.deltaTime / GameStateManager.Singleton.slowdownTimeShield;
+
+            if(slowdownShieldTimer <= 0)
+            {
+                slowdownShieldTimer = 0;
+            }
+
+            ProcessSlowdownShield(1 - slowdownShieldTimer);
         }
 
         if (Input.GetKeyDown(KeyCode.T))
@@ -568,9 +582,12 @@ public class PlayerStateManager : MonoBehaviour
     {
         Debug.Log("Ow I just got shot");
 
-        playerAudioManager.HitSound();
-        StartSlowdown();
-
+        if(slowdownShieldTimer == 0 && GameStateManager.Singleton.GameState != GameState.readiedUp)
+        {
+            playerAudioManager.HitSound();
+            slowdownShieldTimer = 1;
+            StartSlowdown();
+        }
     }
 
     [System.NonSerialized]
@@ -583,6 +600,14 @@ public class PlayerStateManager : MonoBehaviour
         slowdownStartVelocity = playerBody.velocity;
 
         playerController.BoostForce(-slowdownStartVelocity, ForceMode.VelocityChange);
+
+
+    }
+
+    public void GameStarted()
+    {
+
+        slowdownShieldTimer = 2;
     }
 
     /// <summary>
@@ -604,6 +629,14 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
+    public void ProcessSlowdownShield(float t)
+    {
+        if (!playerNetworking.IsOwner)
+        {
+            playerNetworking.nameplate.SetHealthBar(1-t);
+        }
+    }
+
     public void ProcessSlowdownFixedUpdate(float t)
     {
         const float percentageOfSlowdown = 1f;
@@ -612,7 +645,7 @@ public class PlayerStateManager : MonoBehaviour
 
         if(newT <= 1)
         {
-            Vector3 GravityForce = Physics.gravity * 1f * (1 - newT);// * (1- newT);// + pc.CharacterFallingWeight * Vector3.down;
+            Vector3 GravityForce = Physics.gravity * 1f * (1 - newT);
             playerController.BoostForce(-GravityForce, ForceMode.Acceleration);
             playerController.playerControlFactor = newT;
 

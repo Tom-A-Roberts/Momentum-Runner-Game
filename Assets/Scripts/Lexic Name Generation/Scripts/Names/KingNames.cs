@@ -18,7 +18,9 @@ namespace Lexic
                                                     "Rudolf_", "Lothar_", "Hugo_", "Francis_", 
                                                     "Edmund_", "Ragnvald_", "Magnus_", "Albert_", 
                                                     "Sigmund_", "Gustav_", "Frederick_", "Oscar_",
-                                                    "Lech_", "Boleslaw_", 
+                                                    "Lech_", "Boleslaw_", "Bister_", "Romulus_", "Felix_",
+                                                    "Hortensia_", "Octavia_", "Mariana_", "Vitus_", "Antonia_",
+                                                    "Titus_", "Praenomen_", "Appius_", "Aula_", "Decima_"
                                                     }
                 },
                 {
@@ -39,7 +41,19 @@ namespace Lexic
                                                     "the_Peaceful", "the_Martyr", "the_Unready", "Forkbeard", "Ironside",
                                                     "Harefoot", "the_Confessor", "the_Young", "the_Victorious", "the_Old",
                                                     "the_Red", "the_Younger", "the_Lame", "Barnlock", "of_Sweden", "of_Lithuania",
-                                                    "the_Tyrant", "Bourbon", "Savoy", "Habsburg", 
+                                                    "the_Tyrant", "Bourbon", "Savoy", "Habsburg", "Eater_of_Bread", "the_Interested",
+                                                    "the_Wreckless", "Left_Wanting", "the_Undefeated", "Tall_as_a_Boat", "Worth_a_Sheckel",
+                                                    "the_Weak", "the_Pointless", "the_Weak-Willed", "the_Defeated", "the_Unlikely", "the_Undecided",
+                                                    "the_Confused", "the_Slow", "the_Optimist", "the_Thinker", "the_Short", "the_Tall",
+                                                    "Brominov", "_olkov", "Smirnoff", "Semenov", "Kozlov", "Stepanchikov", "Stepanov",
+                                                    "Tiberious", "Domitian", "Trajan", "Augustus", "Maximus", "Gravitus", "the_Bright",
+                                                    "the_Dim", "the_Scared", "the_Knee-high", "the_Big-shoed", "Small-hands", "Long-beard",
+                                                    "Grimbeard", "the_Preacher", "the_Unbroken", "the_Breaker_of_Chains", "of_Sardinia",
+                                                    "the_Majestic", "the_Merciful", "Liege_Lord", "Hippopotolosoto", "Eater_of_Suns",
+                                                    "Vice-Chair_of_Chess_Society", "the_Kahoot_King", "Saver_of_Endangered_Flora",
+                                                    "the_Butcher_of_Lundus", "the_Fourth_Chambermaid", "Assistant_to_the_Manager",
+                                                    "the_Regional_Manager", "the_Unyielding", "the_Builder_of_Blocks", "the_Bad",
+                                                    "the_Unruly", "the_Shaky", "the_Wild"
                                                     }
                 },
             };

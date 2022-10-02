@@ -212,6 +212,11 @@ public class GameStateSwitcher
 
         if (!parent.DeveloperMode)
             parent.localPlayer.myPlayerStateController.playerAudioManager.SwitchToGameplaySoundtrack();
+
+        foreach (var playerKeyValue in PlayerNetworking.ConnectedPlayerNetworkingScripts)
+        {
+            playerKeyValue.Value.myPlayerStateController.GameStarted();
+        }
     }
 
     /// <param name="useEffects">Whether you want to show effects like animations or sounds</param>
