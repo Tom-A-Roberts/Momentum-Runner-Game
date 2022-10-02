@@ -189,8 +189,16 @@ public class GameStateManager : NetworkBehaviour
         {
             closingSpeed = _networkedClosingSpeed.Value;
 
-            // Add callback function for when the game state is changed:
+            // Add callback function for when the game state is changed: 
             _zoneState.OnValueChanged += ChangedZoneState;
+
+            if (DeveloperMode)
+            {
+                if (fogWall)
+                    fogWall.SetActive(false);
+                if (deathWall)
+                    deathWall.SetActive(false);
+            }
         }
         else
         {
@@ -211,9 +219,16 @@ public class GameStateManager : NetworkBehaviour
 
                 _gameState.Value = GameState.waitingToReadyUp;
             }
-               
-
             _networkedClosingSpeed.Value = (ushort)closingSpeed;
+        }
+
+        //If nameplate hasn't been initialized by now, ensure it is.
+        foreach (var player in PlayerNetworking.ConnectedPlayerNetworkingScripts)
+        {
+            if (!player.Value.nameplate.Initialized)
+            {
+                player.Value.InitNameplate();
+            }
         }
     }
     #endregion

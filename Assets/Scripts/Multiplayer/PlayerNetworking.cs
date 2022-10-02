@@ -27,6 +27,7 @@ public class PlayerNetworking : NetworkBehaviour
     public Rigidbody bodyRigidbody;
     public Rigidbody feetRigidbody;
     public Collider MultiplayerCollider;
+    public Nameplate nameplate;
 
     // These variables are set in OnNetworkSpawn
     private GunController myGunController;
@@ -800,6 +801,8 @@ public class PlayerNetworking : NetworkBehaviour
         if (NetworkManager.Singleton.IsHost)
             myStatsTracker = new StatsTracker(this, myPlayerStateController, bodyRigidbody);
 
+        displayName.OnValueChanged += ChangedDisplayName;
+
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)
         {
@@ -822,7 +825,8 @@ public class PlayerNetworking : NetworkBehaviour
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
-            gameObject.name = displayName.Value.ToSafeString() + " (Remote)";
+            if(localPlayer)
+                InitNameplate();
         }
         else
         {
@@ -833,21 +837,37 @@ public class PlayerNetworking : NetworkBehaviour
             // Sadly has to be done here as the GameStateManager OnNetworkSpawn is unreliable
             GameStateManager.Singleton.OnLocalPlayerNetworkSpawn();
 
-            // Update who in the game is currently spectators or not
-            //GetListOfSpectatorsServerRPC();
-
             myPlayerStateController.HideMultiplayerRepresentation();
 
             displayName.Value = GetMyDisplayName();
+        }
+    }
 
-            gameObject.name = displayName.Value.ToSafeString() + " (Local)";
+    private void ChangedDisplayName(FixedString64Bytes oldName, FixedString64Bytes newName)
+    {
+        if (!IsOwner)
+        {
+            gameObject.name = newName + " (Remote)";
+            nameplate.SetName(newName.ToSafeString());
+        }
+        else
+        {
+            gameObject.name = newName + " (Local)";
+        }
+    }
+
+    public void InitNameplate()
+    {
+        if (!IsOwner)
+        {
+            nameplate.Init(localPlayer.bodyRigidbody.transform, displayName.Value.ToSafeString());
         }
     }
 
     public FixedString64Bytes GetMyDisplayName()
     {
         // If using steam, this is where we'd connect to the steam API
-        string name = "Player" + OwnerClientId.ToString();
+        string name = "Player " + OwnerClientId.ToString();
         FixedString64Bytes bytesName = new FixedString64Bytes(name);
         return bytesName;
     }
