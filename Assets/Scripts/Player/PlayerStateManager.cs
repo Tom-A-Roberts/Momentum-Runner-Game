@@ -61,7 +61,7 @@ public class PlayerStateManager : MonoBehaviour
     public bool isDeadLocally = false;
 
     /// <summary>
-    /// Tracks what is locally happening. If this value differs from the network variable, then they are resynced within Update()
+    /// Tracks what is locally happening. If this value differs from the network variable, then they are resynced within Update() 
     /// </summary>
     [System.NonSerialized]
     public bool isSpectatingLocally = false;

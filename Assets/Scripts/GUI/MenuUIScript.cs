@@ -21,6 +21,7 @@ public class MenuUIScript : NetworkBehaviour
 
     // Text inputs:
     public TMP_InputField displayName;
+    public TMP_InputField fpsLimitInput;
 
     public TMP_InputField hostingIpText;
     public TMP_InputField hostingPortText;
@@ -44,6 +45,26 @@ public class MenuUIScript : NetworkBehaviour
     public static bool startNetworkingOnSpawn = true;
 
     public static string localDisplayName = "";
+
+    public static int fpsLimit
+    {
+        get
+        {
+            if (!PlayerPrefs.HasKey("fpsLimit"))
+            {
+                PlayerPrefs.SetInt("fpsLimit", 0);
+                PlayerPrefs.Save();
+                return 0;
+            }
+
+            return PlayerPrefs.GetInt("fpsLimit");
+        }
+        set
+        {
+            PlayerPrefs.SetInt("fpsLimit", value);
+            PlayerPrefs.Save();
+        }
+    }
 
     public static float musicVolume = 1;
     public static float effectsVolume = 1;
@@ -132,6 +153,39 @@ public class MenuUIScript : NetworkBehaviour
         displayName.text = localDisplayName;
     }
 
+    public void UpdateFPSLimit()
+    {
+        int newLim = 0;
+        if (fpsLimitInput.text.Length != 0)
+        {
+            newLim = int.Parse(fpsLimitInput.text);
+        }
+        
+        bool passed = true;
+        if(newLim < 0)
+        {
+            passed = false;
+        }
+        if (newLim > 0 && newLim < 15)
+        {
+            passed = false;
+        }
+        if (newLim > 999)
+        {
+            passed = false;
+        }
+        if (passed)
+        {
+            fpsLimit = newLim;
+        }
+
+        string limTex = fpsLimit.ToString();
+        if (limTex == "0")
+            limTex = "";
+        fpsLimitInput.text = limTex;
+
+    }
+
     public static void UpdateAudioStaticsFromPrefs()
     {
         if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
@@ -164,6 +218,11 @@ public class MenuUIScript : NetworkBehaviour
             PlayerPrefs.SetInt("volumeSettingsRemembered", 1);
             PlayerPrefs.Save();
         }
+
+        string limTex = fpsLimit.ToString();
+        if (limTex == "0")
+            limTex = "";
+        fpsLimitInput.text = limTex;
 
         UpdateDisplayName();
         displayName.text = localDisplayName;

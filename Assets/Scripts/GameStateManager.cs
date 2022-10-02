@@ -148,6 +148,11 @@ public class GameStateManager : NetworkBehaviour
         if (Singleton != null && Singleton != this)
             Destroy(Singleton);
         Singleton = this;
+
+
+        int fpsLimit = MenuUIScript.fpsLimit;
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = fpsLimit;
     }
 
     void Start()
@@ -168,6 +173,8 @@ public class GameStateManager : NetworkBehaviour
         {
             //SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress);
         }
+
+
     }
 
     /// <summary>
