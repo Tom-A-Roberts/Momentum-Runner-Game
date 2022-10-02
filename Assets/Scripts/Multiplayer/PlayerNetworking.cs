@@ -867,7 +867,10 @@ public class PlayerNetworking : NetworkBehaviour
     public FixedString64Bytes GetMyDisplayName()
     {
         // If using steam, this is where we'd connect to the steam API
-        string name = "Player " + OwnerClientId.ToString();
+
+        //string name = "Player " + OwnerClientId.ToString();
+        MenuUIScript.UpdateDisplayName();
+        string name = MenuUIScript.localDisplayName;
         FixedString64Bytes bytesName = new FixedString64Bytes(name);
         return bytesName;
     }

@@ -29884,10 +29884,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 112149360}
     - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
-      propertyPath: DeveloperMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: CountdownPanel
       value: 
       objectReference: {fileID: 821781461}
@@ -29915,10 +29911,6 @@ PrefabInstance:
       propertyPath: waitingToReadyUpPanel
       value: 
       objectReference: {fileID: 1408451216}
-    - target: {fileID: 6462836443202579312, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
-      propertyPath: slowdownAdditionalVelocityMultiplier
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6462836443202579314, guid: 6b5ae68970d5f284b9834c69fe6db9b7, type: 3}
       propertyPath: m_RootOrder
       value: 2

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6462836443202579317}
   - component: {fileID: 6462836443202579312}
   - component: {fileID: 6462836443202579315}
+  - component: {fileID: 6396416393272679532}
   m_Layer: 0
   m_Name: Game State Manager
   m_TagString: Untagged
@@ -32,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6462836443202579317
 MonoBehaviour:
@@ -75,7 +76,7 @@ MonoBehaviour:
   zoneDifficultyChanger: 1
   respawnDuration: 2.5
   slowdownTime: 1
-  slowdownAdditionalVelocityMultiplier: 0.2
+  slowdownAdditionalVelocityMultiplier: 0
   ScreenRedEdges: {fileID: 0}
   SlowdownBorder: {fileID: 0}
   waitingToReadyUpPanel: {fileID: 0}
@@ -106,3 +107,16 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &6396416393272679532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6462836443202579316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c1f8d4aa417fbe479d3dfe26788d9fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  namesSourceClass: Lexic.KingNames
