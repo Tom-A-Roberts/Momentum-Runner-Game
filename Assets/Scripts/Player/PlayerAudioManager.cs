@@ -41,6 +41,7 @@ public class PlayerAudioManager : NetworkBehaviour
     public AudioClip overheatedGun;
     public AudioClip gunCoolingEffect;
     public AudioClip hitmarkerSound;
+    public AudioClip hitSound;
 
     public AudioClip countdownStart;
     public AudioClip countdownBeep;
@@ -177,6 +178,12 @@ public class PlayerAudioManager : NetworkBehaviour
     {
         if (mainAudioSource != null)
             mainAudioSource.PlayOneShot(hitmarkerSound, startVolume * 0.3f);
+    }
+
+    public void HitSound()
+    {
+        if (mainAudioSource != null)
+            mainAudioSource.PlayOneShot(hitSound, startVolume * 0.15f);
     }
 
     public void SwitchToCountdown()

@@ -744,6 +744,7 @@ MonoBehaviour:
   overheatedGun: {fileID: 8300000, guid: cd9fe50eeb6c0fd42aafbb1c603e6081, type: 3}
   gunCoolingEffect: {fileID: 8300000, guid: 364ae69753be8fb44a33c87dd1fe0825, type: 3}
   hitmarkerSound: {fileID: 8300000, guid: 3fc5c8bd6d1f84e41892826508dc7a77, type: 3}
+  hitSound: {fileID: 8300000, guid: 9d58ff37c62bd394284ab9a19f8c4118, type: 3}
   countdownStart: {fileID: 8300000, guid: 550365b304244ed4383b68179575d377, type: 3}
   countdownBeep: {fileID: 8300000, guid: b29eee395940cf747bb20893856b58f0, type: 3}
   countdownEnd: {fileID: 8300000, guid: fceb26558f3f80648af6f75d568a35e5, type: 3}
