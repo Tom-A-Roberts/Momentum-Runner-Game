@@ -151,8 +151,11 @@ public class GameStateManager : NetworkBehaviour
 
 
         int fpsLimit = MenuUIScript.fpsLimit;
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = fpsLimit;
+        if(fpsLimit > 0)
+        {
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = fpsLimit;
+        }
     }
 
     void Start()
