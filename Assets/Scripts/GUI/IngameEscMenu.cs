@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using System;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class IngameEscMenu : MonoBehaviour
 {
@@ -85,7 +85,7 @@ public class IngameEscMenu : MonoBehaviour
 
     private void GoToMainMenu()
     {
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        LoadingScreen.Load("Menu");
     }
 
     public void QuitToDesktop()

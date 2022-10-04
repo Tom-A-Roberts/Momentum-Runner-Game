@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using System.Text;
@@ -298,8 +297,7 @@ public class MenuUIScript : NetworkBehaviour
         joinAsClient = false;
         startNetworkingOnSpawn = true;
 
-        SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
-        //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
+        LoadingScreen.Load("LevelExample");
     }
 
     public void LoadMultiplayerLevel1AsHost()
@@ -307,8 +305,7 @@ public class MenuUIScript : NetworkBehaviour
         joinAsClient = false;
         startNetworkingOnSpawn = true;
 
-        SceneManager.LoadScene("MultiplayerLevel1", LoadSceneMode.Single);
-        //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
+        LoadingScreen.Load("MultiplayerLevel1");
     }
 
     public void LoadMultiplayerLevel2AsHost()
@@ -316,8 +313,7 @@ public class MenuUIScript : NetworkBehaviour
         joinAsClient = false;
         startNetworkingOnSpawn = true;
 
-        SceneManager.LoadScene("MultiplayerLevel 2", LoadSceneMode.Single);
-        //NetworkManager.SceneManager.LoadScene("LevelExample", LoadSceneMode.Single);
+        LoadingScreen.Load("MultiplayerLevel 2");
     }
 
 
