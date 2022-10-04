@@ -81,6 +81,8 @@ public class IngameEscMenu : MonoBehaviour
     public void LoadMainMenu()
     {
         Hide();
+        if (LoadingCamera.Singleton)
+            LoadingCamera.Singleton.Enable();
         StartCoroutine(NetworkShutdown(GoToMainMenu));
     }
 

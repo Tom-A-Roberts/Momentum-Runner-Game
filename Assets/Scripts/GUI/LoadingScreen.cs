@@ -48,15 +48,22 @@ public class LoadingScreen : MonoBehaviour
             loadingProgress = Mathf.Clamp01(currentAsyncOperation.progress / 0.9f);
             if (percentageText)
             {
-                percentageText.text = Mathf.RoundToInt(loadingProgress * 100).ToString() + "%";
+                if(Mathf.RoundToInt(loadingProgress * 100) == 0)
+                {
+                    percentageText.text = "";
+                }
+                else
+                {
+                    percentageText.text = Mathf.RoundToInt(loadingProgress * 100).ToString() + "%";
+                }
+                
             }
         }
     }
 
-
     public void Enable(AsyncOperation _operation)
     {
-        currentAsyncOperation = _operation;
+        
         isShowing = true;
         foreach (Transform child in gameObject.transform)
         {
@@ -78,8 +85,8 @@ public class LoadingScreen : MonoBehaviour
         AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(levelName, LoadSceneMode.Single);
 
         if (Singleton != null)
-        {
+        
             Singleton.Enable(asyncOperation);
-        }
+        
     }
 }
