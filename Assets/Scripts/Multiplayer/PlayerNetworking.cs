@@ -788,6 +788,9 @@ public class PlayerNetworking : NetworkBehaviour
 
         if (IsOwner)
         {
+            // Re-enable the loading camera because this one will soon be destroyed:
+            if (LoadingCamera.Singleton)
+                LoadingCamera.Singleton.Enable();
             // OR: if I am disconnected then send my player to main menu
             IngameEscMenu.Singleton.LoadMainMenu();
         }
@@ -796,6 +799,8 @@ public class PlayerNetworking : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         PlayerConnect();
+
+
 
         myGrappleGun = grappleGun.GetComponent<GrappleGun>();
         myGrappleGun.isGrappleOwner = IsOwner;
@@ -838,6 +843,9 @@ public class PlayerNetworking : NetworkBehaviour
         }
         else
         {
+            if (LoadingCamera.Singleton)
+                LoadingCamera.Singleton.Disable();
+
             GameStateManager.Singleton.localPlayer = this;
             localPlayer = this;
 

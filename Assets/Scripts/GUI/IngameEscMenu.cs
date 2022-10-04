@@ -80,6 +80,7 @@ public class IngameEscMenu : MonoBehaviour
 
     public void LoadMainMenu()
     {
+        Hide();
         StartCoroutine(NetworkShutdown(GoToMainMenu));
     }
 
