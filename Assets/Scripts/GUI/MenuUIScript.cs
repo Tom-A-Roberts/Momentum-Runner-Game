@@ -245,17 +245,17 @@ public class MenuUIScript : NetworkBehaviour
         GameModePanel.SetActive(true);
         UpdatePortFieldsFromPrefs();
     }
+
     public void EnableMainPanel()
     {
         MainMenuPanel.SetActive(true);
-        
     }
+
     public void EnableSettingsPanel()
     {
         SettingsPanel.SetActive(true);
         UpdateSettingsFromPrefs();
     }
-
 
     public void DisableGamePanel()
     {
@@ -348,8 +348,8 @@ public class MenuUIScript : NetworkBehaviour
         PlayerPrefs.SetString("hostingIp", hostingIp);
         PlayerPrefs.SetString("hostingPort", hostingPort);
         PlayerPrefs.Save();
-
     }
+
     public void DirectConnectToServer()
     {
         // Check IP address and port right here

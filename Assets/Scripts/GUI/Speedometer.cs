@@ -15,7 +15,9 @@ public class Speedometer : MonoBehaviour
     {
         if (bodyToTrack != null)
         {
-            int bodySpeed = Mathf.RoundToInt(new Vector3(bodyToTrack.velocity.x, 0, bodyToTrack.velocity.z).magnitude);
+            float originalValue = new Vector3(bodyToTrack.velocity.x, 0, bodyToTrack.velocity.z).magnitude;
+            float adjusted = Mathf.Pow(originalValue, 1.5f) * 0.4f;
+            int bodySpeed = Mathf.RoundToInt(adjusted);
 
             if (bodySpeed > 999)
             {
