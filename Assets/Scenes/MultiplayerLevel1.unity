@@ -15287,7 +15287,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1780334897903950252, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: m_RootOrder
-      value: 91
+      value: 92
       objectReference: {fileID: 0}
     - target: {fileID: 1780334897903950252, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -18421,7 +18421,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 90
+  m_RootOrder: 91
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1702109950
 PrefabInstance:
@@ -26490,6 +26490,10 @@ PrefabInstance:
     - target: {fileID: 611969262137635122, guid: 6a2caa8447f18f046b3dd1c7e536e6c0, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 611969262137635123, guid: 6a2caa8447f18f046b3dd1c7e536e6c0, type: 3}
+      propertyPath: managedReferences[141809101374488589].renderQueueType
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
