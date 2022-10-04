@@ -6,7 +6,7 @@ using TMPro;
 public class Speedometer : MonoBehaviour
 {
     [Tooltip("The text element that should display the current speed")]
-    public TextMeshProUGUI speedometerText;
+    public TMP_Text speedometerText;
     [Tooltip("The rigidbody that the speedometer should track the speed of")]
     public Rigidbody bodyToTrack;
 
