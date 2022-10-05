@@ -36,7 +36,7 @@ public class WinLoseEffects : MonoBehaviour
         PlayerNetworking.localPlayer.myPlayerStateController.playerAudioManager.VictorySound();
 
         victoryImage.SetActive(true);
-        if (!depthEffect.active)
+        if (depthEffect && !depthEffect.active)
             depthEffect.active = true;
 
         if (GameStateManager.Singleton && GameStateManager.Singleton.localPlayer)
@@ -51,7 +51,7 @@ public class WinLoseEffects : MonoBehaviour
         PlayerNetworking.localPlayer.myPlayerStateController.playerAudioManager.DefeatSound();
 
         defeatImage.SetActive(true);
-        if (!depthEffect.active)
+        if (depthEffect && !depthEffect.active)
             depthEffect.active = true;
 
         if (GameStateManager.Singleton && GameStateManager.Singleton.localPlayer)
@@ -64,12 +64,12 @@ public class WinLoseEffects : MonoBehaviour
     {
         victoryImage.SetActive(false);
         defeatImage.SetActive(false);
-        if (depthEffect.active)
+        if (depthEffect && depthEffect.active)
             depthEffect.active = false;
 
     }
 
-    // Start is called before the first frame update
+    // Start is called before the first frame update 
     void Start()
     {
         UnityEngine.Rendering.Volume[] sceneVolumes = GameObject.FindObjectsOfType<UnityEngine.Rendering.Volume>();

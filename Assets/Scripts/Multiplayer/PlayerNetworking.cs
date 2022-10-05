@@ -119,7 +119,7 @@ public class PlayerNetworking : NetworkBehaviour
             }
         }
 
-        if (NetworkManager.Singleton.IsHost && myStatsTracker != null)
+        if (NetworkManager.Singleton.IsHost && myStatsTracker != null && GameStateManager.Singleton)
         {
             myStatsTracker.Update(_netState.Value.PositionData.Velocity);
         }
@@ -384,7 +384,7 @@ public class PlayerNetworking : NetworkBehaviour
                     }
 
                     // finally ready up - only if owner
-                    if (IsOwner)
+                    if (IsOwner && GameStateManager.Singleton)
                     {                        
                         if (hitGameObject.transform.tag == "Readyup" && GameStateManager.Singleton.GameState == GameState.waitingToReadyUp)
                         {
@@ -540,7 +540,7 @@ public class PlayerNetworking : NetworkBehaviour
     [ServerRpc(RequireOwnership =false)]
     public void EveryoneHasReadiedUpServerRPC()
     {
-        if (GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
+        if (GameStateManager.Singleton && GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
         {
             GameStateManager.Singleton.ServerForceChangeGameState(GameState.readiedUp);
         }
@@ -552,7 +552,7 @@ public class PlayerNetworking : NetworkBehaviour
     /// </summary>
     public void ReadyUpStateChange()
     {
-        if (IsOwner)
+        if (IsOwner && GameStateManager.Singleton)
         {
             if (_playerReadyUpState == ReadyUpState.ready)
             {
@@ -710,7 +710,8 @@ public class PlayerNetworking : NetworkBehaviour
     [ClientRpc]
     public void SendLeaderboardDataClientRPC(LeaderboardData leaderboardData)
     {
-        GameStateManager.Singleton.gameStateSwitcher.RecieveLeaderboardData(leaderboardData);
+        if (GameStateManager.Singleton)
+            GameStateManager.Singleton.gameStateSwitcher.RecieveLeaderboardData(leaderboardData);
     }
 
     public void ResetPlayerServerside()
@@ -846,12 +847,14 @@ public class PlayerNetworking : NetworkBehaviour
             if (LoadingCamera.Singleton)
                 LoadingCamera.Singleton.Disable();
 
-            GameStateManager.Singleton.localPlayer = this;
+            if(GameStateManager.Singleton)
+                GameStateManager.Singleton.localPlayer = this;
             localPlayer = this;
 
             // Activate the game state manager initialization:
             // Sadly has to be done here as the GameStateManager OnNetworkSpawn is unreliable
-            GameStateManager.Singleton.OnLocalPlayerNetworkSpawn();
+            if (GameStateManager.Singleton)
+                GameStateManager.Singleton.OnLocalPlayerNetworkSpawn();
 
             myPlayerStateController.HideMultiplayerRepresentation();
 

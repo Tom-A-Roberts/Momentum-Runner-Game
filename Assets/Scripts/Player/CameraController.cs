@@ -58,7 +58,7 @@ public class CameraController : NetworkBehaviour
 	void Update()
 	{
 
-		bool inFinishedGameState = GameStateManager.Singleton.GameState == GameState.winState || GameStateManager.Singleton.GameState == GameState.podium;
+		bool inFinishedGameState = GameStateManager.Singleton && (GameStateManager.Singleton.GameState == GameState.winState || GameStateManager.Singleton.GameState == GameState.podium);
 
         if (!IngameEscMenu.Singleton.curserUnlocked && !inFinishedGameState)
         {

@@ -127,7 +127,7 @@ public class GrappleGun : MonoBehaviour
 
     private void ProcessGrappleInput(GrappleablePointInfo raypointInfo)
     {
-        bool inFinishedGameState = GameStateManager.Singleton.GameState == GameState.winState || GameStateManager.Singleton.GameState == GameState.podium;
+        bool inFinishedGameState = GameStateManager.Singleton && (GameStateManager.Singleton.GameState == GameState.winState || GameStateManager.Singleton.GameState == GameState.podium);
         // Check if grapple gun is being controlled by the owner. If yes, then process local player input
         if (isGrappleOwner && !IngameEscMenu.Singleton.curserUnlocked && !inFinishedGameState)
         {

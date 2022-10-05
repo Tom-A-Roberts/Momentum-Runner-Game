@@ -176,10 +176,10 @@ public class PlayerStateManager : MonoBehaviour
                 InitializeFogwall();
             }
         }
-        if(!GameStateManager.Singleton.DeveloperMode && !playerNetworking._isDead.Value && NetworkManager.Singleton.IsHost)
+        if(GameStateManager.Singleton && (!GameStateManager.Singleton.DeveloperMode && !playerNetworking._isDead.Value && NetworkManager.Singleton.IsHost))
             CheckForDeath();
 
-        if (IsRespawning && NetworkManager.Singleton.IsHost)
+        if (IsRespawning && NetworkManager.Singleton.IsHost && GameStateManager.Singleton)
         {
             respawningTimer += Time.deltaTime;
             if(respawningTimer > GameStateManager.Singleton.respawnDuration)
@@ -198,7 +198,7 @@ public class PlayerStateManager : MonoBehaviour
             }
         }
 
-        if(slowdownTimer > 0)
+        if(slowdownTimer > 0 && GameStateManager.Singleton)
         {
             slowdownTimer -= Time.deltaTime / GameStateManager.Singleton.slowdownTime;
 
@@ -212,7 +212,7 @@ public class PlayerStateManager : MonoBehaviour
             }
         }
 
-        if(slowdownShieldTimer > 0)
+        if(slowdownShieldTimer > 0 && GameStateManager.Singleton)
         {
             slowdownShieldTimer -= Time.deltaTime / GameStateManager.Singleton.slowdownTimeShield;
 
@@ -290,7 +290,7 @@ public class PlayerStateManager : MonoBehaviour
     /// </summary>
     void CheckForDeath()
     {
-        if(GameStateManager.Singleton.deathWallCollider && GameStateManager.Singleton.deathWall)
+        if(GameStateManager.Singleton && (GameStateManager.Singleton.deathWallCollider && GameStateManager.Singleton.deathWall))
         {
             Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, GameStateManager.Singleton.deathWallCollider, GameStateManager.Singleton.deathWall.transform.position, GameStateManager.Singleton.deathWall.transform.rotation);
 
@@ -409,30 +409,32 @@ public class PlayerStateManager : MonoBehaviour
     /// </summary>
     public void UpdateDeathWallEffects(Transform deathwallTransform, BoxCollider deathWallCollider)
     {
-        if (deathwallTransform.gameObject.activeSelf)
+        if (GameStateManager.Singleton)
         {
-            if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+            if (deathwallTransform.gameObject.activeSelf)
             {
-                Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, deathWallCollider, deathwallTransform.position, deathwallTransform.rotation);
+                if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+                {
+                    Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, deathWallCollider, deathwallTransform.position, deathwallTransform.rotation);
 
-                float distance = Vector3.Distance(ClosestPoint, playerBody.position);
+                    float distance = Vector3.Distance(ClosestPoint, playerBody.position);
 
-                float power = Mathf.Clamp01((deathwallRedStartDistance - distance) / deathwallRedStartDistance);
+                    float power = Mathf.Clamp01((deathwallRedStartDistance - distance) / deathwallRedStartDistance);
 
-                playerAudioManager.UpdateDeathwallIntensity(power);
+                    playerAudioManager.UpdateDeathwallIntensity(power);
 
+                    Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
+                    newcol.a = power;
+                    GameStateManager.Singleton.ScreenRedEdges.color = newcol;
+                }
+            }
+            else
+            {
                 Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
-                newcol.a = power;
+                newcol.a = 0;
                 GameStateManager.Singleton.ScreenRedEdges.color = newcol;
             }
         }
-        else
-        {
-            Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
-            newcol.a = 0;
-            GameStateManager.Singleton.ScreenRedEdges.color = newcol;
-        }
-
     }
 
     #region Locally Entering and Leaving States
@@ -582,7 +584,7 @@ public class PlayerStateManager : MonoBehaviour
     {
         Debug.Log("Ow I just got shot");
 
-        if(slowdownShieldTimer == 0 && GameStateManager.Singleton.GameState != GameState.readiedUp)
+        if(slowdownShieldTimer == 0 && GameStateManager.Singleton && GameStateManager.Singleton.GameState != GameState.readiedUp)
         {
             playerAudioManager.HitSound();
             slowdownShieldTimer = 1;
@@ -617,7 +619,7 @@ public class PlayerStateManager : MonoBehaviour
     public void ProcessSlowdown(float t)
     {
 
-        if (playerNetworking.IsOwner)
+        if (playerNetworking.IsOwner && GameStateManager.Singleton)
         {
             if (GameStateManager.Singleton.SlowdownBorder)
             {
@@ -643,7 +645,7 @@ public class PlayerStateManager : MonoBehaviour
 
         float newT = Mathf.Clamp01(t / percentageOfSlowdown);
 
-        if(newT <= 1)
+        if(newT <= 1 && GameStateManager.Singleton)
         {
             Vector3 GravityForce = Physics.gravity * 1f * (1 - newT);
             playerController.BoostForce(-GravityForce, ForceMode.Acceleration);
@@ -656,7 +658,7 @@ public class PlayerStateManager : MonoBehaviour
     public void EndSlowdown()
     {
 
-        if (playerNetworking.IsOwner)
+        if (playerNetworking.IsOwner && GameStateManager.Singleton)
         {
             if (GameStateManager.Singleton.SlowdownBorder)
             {
