@@ -164,7 +164,7 @@ public class GameStateManager : NetworkBehaviour
     {
         if (railwayPointsList == null)
         {
-            throw new System.Exception("\"railwayPointsList is set to null.\\n Therefore no wall points found to use when moving the deathwall and fogwall!\"");
+            //throw new System.Exception("\"railwayPointsList is set to null.\\n Therefore no wall points found to use when moving the deathwall and fogwall!\"");
         }
         populateRailwayPoints();
 
