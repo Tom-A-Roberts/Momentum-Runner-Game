@@ -8866,22 +8866,6 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1629390220, guid: adcbf4380acc65042ac7968e77f54155, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8635522873935620420, guid: adcbf4380acc65042ac7968e77f54155, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8635522874617016688, guid: adcbf4380acc65042ac7968e77f54155, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8635522874825172668, guid: adcbf4380acc65042ac7968e77f54155, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8635522875818543863, guid: adcbf4380acc65042ac7968e77f54155, type: 3}
       propertyPath: m_Name
       value: LoadingScreenCanvas

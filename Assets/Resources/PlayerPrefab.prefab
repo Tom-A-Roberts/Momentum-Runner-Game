@@ -1112,7 +1112,7 @@ MonoBehaviour:
   countdownStart: {fileID: 8300000, guid: 550365b304244ed4383b68179575d377, type: 3}
   countdownBeep: {fileID: 8300000, guid: b29eee395940cf747bb20893856b58f0, type: 3}
   countdownEnd: {fileID: 8300000, guid: fceb26558f3f80648af6f75d568a35e5, type: 3}
-  victorySound: {fileID: 8300000, guid: c4697ab5bf84cdd4d86abeb0c373554b, type: 3}
+  victorySound: {fileID: 8300000, guid: fcffc4c3f682fb243809669f4bd9a64a, type: 3}
   defeatSound: {fileID: 8300000, guid: 4dfe236a74e02e34cbfc54b04b3a2597, type: 3}
   spectatorMode: 0
 --- !u!114 &4316027073834798312
