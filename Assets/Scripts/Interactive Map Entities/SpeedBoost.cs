@@ -54,6 +54,9 @@ public class SpeedBoost : MonoBehaviour
         }
 
     }
+
+
+
     private void OnTriggerExit(Collider other)
     {
         DashMultiplier = 0;

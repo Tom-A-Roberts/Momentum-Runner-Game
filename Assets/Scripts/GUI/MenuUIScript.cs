@@ -8,33 +8,45 @@ using System.Text;
 using UnityEngine.UI;
 using Lexic;
 
+//[RequireComponent(typeof(Settings))]
 public class MenuUIScript : NetworkBehaviour
 {
-    public AudioClip clickSoundEffect;
+
+    [Header("Panels")]
     public GameObject MainMenuPanel;
     public GameObject SettingsPanel;
     public GameObject GameModePanel;
     public GameObject LevelSelectPanel;
 
+    [Header("Known Settings Objects")]
+    public TMP_InputField displayNameInput;
+    public TMP_InputField fpsLimitInput;
+    public Slider musicVolumeSlider;
+    public Slider effectsVolumeSlider;
+    public Slider brightnessSlider;
+    public TMP_Dropdown graphicsQualityDropdown;
+
     public GameObject ConnectingToServerText;
 
-    // Text inputs:
-    public TMP_InputField displayName;
-    public TMP_InputField fpsLimitInput;
-
+    [Header("Known IP Inputs")]
     public TMP_InputField hostingIpText;
     public TMP_InputField hostingPortText;
     public TMP_InputField clientingIpText;
     public TMP_InputField clientingPortText;
 
-    // Sliders
-    public Slider musicVolumeSlider;
-    public Slider effectsVolumeSlider;
-
+    [Header("Other")]
     public bool isMultiplayerHosting;
+    public AudioClip clickSoundEffect;
+
+    public SettingsInterface Settings => settings;
+    private SettingsInterface settings;
+
+    public AdjustSettingsFromPrefs SettingsAdjuster => settingsAdjuster;
+    private AdjustSettingsFromPrefs settingsAdjuster;
 
     private AudioSource myAudioSource;
     private AudioSource effectsAudioSource;
+
     private string hostingIp;
     private string hostingPort;
     private string clientingIp;
@@ -43,65 +55,21 @@ public class MenuUIScript : NetworkBehaviour
     public static bool joinAsClient = false;
     public static bool startNetworkingOnSpawn = true;
 
-    public static string localDisplayName = "";
-
-    public static int fpsLimit
-    {
-        get
-        {
-            if (!PlayerPrefs.HasKey("fpsLimit"))
-            {
-                PlayerPrefs.SetInt("fpsLimit", 0);
-                PlayerPrefs.Save();
-                return 0;
-            }
-
-            return PlayerPrefs.GetInt("fpsLimit");
-        }
-        set
-        {
-            PlayerPrefs.SetInt("fpsLimit", value);
-            PlayerPrefs.Save();
-        }
-    }
-
-    public static float musicVolume = 1;
-    public static float effectsVolume = 1;
-
-
     public void Start()
     {
         Cursor.lockState = CursorLockMode.None;
 
+        settings = new SettingsInterface();
+        settingsAdjuster = new AdjustSettingsFromPrefs();
+
         myAudioSource = GameObject.FindObjectOfType<AudioSource>();
         effectsAudioSource = myAudioSource.gameObject.AddComponent<AudioSource>();
         effectsAudioSource.volume = 1;
-        UpdateDisplayName();
+        UpdateMenuVolumes();
+        settingsAdjuster.UpdateGraphics();
         UpdatePortFieldsFromPrefs();
-        UpdateSettingsFromPrefs();
+        UpdateSettingsPage();
         joinAsClient = false;
-    }
-
-    public static void UpdateDisplayName(string newName = "")
-    {
-        if(newName.Length == 0)
-        {
-            localDisplayName = PlayerPrefs.GetString("displayName");
-            if (localDisplayName.Length == 0)
-            {
-                localDisplayName = NameGen.GetNextRandomName();
-                PlayerPrefs.SetString("displayName", localDisplayName);
-                PlayerPrefs.Save();
-            }
-        }
-        else
-        {
-            localDisplayName = newName;
-            PlayerPrefs.SetString("displayName", localDisplayName);
-            PlayerPrefs.Save();
-        }
-
-
     }
 
     public void ButtonClicked()
@@ -121,47 +89,53 @@ public class MenuUIScript : NetworkBehaviour
 
     #region Settings Menu
 
-    public void EffectsVolumeChanged()
-    {
-        effectsVolume = effectsVolumeSlider.value;
-        UpdateVolumes();
-        PlayerPrefs.SetFloat("effectsVolume", effectsVolume);
-        PlayerPrefs.SetInt("volumeSettingsRemembered", 1);
-        PlayerPrefs.Save();
-    }
     public void MusicVolumeChanged()
     {
-        musicVolume = musicVolumeSlider.value;
-        UpdateVolumes();
-        PlayerPrefs.SetFloat("musicVolume", musicVolume);
-        PlayerPrefs.SetInt("volumeSettingsRemembered", 1);
-        PlayerPrefs.Save();
+        settings.musicVolume.Value = musicVolumeSlider.value;
+        UpdateMenuVolumes();
+    }
+    public void EffectsVolumeChanged()
+    {
+        settings.effectsVolume.Value = effectsVolumeSlider.value;
+        UpdateMenuVolumes();
+    }
+
+    public void BrightnessChanged()
+    {
+        settings.brightness.Value = brightnessSlider.value;
+        settingsAdjuster.UpdateGraphics();
+    }
+
+    public void GraphicsQualityChanged()
+    {
+        settings.graphicsQuality.Value = graphicsQualityDropdown.value;
+        settingsAdjuster.UpdateGraphics();
     }
 
     public void DisplayNameChanged()
     {
-        UpdateDisplayName(displayName.text);
-        displayName.text = localDisplayName;
-    }
-    public void RegenerateName()
-    {
-        localDisplayName = "";
-        PlayerPrefs.SetString("displayName", localDisplayName);
-        PlayerPrefs.Save();
-        UpdateDisplayName();
-        displayName.text = localDisplayName;
+        string newText = displayNameInput.text;
+        if (newText.Length == 0)
+        {
+            settings.RegenerateName();
+        }
+        else
+        {
+            settings.DisplayName = newText;
+            displayNameInput.text = newText;
+        }
     }
 
-    public void UpdateFPSLimit()
+    public void FPSLimitChanged()
     {
         int newLim = 0;
         if (fpsLimitInput.text.Length != 0)
         {
             newLim = int.Parse(fpsLimitInput.text);
         }
-        
+
         bool passed = true;
-        if(newLim < 0)
+        if (newLim < 0)
         {
             passed = false;
         }
@@ -175,67 +149,86 @@ public class MenuUIScript : NetworkBehaviour
         }
         if (passed)
         {
-            fpsLimit = newLim;
+            settings.fpsLimit.Value = newLim;
+
+            settingsAdjuster.UpdateGraphics();
         }
 
-        string limTex = fpsLimit.ToString();
+        string limTex = settings.fpsLimit.Value.ToString();
+        
+        if (limTex == "0")
+            limTex = "";
+        fpsLimitInput.text = limTex;
+    }
+
+    public void RegenerateName()
+    {
+        settings.RegenerateName();
+        displayNameInput.text = settings.DisplayName;
+    }
+
+    public void UpdateSettingsPage()
+    {
+        effectsVolumeSlider.value = settings.effectsVolume.Value;
+        musicVolumeSlider.value = settings.musicVolume.Value;
+
+        string limTex = settings.fpsLimit.Value.ToString();
         if (limTex == "0")
             limTex = "";
         fpsLimitInput.text = limTex;
 
+        displayNameInput.text = settings.DisplayName;
+
+        graphicsQualityDropdown.value = settings.graphicsQuality.Value;
+
+        brightnessSlider.value = settings.brightness.Value;
     }
 
-    public static void UpdateAudioStaticsFromPrefs()
+    public void UpdateMenuVolumes()
     {
-        if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
-        {
-            musicVolume = PlayerPrefs.GetFloat("musicVolume");
-            effectsVolume = PlayerPrefs.GetFloat("effectsVolume");
-        }
-        else
-        {
-            musicVolume = 1;
-            effectsVolume = 1;
-        }
-
+        effectsAudioSource.volume = settings.effectsVolume.Value;
+        myAudioSource.volume = settings.musicVolume.Value * 0.7f;
     }
 
-    private void UpdateSettingsFromPrefs()
+    //public void UpdateGraphics()
+    //{
+    //    if (exposureVolumeProfile == null)
+    //    {
+    //        Volume[] sceneVolumes = GameObject.FindObjectsOfType<UnityEngine.Rendering.Volume>();
+    //        foreach (var sceneVolume in sceneVolumes)
+    //        {
+    //            if (sceneVolume != null)
+    //            {
+    //                for (int componentID = 0; componentID < sceneVolume.profile.components.Count; componentID++)
+    //                {
+    //                    if (sceneVolume.profile.components[componentID].name.Contains("Exposure"))
+    //                    {
+    //                        exposureVolumeProfile = (Exposure)sceneVolume.profile.components[componentID];
+    //                        originalSceneExposure = exposureVolumeProfile.fixedExposure.value;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    if (exposureVolumeProfile != null)
+    //    {
+    //        exposureVolumeProfile.fixedExposure.value = originalSceneExposure + (-settings.brightness.Value + 0.5f) * 2.5f;
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning("No exposure found in this scene in any volume profiles! Cannot adjust brightness.");
+    //    }
+
+    //}
+
+    public void ResetSettings()
     {
-        if(PlayerPrefs.GetInt("volumeSettingsRemembered") == 1)
-        {
-            UpdateAudioStaticsFromPrefs();
-            effectsVolumeSlider.value = effectsVolume;
-            musicVolumeSlider.value = musicVolume;
-        }
-        else
-        {
-            effectsVolume = effectsVolumeSlider.value;
-            musicVolume = musicVolumeSlider.value;
-            PlayerPrefs.SetFloat("musicVolume", musicVolume);
-            PlayerPrefs.SetFloat("effectsVolume", effectsVolume);
-            PlayerPrefs.SetInt("volumeSettingsRemembered", 1);
-            PlayerPrefs.Save();
-        }
-
-        string limTex = fpsLimit.ToString();
-        if (limTex == "0")
-            limTex = "";
-        fpsLimitInput.text = limTex;
-
-        UpdateDisplayName();
-        displayName.text = localDisplayName;
+        settings.ClearSettingsPlayerPrefs();
+        UpdateSettingsPage();
     }
-
-    public void UpdateVolumes()
-    {
-        effectsAudioSource.volume = effectsVolume;
-        myAudioSource.volume = musicVolume * 0.7f;
-    }
-    
 
     #endregion
-
 
     #region Panel management
 
@@ -253,7 +246,7 @@ public class MenuUIScript : NetworkBehaviour
     public void EnableSettingsPanel()
     {
         SettingsPanel.SetActive(true);
-        UpdateSettingsFromPrefs();
+        UpdateSettingsPage();
     }
 
     public void DisableGamePanel()
