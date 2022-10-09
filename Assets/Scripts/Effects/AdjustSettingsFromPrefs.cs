@@ -48,6 +48,10 @@ public class AdjustSettingsFromPrefs
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = fpsLimit;
         }
+        else
+        {
+            Application.targetFrameRate = -1;
+        }
 
         if (exposureVolumeProfile != null)
         {
@@ -55,6 +59,7 @@ public class AdjustSettingsFromPrefs
         }
 
         int currentQualityLevel = QualitySettings.GetQualityLevel();
+
         if(currentQualityLevel != settings.graphicsQuality.Value)
         {
             QualitySettings.SetQualityLevel(settings.graphicsQuality.Value, changeExpensiveSettings);

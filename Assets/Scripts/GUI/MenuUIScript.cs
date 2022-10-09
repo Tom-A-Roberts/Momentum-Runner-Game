@@ -150,10 +150,12 @@ public class MenuUIScript : NetworkBehaviour
         if (passed)
         {
             settings.fpsLimit.Value = newLim;
+
+            settingsAdjuster.UpdateGraphics();
         }
 
         string limTex = settings.fpsLimit.Value.ToString();
-        settingsAdjuster.UpdateGraphics();
+        
         if (limTex == "0")
             limTex = "";
         fpsLimitInput.text = limTex;
