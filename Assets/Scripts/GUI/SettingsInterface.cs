@@ -184,7 +184,6 @@ public class SettingsInterface
         effectsVolume.Reset();
         graphicsQuality.Reset();
         brightness.Reset();
-
     }
 
 }
