@@ -129,7 +129,8 @@ public class GameStateManager : NetworkBehaviour
 
     public GameState GameState => _gameState.Value;
 
-    private SettingsInterface settings;
+    //private SettingsInterface settings;
+    private AdjustSettingsFromPrefs settingsAdjuster;
 
     private float zoneSpeedTarget = 0;
     private float zoneSpeedDeriv = 0;
@@ -153,13 +154,15 @@ public class GameStateManager : NetworkBehaviour
             Destroy(Singleton);
         Singleton = this;
 
-        settings = new SettingsInterface();
-        int fpsLimit = settings.fpsLimit.Value;
-        if(fpsLimit > 0)
-        {
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = fpsLimit;
-        }
+        //settings = new SettingsInterface();
+        //int fpsLimit = settings.fpsLimit.Value;
+        //if(fpsLimit > 0)
+        //{
+        //    QualitySettings.vSyncCount = 0;
+        //    Application.targetFrameRate = fpsLimit;
+        //}
+
+
     }
 
     void Start()
@@ -181,6 +184,9 @@ public class GameStateManager : NetworkBehaviour
             //SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress);
         }
 
+        settingsAdjuster = new AdjustSettingsFromPrefs();
+
+        settingsAdjuster.UpdateGraphics();
 
     }
 

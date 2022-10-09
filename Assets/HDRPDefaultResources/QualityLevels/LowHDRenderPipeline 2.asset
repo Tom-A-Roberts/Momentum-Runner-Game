@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0cf1dab834d4ec34195b920ea7bbf9ec, type: 3}
-  m_Name: HDRenderPipelineAsset
+  m_Name: LowHDRenderPipeline 2
   m_EditorClassIdentifier: 
   m_RenderPipelineSettings:
     supportShadowMask: 1
     supportSSR: 0
     supportSSRTransparent: 0
-    supportSSAO: 1
+    supportSSAO: 0
     supportSSGI: 0
     supportSubsurfaceScattering: 1
     sssSampleBudget:
@@ -68,15 +68,15 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 0
       supportFabricConvolution: 0
-      maxDirectionalLightsOnScreen: 16
-      maxPunctualLightsOnScreen: 512
-      maxAreaLightsOnScreen: 64
+      maxDirectionalLightsOnScreen: 6
+      maxPunctualLightsOnScreen: 128
+      maxAreaLightsOnScreen: 16
       maxEnvLightsOnScreen: 64
       maxDecalsOnScreen: 512
       maxPlanarReflectionOnScreen: 16
-      maxLightsPerClusterCell: 16
+      maxLightsPerClusterCell: 8
       maxLocalVolumetricFogSize: 32
-      maxLocalVolumetricFogOnScreen: 64
+      maxLocalVolumetricFogOnScreen: 6
     hdShadowInitParams:
       maxShadowRequests: 128
       directionalShadowsDepthBits: 32
@@ -120,16 +120,16 @@ MonoBehaviour:
       lutFormat: 48
       bufferFormat: 74
     dynamicResolutionSettings:
-      enabled: 0
+      enabled: 1
       useMipBias: 0
       enableDLSS: 0
       DLSSPerfQualitySetting: 0
       DLSSUseOptimalSettings: 1
       DLSSSharpness: 0.5
       maxPercentage: 100
-      minPercentage: 100
+      minPercentage: 70
       dynResType: 1
-      upsampleFilter: 1
+      upsampleFilter: 4
       forceResolution: 0
       forcedPercentage: 100
       lowResTransparencyMinimumThreshold: 0
@@ -144,23 +144,23 @@ MonoBehaviour:
       cameraJitter: 0
       allowMotionBlur: 1
     postProcessQualitySettings:
-      NearBlurSampleCount: 030000000500000008000000
+      NearBlurSampleCount: 030000000300000003000000
       NearBlurMaxRadius:
       - 2
-      - 4
-      - 7
-      FarBlurSampleCount: 04000000070000000e000000
+      - 2
+      - 2
+      FarBlurSampleCount: 040000000400000004000000
       FarBlurMaxRadius:
       - 5
-      - 8
-      - 13
-      DoFResolution: 040000000200000001000000
+      - 5
+      - 5
+      DoFResolution: 040000000400000004000000
       DoFHighQualityFiltering: 000101
       DoFPhysicallyBased: 000000
       MotionBlurSampleCount: 04000000080000000c000000
-      BloomRes: 040000000200000002000000
-      BloomHighQualityFiltering: 000101
-      BloomHighQualityPrefiltering: 000001
+      BloomRes: 040000000400000004000000
+      BloomHighQualityFiltering: 000000
+      BloomHighQualityPrefiltering: 000000
       ChromaticAberrationMaxSamples: 03000000060000000c000000
     lightSettings:
       useContactShadow:
@@ -184,7 +184,7 @@ MonoBehaviour:
       AOMaximumRadiusPixels: 200000002800000050000000
       AOBilateralUpsample: 000101
       AODirectionCount: 010000000200000004000000
-      ContactShadowSampleCount: 060000000a00000010000000
+      ContactShadowSampleCount: 040000000600000008000000
       SSRMaxRaySteps: 100000002000000040000000
       SSGIRaySteps: 200000004000000080000000
       SSGIDenoise: 010101
@@ -244,9 +244,9 @@ MonoBehaviour:
       RTRSmoothDenoising: 010000
       Fog_ControlMode: 000000000000000000000000
       Fog_Budget:
-      - 0.166
-      - 0.33
-      - 0.666
+      - 0.02
+      - 0.06
+      - 0.06
       Fog_DepthRatio:
       - 0.666
       - 0.666
@@ -271,7 +271,7 @@ MonoBehaviour:
   allowShaderVariantStripping: 1
   enableSRPBatcher: 1
   availableMaterialQualityLevels: -1
-  m_DefaultMaterialQualityLevel: 4
+  m_DefaultMaterialQualityLevel: 1
   diffusionProfileSettings: {fileID: 0}
   virtualTexturingSettings:
     streamingCpuCacheSizeInMegaBytes: 256

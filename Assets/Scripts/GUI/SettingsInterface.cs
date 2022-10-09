@@ -29,7 +29,7 @@ public class SettingsInterface
         private T defaultValue;
         public T DefaultValue => defaultValue;
 
-        private T cachedValue;
+        private static Dictionary<string, T> cachedValues;
 
         public SettingsContainer(string _name, T _defaultValue)
         {
@@ -37,6 +37,11 @@ public class SettingsInterface
             {
                 Debug.LogError("Player prefs SettingsContainer was instantiated with an unknown type!");
                 return;
+            }
+
+            if(cachedValues == null)
+            {
+                cachedValues = new Dictionary<string, T>();
             }
 
             prefsName = _name;
@@ -48,7 +53,7 @@ public class SettingsInterface
             }
             else
             {
-                cachedValue = GetValueFromMemory();
+                cachedValues[prefsName] = GetValueFromMemory();
             }
         }
 
@@ -61,11 +66,25 @@ public class SettingsInterface
         {
             get
             {
-                return cachedValue;
+                if(cachedValues.ContainsKey(prefsName))
+                    return cachedValues[prefsName];
+                else
+                {
+                    if (!PlayerPrefs.HasKey(prefsName))
+                    {
+                        Value = defaultValue;
+                        return defaultValue;
+                    }
+                    else
+                    {
+                        cachedValues[prefsName] = GetValueFromMemory();
+                        return cachedValues[prefsName];
+                    }
+                }
             }
             set
             {
-                if(cachedValue.Equals(value))
+                if(cachedValues[prefsName].Equals(value))
                 {
                     return;
                 }
@@ -76,6 +95,7 @@ public class SettingsInterface
 
         private T GetValueFromMemory()
         {
+
             if (typeof(T) == typeof(string))
             {
                 return (T)Convert.ChangeType(PlayerPrefs.GetString(prefsName), typeof(string));
@@ -97,7 +117,7 @@ public class SettingsInterface
 
         private void SetMemoryFromValue(T value)
         {
-            cachedValue = value;
+            cachedValues[prefsName] = value;
 
             if (typeof(T) == typeof(string))
             {
@@ -165,7 +185,7 @@ public class SettingsInterface
         fpsLimit = new SettingsContainer<int>("fpsLimit", _defaultValue: 0);
         musicVolume = new SettingsContainer<float>("musicVolume", _defaultValue: 1);
         effectsVolume = new SettingsContainer<float>("effectsVolume", _defaultValue: 1);
-        graphicsQuality = new SettingsContainer<int>("qualityPreset", _defaultValue: 0);
+        graphicsQuality = new SettingsContainer<int>("qualityPreset", _defaultValue: 3);
         brightness = new SettingsContainer<float>("brightness", _defaultValue: 0.5f);
     }
 

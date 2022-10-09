@@ -7,13 +7,10 @@ using Unity.Netcode.Transports.UTP;
 using System.Text;
 using UnityEngine.UI;
 using Lexic;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
 
 //[RequireComponent(typeof(Settings))]
 public class MenuUIScript : NetworkBehaviour
 {
-    public SettingsInterface settingsObject;
 
     [Header("Panels")]
     public GameObject MainMenuPanel;
@@ -41,12 +38,11 @@ public class MenuUIScript : NetworkBehaviour
     public bool isMultiplayerHosting;
     public AudioClip clickSoundEffect;
 
-
-    private Exposure exposureVolumeProfile;
-    private float originalSceneExposure;
-
     public SettingsInterface Settings => settings;
     private SettingsInterface settings;
+
+    public AdjustSettingsFromPrefs SettingsAdjuster => settingsAdjuster;
+    private AdjustSettingsFromPrefs settingsAdjuster;
 
     private AudioSource myAudioSource;
     private AudioSource effectsAudioSource;
@@ -64,12 +60,13 @@ public class MenuUIScript : NetworkBehaviour
         Cursor.lockState = CursorLockMode.None;
 
         settings = new SettingsInterface();
+        settingsAdjuster = new AdjustSettingsFromPrefs();
 
         myAudioSource = GameObject.FindObjectOfType<AudioSource>();
         effectsAudioSource = myAudioSource.gameObject.AddComponent<AudioSource>();
         effectsAudioSource.volume = 1;
         UpdateMenuVolumes();
-        UpdateGraphics();
+        settingsAdjuster.UpdateGraphics();
         UpdatePortFieldsFromPrefs();
         UpdateSettingsPage();
         joinAsClient = false;
@@ -106,13 +103,13 @@ public class MenuUIScript : NetworkBehaviour
     public void BrightnessChanged()
     {
         settings.brightness.Value = brightnessSlider.value;
-        UpdateGraphics();
+        settingsAdjuster.UpdateGraphics();
     }
 
     public void GraphicsQualityChanged()
     {
         settings.graphicsQuality.Value = graphicsQualityDropdown.value;
-        UpdateGraphics();
+        settingsAdjuster.UpdateGraphics();
     }
 
     public void DisplayNameChanged()
@@ -156,6 +153,7 @@ public class MenuUIScript : NetworkBehaviour
         }
 
         string limTex = settings.fpsLimit.Value.ToString();
+        settingsAdjuster.UpdateGraphics();
         if (limTex == "0")
             limTex = "";
         fpsLimitInput.text = limTex;
@@ -190,37 +188,37 @@ public class MenuUIScript : NetworkBehaviour
         myAudioSource.volume = settings.musicVolume.Value * 0.7f;
     }
 
-    public void UpdateGraphics()
-    {
-        if (exposureVolumeProfile == null)
-        {
-            Volume[] sceneVolumes = GameObject.FindObjectsOfType<UnityEngine.Rendering.Volume>();
-            foreach (var sceneVolume in sceneVolumes)
-            {
-                if (sceneVolume != null)
-                {
-                    for (int componentID = 0; componentID < sceneVolume.profile.components.Count; componentID++)
-                    {
-                        if (sceneVolume.profile.components[componentID].name.Contains("Exposure"))
-                        {
-                            exposureVolumeProfile = (Exposure)sceneVolume.profile.components[componentID];
-                            originalSceneExposure = exposureVolumeProfile.fixedExposure.value;
-                        }
-                    }
-                }
-            }
-        }
+    //public void UpdateGraphics()
+    //{
+    //    if (exposureVolumeProfile == null)
+    //    {
+    //        Volume[] sceneVolumes = GameObject.FindObjectsOfType<UnityEngine.Rendering.Volume>();
+    //        foreach (var sceneVolume in sceneVolumes)
+    //        {
+    //            if (sceneVolume != null)
+    //            {
+    //                for (int componentID = 0; componentID < sceneVolume.profile.components.Count; componentID++)
+    //                {
+    //                    if (sceneVolume.profile.components[componentID].name.Contains("Exposure"))
+    //                    {
+    //                        exposureVolumeProfile = (Exposure)sceneVolume.profile.components[componentID];
+    //                        originalSceneExposure = exposureVolumeProfile.fixedExposure.value;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 
-        if (exposureVolumeProfile != null)
-        {
-            exposureVolumeProfile.fixedExposure.value = originalSceneExposure + (-settings.brightness.Value + 0.5f) * 2.5f;
-        }
-        else
-        {
-            Debug.LogWarning("No exposure found in this scene in any volume profiles! Cannot adjust brightness.");
-        }
+    //    if (exposureVolumeProfile != null)
+    //    {
+    //        exposureVolumeProfile.fixedExposure.value = originalSceneExposure + (-settings.brightness.Value + 0.5f) * 2.5f;
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning("No exposure found in this scene in any volume profiles! Cannot adjust brightness.");
+    //    }
 
-    }
+    //}
 
     public void ResetSettings()
     {
