@@ -7,6 +7,8 @@ using Unity.Netcode.Transports.UTP;
 using System.Text;
 using UnityEngine.UI;
 using Lexic;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 //[RequireComponent(typeof(Settings))]
 public class MenuUIScript : NetworkBehaviour
@@ -38,6 +40,10 @@ public class MenuUIScript : NetworkBehaviour
     [Header("Other")]
     public bool isMultiplayerHosting;
     public AudioClip clickSoundEffect;
+
+
+    private Exposure exposureVolumeProfile;
+    private float originalSceneExposure;
 
     public SettingsInterface Settings => settings;
     private SettingsInterface settings;
@@ -186,7 +192,34 @@ public class MenuUIScript : NetworkBehaviour
 
     public void UpdateGraphics()
     {
-        Debug.LogWarning("Could not update graphics quality as this is not implemented yet");
+        if (exposureVolumeProfile == null)
+        {
+            Volume[] sceneVolumes = GameObject.FindObjectsOfType<UnityEngine.Rendering.Volume>();
+            foreach (var sceneVolume in sceneVolumes)
+            {
+                if (sceneVolume != null)
+                {
+                    for (int componentID = 0; componentID < sceneVolume.profile.components.Count; componentID++)
+                    {
+                        if (sceneVolume.profile.components[componentID].name.Contains("Exposure"))
+                        {
+                            exposureVolumeProfile = (Exposure)sceneVolume.profile.components[componentID];
+                            originalSceneExposure = exposureVolumeProfile.fixedExposure.value;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (exposureVolumeProfile != null)
+        {
+            exposureVolumeProfile.fixedExposure.value = originalSceneExposure + (-settings.brightness.Value + 0.5f) * 2.5f;
+        }
+        else
+        {
+            Debug.LogWarning("No exposure found in this scene in any volume profiles! Cannot adjust brightness.");
+        }
+
     }
 
     public void ResetSettings()
