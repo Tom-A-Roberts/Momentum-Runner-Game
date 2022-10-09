@@ -72,6 +72,8 @@ public class PlayerNetworking : NetworkBehaviour
     /// </summary>
     public string DisplayName => displayName.Value.ToSafeString();
 
+    private SettingsInterface settings;
+
     /// <summary>
     /// My display name, as decided by the owner playerNetworking
     /// </summary>
@@ -94,7 +96,10 @@ public class PlayerNetworking : NetworkBehaviour
     /// </summary>
     [SerializeField] private float _cheapInterpolationTime = 0.05f;
 
-
+    void Awake()
+    {
+        settings = new SettingsInterface();
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -888,8 +893,8 @@ public class PlayerNetworking : NetworkBehaviour
         // If using steam, this is where we'd connect to the steam API
 
         //string name = "Player " + OwnerClientId.ToString();
-        MenuUIScript.UpdateDisplayName();
-        string name = MenuUIScript.localDisplayName;
+        //MenuUIScript.UpdateDisplayName();
+        string name = settings.DisplayName;
         FixedString64Bytes bytesName = new FixedString64Bytes(name);
         return bytesName;
     }

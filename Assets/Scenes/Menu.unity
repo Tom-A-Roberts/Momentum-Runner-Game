@@ -2404,7 +2404,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1320177302}
         m_TargetAssemblyTypeName: MenuUIScript, Assembly-CSharp
-        m_MethodName: UpdateFPSLimit
+        m_MethodName: FPSLimitChanged
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8894,7 +8894,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 909899057}
   m_HandleRect: {fileID: 909899056}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -11663,21 +11663,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9715bf836fe05b4448ec13376ebb9fea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clickSoundEffect: {fileID: 8300000, guid: 583c86bb05f94a041bd7673fac4eebb8, type: 3}
   MainMenuPanel: {fileID: 1832663294}
   SettingsPanel: {fileID: 376121656}
   GameModePanel: {fileID: 808834507}
   LevelSelectPanel: {fileID: 2045047740}
-  ConnectingToServerText: {fileID: 881531297}
-  displayName: {fileID: 1336272467}
+  displayNameInput: {fileID: 1336272467}
   fpsLimitInput: {fileID: 237825232}
+  musicVolumeSlider: {fileID: 1000103293}
+  effectsVolumeSlider: {fileID: 455824040}
+  ConnectingToServerText: {fileID: 881531297}
   hostingIpText: {fileID: 774199076}
   hostingPortText: {fileID: 1403011492}
   clientingIpText: {fileID: 91127460}
   clientingPortText: {fileID: 1143878089}
-  musicVolumeSlider: {fileID: 1000103293}
-  effectsVolumeSlider: {fileID: 455824040}
   isMultiplayerHosting: 0
+  clickSoundEffect: {fileID: 8300000, guid: 583c86bb05f94a041bd7673fac4eebb8, type: 3}
 --- !u!114 &1320177303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14629,7 +14629,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 568758736}
   m_HandleRect: {fileID: 568758735}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -15560,7 +15560,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.00012207031}
-  m_SizeDelta: {x: -569.6033, y: 726.0637}
+  m_SizeDelta: {x: -189.27246, y: 726.0637}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1957225028
 MonoBehaviour:

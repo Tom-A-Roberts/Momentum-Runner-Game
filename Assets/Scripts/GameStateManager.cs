@@ -129,6 +129,8 @@ public class GameStateManager : NetworkBehaviour
 
     public GameState GameState => _gameState.Value;
 
+    private SettingsInterface settings;
+
     private float zoneSpeedTarget = 0;
     private float zoneSpeedDeriv = 0;
 
@@ -151,8 +153,8 @@ public class GameStateManager : NetworkBehaviour
             Destroy(Singleton);
         Singleton = this;
 
-
-        int fpsLimit = MenuUIScript.fpsLimit;
+        settings = new SettingsInterface();
+        int fpsLimit = settings.fpsLimit.Value;
         if(fpsLimit > 0)
         {
             QualitySettings.vSyncCount = 0;
@@ -188,6 +190,8 @@ public class GameStateManager : NetworkBehaviour
     public void OnLocalPlayerNetworkSpawn()
     {
         readiedPlayers = new HashSet<ulong>();
+
+        //Debug.Log(localPlayer.myPlayerStateController);
 
         localPlayer.myPlayerStateController.playerAudioManager.SetupLevelSoundtracks(waitingToReadyUpSong, levelSoundTracks);
 

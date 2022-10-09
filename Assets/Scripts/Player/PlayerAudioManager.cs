@@ -83,13 +83,16 @@ public class PlayerAudioManager : NetworkBehaviour
     private float grappleCurrentIntensity;
     private float grappleIntensityDif;
 
+    private SettingsInterface settings;
+
     void Start()
     {
         mainAudioSource = GetComponent<AudioSource>();
 
-        MenuUIScript.UpdateAudioStaticsFromPrefs();
-        startVolume = MenuUIScript.effectsVolume;
-        musicVolume = MenuUIScript.musicVolume;
+        if (settings == null)
+            settings = new SettingsInterface();
+        startVolume = settings.effectsVolume.Value;
+        musicVolume = settings.musicVolume.Value;
 
         if (IsOwner)
         {
@@ -140,9 +143,11 @@ public class PlayerAudioManager : NetworkBehaviour
 
     public void SetupLevelSoundtracks(AudioClip _waitingToReadyUpSong, AudioClip _levelSoundTracks)
     {
-        MenuUIScript.UpdateAudioStaticsFromPrefs();
-        startVolume = MenuUIScript.effectsVolume;
-        musicVolume = MenuUIScript.musicVolume;
+        if(settings == null)
+            settings = new SettingsInterface();
+
+        startVolume = settings.effectsVolume.Value;
+        musicVolume = settings.musicVolume.Value;
 
         waitingToReadyUpSong = _waitingToReadyUpSong;
         levelSoundTracks = _levelSoundTracks;
