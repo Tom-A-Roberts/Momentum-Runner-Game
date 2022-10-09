@@ -122,6 +122,8 @@ public class SettingsInterface
 
     public SettingsContainer<float> effectsVolume;
 
+    public SettingsContainer<int> graphicsQuality;
+
     public string DisplayName
     {
         get
@@ -150,6 +152,7 @@ public class SettingsInterface
         fpsLimit = new SettingsContainer<int>("fpsLimit", _defaultValue: 0);
         musicVolume = new SettingsContainer<float>("musicVolume", _defaultValue: 1);
         effectsVolume = new SettingsContainer<float>("effectsVolume", _defaultValue: 1);
+        graphicsQuality = new SettingsContainer<int>("qualityPreset", _defaultValue: 0);
     }
 
     public void RegenerateName()

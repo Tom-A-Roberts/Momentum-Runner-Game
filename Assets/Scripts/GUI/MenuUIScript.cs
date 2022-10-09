@@ -24,6 +24,7 @@ public class MenuUIScript : NetworkBehaviour
     public TMP_InputField fpsLimitInput;
     public Slider musicVolumeSlider;
     public Slider effectsVolumeSlider;
+    public TMP_Dropdown graphicsQualityDropdown;
 
     public GameObject ConnectingToServerText;
 
@@ -65,6 +66,7 @@ public class MenuUIScript : NetworkBehaviour
         effectsAudioSource = myAudioSource.gameObject.AddComponent<AudioSource>();
         effectsAudioSource.volume = 1;
         UpdateMenuVolumes();
+        UpdateGraphicsQuality();
         UpdatePortFieldsFromPrefs();
         UpdateSettingsPage();
         joinAsClient = false;
@@ -85,7 +87,7 @@ public class MenuUIScript : NetworkBehaviour
         Application.Quit();
     }
 
-    //#region Settings Menu
+    #region Settings Menu
 
     public void MusicVolumeChanged()
     {
@@ -97,6 +99,12 @@ public class MenuUIScript : NetworkBehaviour
     {
         settings.effectsVolume.Value = effectsVolumeSlider.value;
         UpdateMenuVolumes();
+    }
+
+    public void GraphicsQualityChanged()
+    {
+        settings.graphicsQuality.Value = graphicsQualityDropdown.value;
+        UpdateGraphicsQuality();
     }
 
     public void DisplayNameChanged()
@@ -162,6 +170,9 @@ public class MenuUIScript : NetworkBehaviour
         fpsLimitInput.text = limTex;
 
         displayNameInput.text = settings.DisplayName;
+
+        graphicsQualityDropdown.value = settings.graphicsQuality.Value;
+
     }
 
     public void UpdateMenuVolumes()
@@ -169,6 +180,13 @@ public class MenuUIScript : NetworkBehaviour
         effectsAudioSource.volume = settings.effectsVolume.Value;
         myAudioSource.volume = settings.musicVolume.Value * 0.7f;
     }
+
+    public void UpdateGraphicsQuality()
+    {
+        Debug.LogWarning("Could not update graphics quality as this is not implemented yet");
+    }
+
+    #endregion
 
     #region Panel management
 
