@@ -24,13 +24,10 @@ public class MenuUIScript : NetworkBehaviour
     public TMP_InputField fpsLimitInput;
     public Slider musicVolumeSlider;
     public Slider effectsVolumeSlider;
+    public Slider brightnessSlider;
     public TMP_Dropdown graphicsQualityDropdown;
 
     public GameObject ConnectingToServerText;
-
-    // Text inputs:
-    //public TMP_InputField displayName;
-    //public TMP_InputField fpsLimitInput;
 
     [Header("Known IP Inputs")]
     public TMP_InputField hostingIpText;
@@ -66,7 +63,7 @@ public class MenuUIScript : NetworkBehaviour
         effectsAudioSource = myAudioSource.gameObject.AddComponent<AudioSource>();
         effectsAudioSource.volume = 1;
         UpdateMenuVolumes();
-        UpdateGraphicsQuality();
+        UpdateGraphics();
         UpdatePortFieldsFromPrefs();
         UpdateSettingsPage();
         joinAsClient = false;
@@ -93,7 +90,6 @@ public class MenuUIScript : NetworkBehaviour
     {
         settings.musicVolume.Value = musicVolumeSlider.value;
         UpdateMenuVolumes();
-        //Debug.Log(PlayerPrefs.GetFloat("musicVolume"));
     }
     public void EffectsVolumeChanged()
     {
@@ -101,10 +97,16 @@ public class MenuUIScript : NetworkBehaviour
         UpdateMenuVolumes();
     }
 
+    public void BrightnessChanged()
+    {
+        settings.brightness.Value = brightnessSlider.value;
+        UpdateGraphics();
+    }
+
     public void GraphicsQualityChanged()
     {
         settings.graphicsQuality.Value = graphicsQualityDropdown.value;
-        UpdateGraphicsQuality();
+        UpdateGraphics();
     }
 
     public void DisplayNameChanged()
@@ -173,6 +175,7 @@ public class MenuUIScript : NetworkBehaviour
 
         graphicsQualityDropdown.value = settings.graphicsQuality.Value;
 
+        brightnessSlider.value = settings.brightness.Value;
     }
 
     public void UpdateMenuVolumes()
@@ -181,9 +184,15 @@ public class MenuUIScript : NetworkBehaviour
         myAudioSource.volume = settings.musicVolume.Value * 0.7f;
     }
 
-    public void UpdateGraphicsQuality()
+    public void UpdateGraphics()
     {
         Debug.LogWarning("Could not update graphics quality as this is not implemented yet");
+    }
+
+    public void ResetSettings()
+    {
+        settings.ClearSettingsPlayerPrefs();
+        UpdateSettingsPage();
     }
 
     #endregion

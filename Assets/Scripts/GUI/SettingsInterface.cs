@@ -48,7 +48,7 @@ public class SettingsInterface
             }
             else
             {
-                cachedValue = getValueFromMemory();
+                cachedValue = GetValueFromMemory();
             }
         }
 
@@ -70,29 +70,11 @@ public class SettingsInterface
                     return;
                 }
 
-                cachedValue = value;
-
-                if(typeof(T) == typeof(string))
-                {
-                    PlayerPrefs.SetString(prefsName, (string)Convert.ChangeType(value, typeof(string)));
-                }
-                else if (typeof(T) == typeof(int))
-                {
-                    PlayerPrefs.SetInt(prefsName, (int)Convert.ChangeType(value, typeof(int)));
-                }
-                else if (typeof(T) == typeof(float))
-                {
-                    PlayerPrefs.SetFloat(prefsName, (float)Convert.ChangeType(value, typeof(float)));
-                }
-                else
-                {
-                    Debug.LogError("Player prefs SettingsContainer was instantiated with an unknown type!");
-                }
-                PlayerPrefs.Save();
+                SetMemoryFromValue(value);
             }
         }
 
-        private T getValueFromMemory()
+        private T GetValueFromMemory()
         {
             if (typeof(T) == typeof(string))
             {
@@ -113,6 +95,35 @@ public class SettingsInterface
             }
         }
 
+        private void SetMemoryFromValue(T value)
+        {
+            cachedValue = value;
+
+            if (typeof(T) == typeof(string))
+            {
+                PlayerPrefs.SetString(prefsName, (string)Convert.ChangeType(value, typeof(string)));
+            }
+            else if (typeof(T) == typeof(int))
+            {
+                PlayerPrefs.SetInt(prefsName, (int)Convert.ChangeType(value, typeof(int)));
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                PlayerPrefs.SetFloat(prefsName, (float)Convert.ChangeType(value, typeof(float)));
+            }
+            else
+            {
+                Debug.LogError("Player prefs SettingsContainer was instantiated with an unknown type!");
+            }
+            PlayerPrefs.Save();
+        }
+
+        public void Reset()
+        {
+            PlayerPrefs.DeleteKey(prefsName);
+            SetMemoryFromValue(defaultValue);
+        }
+
         public override string ToString() => Value.ToString();
     }
 
@@ -123,6 +134,8 @@ public class SettingsInterface
     public SettingsContainer<float> effectsVolume;
 
     public SettingsContainer<int> graphicsQuality;
+
+    public SettingsContainer<float> brightness;
 
     public string DisplayName
     {
@@ -153,12 +166,25 @@ public class SettingsInterface
         musicVolume = new SettingsContainer<float>("musicVolume", _defaultValue: 1);
         effectsVolume = new SettingsContainer<float>("effectsVolume", _defaultValue: 1);
         graphicsQuality = new SettingsContainer<int>("qualityPreset", _defaultValue: 0);
+        brightness = new SettingsContainer<float>("brightness", _defaultValue: 0.5f);
     }
 
     public void RegenerateName()
     {
         string newName = NameGen.GetNextRandomName();
         DisplayName = newName;
+    }
+
+    public void ClearSettingsPlayerPrefs()
+    {
+        //PlayerPrefs.DeleteKey("displayName");
+
+        fpsLimit.Reset();
+        musicVolume.Reset();
+        effectsVolume.Reset();
+        graphicsQuality.Reset();
+        brightness.Reset();
+
     }
 
 }
