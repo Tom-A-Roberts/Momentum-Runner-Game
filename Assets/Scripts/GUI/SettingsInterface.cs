@@ -84,7 +84,7 @@ public class SettingsInterface
             }
             set
             {
-                if(cachedValues[prefsName].Equals(value))
+                if(cachedValues.ContainsKey(prefsName) && cachedValues[prefsName].Equals(value))
                 {
                     return;
                 }
@@ -157,6 +157,11 @@ public class SettingsInterface
 
     public SettingsContainer<float> brightness;
 
+    public SettingsContainer<int> resolutionWidth;
+    public SettingsContainer<int> resolutionHeight;
+
+    public SettingsContainer<int> fullscreenMode;
+
     public string DisplayName
     {
         get
@@ -185,8 +190,11 @@ public class SettingsInterface
         fpsLimit = new SettingsContainer<int>("fpsLimit", _defaultValue: 0);
         musicVolume = new SettingsContainer<float>("musicVolume", _defaultValue: 1);
         effectsVolume = new SettingsContainer<float>("effectsVolume", _defaultValue: 1);
-        graphicsQuality = new SettingsContainer<int>("qualityPreset", _defaultValue: 3);
+        graphicsQuality = new SettingsContainer<int>("qualityPreset", _defaultValue: 2);
         brightness = new SettingsContainer<float>("brightness", _defaultValue: 0.5f);
+        resolutionWidth = new SettingsContainer<int>("resolutionWidth", _defaultValue: Screen.currentResolution.width);
+        resolutionHeight = new SettingsContainer<int>("resolutionHeight", _defaultValue: Screen.currentResolution.height);
+        fullscreenMode = new SettingsContainer<int>("fullscreenMode", _defaultValue: 0);
     }
 
     public void RegenerateName()
@@ -204,6 +212,10 @@ public class SettingsInterface
         effectsVolume.Reset();
         graphicsQuality.Reset();
         brightness.Reset();
+
+        resolutionWidth.Reset();
+        resolutionHeight.Reset();
+        fullscreenMode.Reset();
     }
 
 }

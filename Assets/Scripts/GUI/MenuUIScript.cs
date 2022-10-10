@@ -25,6 +25,8 @@ public class MenuUIScript : NetworkBehaviour
     public Slider effectsVolumeSlider;
     public Slider brightnessSlider;
     public TMP_Dropdown graphicsQualityDropdown;
+    public TMP_Dropdown resolutionDropdown;
+    public TMP_Dropdown fullscreenModeDropdown;
 
     public GameObject ConnectingToServerText;
 
@@ -46,6 +48,9 @@ public class MenuUIScript : NetworkBehaviour
 
     private AudioSource myAudioSource;
     private AudioSource effectsAudioSource;
+
+    private Resolution[] availableResolutions;
+    private Dictionary<int, int> dropdownIndexToResolutionIndex;
 
     private string hostingIp;
     private string hostingPort;
@@ -161,6 +166,32 @@ public class MenuUIScript : NetworkBehaviour
         fpsLimitInput.text = limTex;
     }
 
+    public void ResolutionChanged()
+    {
+        if(dropdownIndexToResolutionIndex == null)
+        {
+            Debug.LogError("dropdownIndexToResolutionIndex is not initiated! Ensure resolution dropdown is updated.");
+            return;
+        }
+        int newVal = dropdownIndexToResolutionIndex[resolutionDropdown.value];
+        if (newVal >= availableResolutions.Length)
+        {
+            Debug.LogError("Chosen resolution does not appear to be an available option! Ensure resolution dropdown is updated.");
+            return;
+        }
+
+        Resolution chosenRes = availableResolutions[newVal];
+        settings.resolutionHeight.Value = chosenRes.height;
+        settings.resolutionWidth.Value = chosenRes.width;
+        settingsAdjuster.UpdateGraphics();
+    }
+
+    public void FullscreenModeChanged()
+    {
+        settings.fullscreenMode.Value = fullscreenModeDropdown.value;
+        settingsAdjuster.UpdateGraphics();
+    }
+
     public void RegenerateName()
     {
         settings.RegenerateName();
@@ -182,7 +213,57 @@ public class MenuUIScript : NetworkBehaviour
         graphicsQualityDropdown.value = settings.graphicsQuality.Value;
 
         brightnessSlider.value = settings.brightness.Value;
+
+        fullscreenModeDropdown.value = settings.fullscreenMode.Value;
+
+        UpdateResolutionDropdown();
     }
+
+
+    public void UpdateResolutionDropdown()
+    {
+        List<string> options = new List<string>();
+        HashSet<string> addedResolutions = new HashSet<string>();
+        dropdownIndexToResolutionIndex = new Dictionary<int, int>();
+        availableResolutions = Screen.resolutions;
+        int currentChoice = 0;
+        int currentChoiceDropdownIndex = 0;
+        bool noPlayerPrefsResolutionFound = true;
+        resolutionDropdown.ClearOptions();
+        for (int i = 0; i < availableResolutions.Length; i++)
+        {
+            string option = availableResolutions[i].width + " x " + availableResolutions[i].height;
+            if (!addedResolutions.Contains(option))
+            {
+                addedResolutions.Add(option);
+                options.Add(option);
+                dropdownIndexToResolutionIndex[options.Count - 1] = i;
+
+                if (currentChoice == -1 && availableResolutions[i].height == Screen.currentResolution.height && availableResolutions[i].width == Screen.currentResolution.width)
+                {
+                    currentChoice = i;
+                    currentChoiceDropdownIndex = options.Count - 1;
+                }
+                if (availableResolutions[i].height == settings.resolutionHeight.Value && availableResolutions[i].width == settings.resolutionWidth.Value)
+                {
+                    currentChoice = i;
+                    currentChoiceDropdownIndex = options.Count - 1;
+                    noPlayerPrefsResolutionFound = false;
+                }
+            }
+
+        }
+        resolutionDropdown.AddOptions(options);
+
+        if(noPlayerPrefsResolutionFound)
+        {
+            settings.resolutionHeight.Value = Screen.currentResolution.height;
+            settings.resolutionWidth.Value = Screen.currentResolution.width;
+        }
+
+        resolutionDropdown.value = currentChoiceDropdownIndex;
+    }
+
 
     public void UpdateMenuVolumes()
     {

@@ -184,9 +184,7 @@ public class GameStateManager : NetworkBehaviour
             //SetWallPositionAndRotationToProgress(fogWall.transform, zoneProgress);
         }
 
-        settingsAdjuster = new AdjustSettingsFromPrefs();
 
-        settingsAdjuster.UpdateGraphics();
 
     }
 
@@ -195,6 +193,11 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     public void OnLocalPlayerNetworkSpawn()
     {
+        settingsAdjuster = new AdjustSettingsFromPrefs();
+
+        settingsAdjuster.UpdateGraphics();
+
+
         readiedPlayers = new HashSet<ulong>();
 
         //Debug.Log(localPlayer.myPlayerStateController);

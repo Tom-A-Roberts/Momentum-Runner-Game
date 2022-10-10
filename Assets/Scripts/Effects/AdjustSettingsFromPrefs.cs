@@ -59,7 +59,6 @@ public class AdjustSettingsFromPrefs
         }
 
         int currentQualityLevel = QualitySettings.GetQualityLevel();
-
         if(currentQualityLevel != settings.graphicsQuality.Value)
         {
             QualitySettings.SetQualityLevel(settings.graphicsQuality.Value, changeExpensiveSettings);
@@ -67,6 +66,18 @@ public class AdjustSettingsFromPrefs
         }
 
 
+        FullScreenMode newScreenMode = FullScreenMode.MaximizedWindow;
+        if (settings.fullscreenMode.Value == 0)
+            newScreenMode = FullScreenMode.MaximizedWindow;
+        else if (settings.fullscreenMode.Value == 1)
+            newScreenMode = FullScreenMode.ExclusiveFullScreen;
+        else if (settings.fullscreenMode.Value == 2)
+            newScreenMode = FullScreenMode.Windowed;
+        if (Screen.fullScreenMode != newScreenMode || settings.resolutionHeight.Value != Screen.currentResolution.height || settings.resolutionWidth.Value != Screen.currentResolution.width)
+        {
+            Debug.Log("Changing resolution");
+            Screen.SetResolution(settings.resolutionWidth.Value, settings.resolutionHeight.Value, newScreenMode);
+        }
 
     }
 }
