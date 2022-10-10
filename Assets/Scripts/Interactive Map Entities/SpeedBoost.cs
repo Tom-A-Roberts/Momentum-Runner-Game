@@ -33,7 +33,7 @@ public class SpeedBoost : MonoBehaviour
     {
         if (DashMultiplier > 0)
         {
-            timer += Time.deltaTime / DashAcceleration;
+            timer += Time.fixedDeltaTime / DashAcceleration;
             if (timer > 0)
             {
                 DashMultiplier -= Time.fixedDeltaTime / timer;
