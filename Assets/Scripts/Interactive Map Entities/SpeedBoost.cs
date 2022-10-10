@@ -29,22 +29,22 @@ public class SpeedBoost : MonoBehaviour
         }
 
     }
-    private void Update()
+    private void FixedUpdate()
     {
         if (DashMultiplier > 0)
         {
             timer += Time.deltaTime / DashAcceleration;
             if (timer > 0)
             {
-                DashMultiplier -= Time.deltaTime / timer;
+                DashMultiplier -= Time.fixedDeltaTime / timer;
                 if (DashMultiplier < 0) DashMultiplier = 0;
                 float currentDashForceAmount = (DashForce * DashMultiplier) * 2f;
                 boostVector = transform.forward * currentDashForceAmount;
                 float upComponent = Vector3.Dot(transform.up, rb.velocity);
-                Vector3 verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
+                Vector3 verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.fixedDeltaTime;
 
                 float rightComponent = Vector3.Dot(transform.right, rb.velocity);
-                Vector3 sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.deltaTime;
+                Vector3 sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.fixedDeltaTime;
 
                 ForceMode boostType = ForceMode.Force;
                 pc.BoostForce(boostVector, boostType);

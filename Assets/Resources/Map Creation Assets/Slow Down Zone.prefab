@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67c0b9d3dcb13f544babf691afd4ee1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dragCoefficient: 1
+  dragCoefficient: 1.4
   MinimumSpeed: 10
 --- !u!114 &7808350247563189029
 MonoBehaviour:
@@ -184,7 +184,7 @@ Transform:
   - {fileID: 7770517312801604236}
   - {fileID: 7770517312198348509}
   m_Father: {fileID: 0}
-  m_RootOrder: 26
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7808350249276182016
 GameObject:

@@ -26,7 +26,7 @@ public class SlowZone : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (playerIsInZone == true)
         {
@@ -35,7 +35,7 @@ public class SlowZone : MonoBehaviour
             {
                 Vector3 dragDirection = -rb.velocity.normalized;
                 float v_squared = Mathf.Pow(rb.velocity.magnitude, 2);
-                Vector3 dragForce = dragDirection * v_squared * dragCoefficient * Time.deltaTime;
+                Vector3 dragForce = dragDirection * v_squared * dragCoefficient * Time.fixedDeltaTime;
 
                 pc.BoostForce(dragForce, ForceMode.Acceleration);
             }

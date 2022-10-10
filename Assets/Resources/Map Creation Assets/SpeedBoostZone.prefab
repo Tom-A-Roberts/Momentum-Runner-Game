@@ -217,7 +217,7 @@ Transform:
   - {fileID: 2847029161463075029}
   - {fileID: 6822846755801086761}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2251725412095940057
 GameObject:
@@ -5402,7 +5402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DashAcceleration: 0.15
-  DashForce: 35
+  DashForce: 50
   VerticalForce: 1050
   SidewaysForce: 1050
 --- !u!1 &8185863762951830536
