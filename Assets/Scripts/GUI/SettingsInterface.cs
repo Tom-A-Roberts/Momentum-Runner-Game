@@ -162,6 +162,11 @@ public class SettingsInterface
 
     public SettingsContainer<int> fullscreenMode;
 
+    public SettingsContainer<float> fov;
+
+    public SettingsContainer<float> sensitivity;
+
+
     public string DisplayName
     {
         get
@@ -195,6 +200,9 @@ public class SettingsInterface
         resolutionWidth = new SettingsContainer<int>("resolutionWidth", _defaultValue: Screen.currentResolution.width);
         resolutionHeight = new SettingsContainer<int>("resolutionHeight", _defaultValue: Screen.currentResolution.height);
         fullscreenMode = new SettingsContainer<int>("fullscreenMode", _defaultValue: 0);
+
+        fov = new SettingsContainer<float>("fov", _defaultValue: 100);
+        sensitivity = new SettingsContainer<float>("sensitivity", _defaultValue: 1);
     }
 
     public void RegenerateName()
@@ -212,6 +220,8 @@ public class SettingsInterface
         effectsVolume.Reset();
         graphicsQuality.Reset();
         brightness.Reset();
+        fov.Reset();
+        sensitivity.Reset();
 
         resolutionWidth.Reset();
         resolutionHeight.Reset();

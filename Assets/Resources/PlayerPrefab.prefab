@@ -1024,7 +1024,7 @@ Camera:
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
-  m_FOVAxisMode: 0
+  m_FOVAxisMode: 1
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
   m_FocalLength: 12
@@ -1036,7 +1036,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 800
-  field of view: 72
+  field of view: 54.900883
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1132,7 +1132,7 @@ MonoBehaviour:
   MaxFOVMultiplier: 1.3
   MaxFOVSpeed: 40
   fovChangeSmoothing: 0.05
-  sensitivity: 2
+  Sensitivity: 2
   yRotationLimit: 88
 --- !u!114 &5791849260967413827
 MonoBehaviour:

@@ -7,6 +7,7 @@ using Unity.Netcode.Transports.UTP;
 using System.Text;
 using UnityEngine.UI;
 using Lexic;
+using System;
 
 //[RequireComponent(typeof(Settings))]
 public class MenuUIScript : NetworkBehaviour
@@ -24,6 +25,10 @@ public class MenuUIScript : NetworkBehaviour
     public Slider musicVolumeSlider;
     public Slider effectsVolumeSlider;
     public Slider brightnessSlider;
+    public Slider FOVSlider;
+    public TMP_Text FOVText;
+    public Slider SensitivitySlider;
+    public TMP_Text SensitivityText;
     public TMP_Dropdown graphicsQualityDropdown;
     public TMP_Dropdown resolutionDropdown;
     public TMP_Dropdown fullscreenModeDropdown;
@@ -216,6 +221,12 @@ public class MenuUIScript : NetworkBehaviour
 
         fullscreenModeDropdown.value = settings.fullscreenMode.Value;
 
+        FOVSlider.value = settings.fov.Value;
+        FOVText.text = "Field of View (" + Mathf.RoundToInt(settings.fov.Value) + ")";
+
+        SensitivitySlider.value = settings.sensitivity.Value;
+        SensitivityText.text = "Sensitivity (" + String.Format("{0:0.##}", settings.sensitivity.Value) + ")";
+
         UpdateResolutionDropdown();
     }
 
@@ -269,6 +280,23 @@ public class MenuUIScript : NetworkBehaviour
     {
         effectsAudioSource.volume = settings.effectsVolume.Value;
         myAudioSource.volume = settings.musicVolume.Value * 0.7f;
+    }
+
+    public void UpdateSensitivity()
+    {
+        SensitivityText.text = "Sensitivity (" + String.Format("{0:0.##}", SensitivitySlider.value) + ")";
+        settings.sensitivity.Value = SensitivitySlider.value;
+        //effectsAudioSource.volume = settings.effectsVolume.Value;
+        //myAudioSource.volume = settings.musicVolume.Value * 0.7f;
+    }
+
+    public void UpdateFOV()
+    {
+        FOVText.text = "Field of View (" + Mathf.RoundToInt(FOVSlider.value) + ")";
+        settings.fov.Value = FOVSlider.value;
+
+        //effectsAudioSource.volume = settings.effectsVolume.Value;
+        //myAudioSource.volume = settings.musicVolume.Value * 0.7f;
     }
 
     //public void UpdateGraphics()
