@@ -42180,7 +42180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2251725413249629756, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: DashForce
-      value: 130
+      value: 110
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -42654,7 +42654,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2251725413249629756, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: DashForce
-      value: 130
+      value: 110
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -58631,7 +58631,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2251725413249629756, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: DashForce
-      value: 110
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2551568962839771387, guid: 48973c41636553d47a89fb97d7a3f9eb, type: 3}
       propertyPath: m_LocalPosition.x
