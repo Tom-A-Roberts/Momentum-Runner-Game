@@ -402,6 +402,14 @@ public class MenuUIScript : NetworkBehaviour
         LoadingScreen.Load("LevelExample");
     }
 
+    public void LoadTutorialAsHost()
+    {
+        joinAsClient = false;
+        startNetworkingOnSpawn = true;
+
+        LoadingScreen.Load("Tutorial");
+    }
+
     public void LoadMultiplayerLevel1AsHost()
     {
         joinAsClient = false;

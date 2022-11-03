@@ -1957,8 +1957,9 @@ MonoBehaviour:
   spectatorRepresentation: {fileID: 955790866180259259}
   bodyCollider: {fileID: 4316027074644905777}
   feetCollider: {fileID: 4316027073947639283}
-  deathwallRedStartDistance: 15
+  deathwallRedStartDistance: 30
   hitmarkerDuration: 0.1
+  completedSingleplayerLevel: 0
 --- !u!114 &1445570255
 MonoBehaviour:
   m_ObjectHideFlags: 0

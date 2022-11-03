@@ -37,6 +37,9 @@ public class PlayerStateManager : MonoBehaviour
 
     public bool IsDead => playerNetworking._isDead.Value;
 
+    // Set to true if level is singleplayer and it's been completed (finish line reached)
+    public bool completedSingleplayerLevel = false;
+
     //[SerializeField]
     //private bool _isRespawningAndIsHost = false;
     //public bool IsRespawningAndIsHost => _isRespawningAndIsHost;
@@ -224,10 +227,10 @@ public class PlayerStateManager : MonoBehaviour
             ProcessSlowdownShield(1 - slowdownShieldTimer);
         }
 
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            ProcessHit();
-        }
+        //if (Input.GetKeyDown(KeyCode.T))
+        //{
+        //    ProcessHit();
+        //}
 
         CheckForServerStateChanges();
     }
@@ -294,8 +297,16 @@ public class PlayerStateManager : MonoBehaviour
         {
             Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, GameStateManager.Singleton.deathWallCollider, GameStateManager.Singleton.deathWall.transform.position, GameStateManager.Singleton.deathWall.transform.rotation);
 
-            float signedDistance = Vector3.Dot(playerBody.position - ClosestPoint, GameStateManager.Singleton.transform.forward);
-            if(signedDistance < -0.2)
+            float signedDistance = Vector3.Dot(playerBody.position - ClosestPoint, -GameStateManager.Singleton.deathWall.transform.up);
+
+            float sidewaysDistance = Vector3.Dot(playerBody.position - GameStateManager.Singleton.deathWall.transform.position, GameStateManager.Singleton.deathWall.transform.right);
+
+            //Debug.Log(sidewaysDistance.ToString() + "   " + GameStateManager.Singleton.deathWall.transform.localScale.x.ToString());
+
+            //Debug.DrawLine(playerBody.position, ClosestPoint, Color.red);
+            //Debug.DrawLine(playerBody.position, playerBody.position + sidewaysDistance * GameStateManager.Singleton.deathWall.transform.right, Color.blue);
+
+            if(signedDistance < -0.2 && Mathf.Abs(sidewaysDistance) < GameStateManager.Singleton.deathWall.transform.localScale.x / 2)
             {
                 playerNetworking._isDead.Value = true;
                 if (NetworkManager.Singleton.IsHost)
@@ -305,6 +316,42 @@ public class PlayerStateManager : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// As the deathwall gets closer to the player, the effects show up on the screen more
+    /// </summary>
+    public void UpdateDeathWallEffects(Transform deathwallTransform, BoxCollider deathWallCollider)
+    {
+        if (GameStateManager.Singleton)
+        {
+            if (deathwallTransform.gameObject.activeSelf)
+            {
+                if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
+                {
+                    Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, deathWallCollider, deathwallTransform.position, deathwallTransform.rotation);
+
+                    float distance = Vector3.Distance(ClosestPoint, playerBody.position);
+
+                    float power = Mathf.Clamp01((deathwallRedStartDistance - distance) / deathwallRedStartDistance);
+
+                    playerAudioManager.UpdateDeathwallIntensity(power);
+
+                    Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
+                    newcol.a = power;
+                    GameStateManager.Singleton.ScreenRedEdges.color = newcol;
+                }
+            }
+            else
+            {
+                Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
+                newcol.a = 0;
+                GameStateManager.Singleton.ScreenRedEdges.color = newcol;
+            }
+        }
+    }
+
+
+
 
     public void StartHitmarker()
     {
@@ -403,39 +450,30 @@ public class PlayerStateManager : MonoBehaviour
         Debug.Log("Lap complete!");
         // Not implemented yet
     }
-
-    /// <summary>
-    /// As the deathwall gets closer to the player, the effects show up on the screen more
-    /// </summary>
-    public void UpdateDeathWallEffects(Transform deathwallTransform, BoxCollider deathWallCollider)
+    public void HasCompletedSingleplayerLevel()
     {
-        if (GameStateManager.Singleton)
+        //Debug.Log("Here!!");
+
+        if (!completedSingleplayerLevel)
         {
-            if (deathwallTransform.gameObject.activeSelf)
+            completedSingleplayerLevel = true;
+            IEnumerator winWaitCoroutine = WaitAfterSingleplayerWin(6f);
+
+            WinLoseEffects winLoseEffects = FindObjectOfType<WinLoseEffects>();
+            if (winLoseEffects != null)
             {
-                if (GameStateManager.Singleton && GameStateManager.Singleton.ScreenRedEdges)
-                {
-                    Vector3 ClosestPoint = Physics.ClosestPoint(playerBody.position, deathWallCollider, deathwallTransform.position, deathwallTransform.rotation);
-
-                    float distance = Vector3.Distance(ClosestPoint, playerBody.position);
-
-                    float power = Mathf.Clamp01((deathwallRedStartDistance - distance) / deathwallRedStartDistance);
-
-                    playerAudioManager.UpdateDeathwallIntensity(power);
-
-                    Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
-                    newcol.a = power;
-                    GameStateManager.Singleton.ScreenRedEdges.color = newcol;
-                }
+                winLoseEffects.StartWinEffects();
             }
-            else
-            {
-                Color newcol = GameStateManager.Singleton.ScreenRedEdges.color;
-                newcol.a = 0;
-                GameStateManager.Singleton.ScreenRedEdges.color = newcol;
-            }
+            StartCoroutine(winWaitCoroutine);
         }
     }
+
+    private IEnumerator WaitAfterSingleplayerWin(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        IngameEscMenu.Singleton.LoadMainMenu();
+    }
+
 
     #region Locally Entering and Leaving States
 

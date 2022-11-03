@@ -3906,7 +3906,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0.39358997, a: 0}
+  m_Color: {r: 0.574, g: 0.05102222, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7224,7 +7224,7 @@ RectTransform:
   - {fileID: 1124497356}
   - {fileID: 1892942301}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -7746,7 +7746,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8379565347836861326}
   - component: {fileID: 172390385}
-  - component: {fileID: 8612399625128467196}
   m_Layer: 5
   m_Name: WinLoseEffects
   m_TagString: Untagged
@@ -7777,22 +7776,6 @@ RectTransform:
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &172390385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8751752851559808361}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f1ba997f675e944a97d23b080c3f990, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  victoryImage: {fileID: 819277082}
-  defeatImage: {fileID: 750535148}
-  victoryParticles: {fileID: 5993959167913449139, guid: 9bc9562d296c23341aa3156a37f258f9, type: 3}
-  defeatParticles: {fileID: 7082244525683040501, guid: b1f07d9c5d600ba479e7214e27357914, type: 3}
---- !u!114 &8612399625128467196
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

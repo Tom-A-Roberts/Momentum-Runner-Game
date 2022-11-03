@@ -98,7 +98,9 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     public float _zoneWidth;
 
+    [System.NonSerialized]
     public float _zoneSpeed = 1;
+
 
     public float _zoneProgress = 0;
 

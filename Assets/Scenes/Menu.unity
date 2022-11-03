@@ -3610,7 +3610,7 @@ GameObject:
   - component: {fileID: 260730465}
   - component: {fileID: 260730464}
   m_Layer: 5
-  m_Name: LevelExample
+  m_Name: Tutorial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3656,7 +3656,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 31428e5f4475e214596effa01cf28a3c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 68d4bcc2aba417046ad304198815b80d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4410,14 +4410,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.496, g: 0.496, b: 0.496, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 19d28f37e7c23884590e9d35370ebee6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 28611fc447135b44580988ff6ea39d87, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7937,14 +7937,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.496, g: 0.496, b: 0.496, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 19d28f37e7c23884590e9d35370ebee6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 78bd1558f0fce2b409a02847f0aead0f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -13312,7 +13312,7 @@ GameObject:
   - component: {fileID: 1084771530}
   - component: {fileID: 1084771529}
   m_Layer: 5
-  m_Name: Level Example button
+  m_Name: Tutorial button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13385,7 +13385,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1320177302}
         m_TargetAssemblyTypeName: MenuUIScript, Assembly-CSharp
-        m_MethodName: LoadExampleLevelAsHost
+        m_MethodName: LoadTutorialAsHost
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -19572,9 +19572,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Level Example
-
-'
+  m_text: Tutorial
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5b3d1b4c145179940a7f3289afe425be, type: 2}
   m_sharedMaterial: {fileID: -6862646134182506265, guid: 5b3d1b4c145179940a7f3289afe425be, type: 2}

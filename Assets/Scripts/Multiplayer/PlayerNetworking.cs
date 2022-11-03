@@ -196,7 +196,7 @@ public class PlayerNetworking : NetworkBehaviour
         float xRot;
         float yRot;
         float zRot;
-
+        // && foundDataIndex > -1
         if (foundDataIndex < positionHistory.Count - 1)
         {
             foundData = positionHistory[foundDataIndex].Value;
@@ -210,7 +210,7 @@ public class PlayerNetworking : NetworkBehaviour
         }
         else
         {
-            Debug.LogWarning("Cannot Interp!");
+            //Debug.LogWarning("Cannot Interp!");
             foundData = positionHistory[positionHistory.Count - 1].Value;
             position = foundData.Position;
             velocity = foundData.Velocity;

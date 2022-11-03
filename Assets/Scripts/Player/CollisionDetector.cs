@@ -82,9 +82,9 @@ public class CollisionDetector : MonoBehaviour
         {
             levelController.CheckForRespawn();
         }
-        if (deathbox.gameObject.tag == "FinishLine")
+        if (deathbox.gameObject.tag == "Finish")
         {
-            levelController.RespawnPlayerToBeginning();
+            levelController.HasCompletedSingleplayerLevel();
         }
 
     }
