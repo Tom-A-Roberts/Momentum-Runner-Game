@@ -14,11 +14,10 @@ public class SpeedBoost : MonoBehaviour
     private PlayerController pc;
     private Rigidbody rb;
     private Vector3 boostVector;
-    //private Vector3 verticalCompensationForce;
-    
+
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.GetComponent<PlayerController>() == null)
+        if (other.gameObject.GetComponent<PlayerController>() == null)
         {
             return;
         }
@@ -28,25 +27,24 @@ public class SpeedBoost : MonoBehaviour
             DashMultiplier = 1;
             rb = pc.gameObject.GetComponent<Rigidbody>();
         }
-        
+
     }
-    private void Update()
+    private void FixedUpdate()
     {
         if (DashMultiplier > 0)
         {
-            timer += Time.deltaTime / DashAcceleration;
+            timer += Time.fixedDeltaTime / DashAcceleration;
             if (timer > 0)
             {
-                DashMultiplier -= Time.deltaTime / timer;
-                if(DashMultiplier < 0) DashMultiplier = 0;
+                DashMultiplier -= Time.fixedDeltaTime / timer;
+                if (DashMultiplier < 0) DashMultiplier = 0;
                 float currentDashForceAmount = (DashForce * DashMultiplier) * 2f;
                 boostVector = transform.forward * currentDashForceAmount;
-                //verticalCompensationForce = new Vector3(0, rb.velocity.y * -1 * VerticalForce * Time.deltaTime, 0);
                 float upComponent = Vector3.Dot(transform.up, rb.velocity);
-                Vector3 verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.deltaTime;
+                Vector3 verticalCompensationForce = transform.up * upComponent * -1 * VerticalForce * Time.fixedDeltaTime;
 
                 float rightComponent = Vector3.Dot(transform.right, rb.velocity);
-                Vector3 sidewaysCompensationForce = transform.right * rightComponent * -1 * VerticalForce * Time.deltaTime;
+                Vector3 sidewaysCompensationForce = transform.right * rightComponent * -1 * SidewaysForce * Time.fixedDeltaTime;
 
                 ForceMode boostType = ForceMode.Force;
                 pc.BoostForce(boostVector, boostType);
@@ -56,13 +54,13 @@ public class SpeedBoost : MonoBehaviour
         }
 
     }
+
+
+
     private void OnTriggerExit(Collider other)
     {
         DashMultiplier = 0;
         timer = 0;
         pc = null;
     }
-
-    //new Vector3(0,bodyRigidBody.velocity.y * -1,0), ForceMode.Impulse
-    //Rigidbody playerRB = other.gameObject.GetComponent<Rigidbody>();
 }

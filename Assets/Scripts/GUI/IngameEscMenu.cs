@@ -1,26 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using System;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class IngameEscMenu : MonoBehaviour
 {
-    public static IngameEscMenu Instance { get; private set; }
+    public static IngameEscMenu Singleton { get; private set; }
 
+    public GameObject recoveringText;
     public GameObject escapeMenuUIObject;
+    public GameObject hitmarkerUIElement;
     public bool isEscMenuShowing = false;
     public bool curserUnlocked = false;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Singleton != null && Singleton != this)
         {
-            Destroy(Instance);
+            Destroy(Singleton);
         }
-
-        Instance = this;
+        Singleton = this;
     }
 
     void Start()
@@ -43,6 +45,21 @@ public class IngameEscMenu : MonoBehaviour
             Show();
     }
 
+    public void ShowRecoveringInfo()
+    {
+        if (recoveringText)
+        {
+            recoveringText.SetActive(true);
+        }
+    }
+    public void HideRecoveringInfo()
+    {
+        if (recoveringText)
+        {
+            recoveringText.SetActive(false);
+        }
+    }
+
     public void Show()
     {
         escapeMenuUIObject.SetActive(true);
@@ -54,24 +71,35 @@ public class IngameEscMenu : MonoBehaviour
     {
         escapeMenuUIObject.SetActive(false);
         isEscMenuShowing = false;
-        LockCursor();
+
+        if(!LeaderboardUI.Singleton.IsShowing)
+            LockCursor();
     }
 
     private delegate void OnNetworkShutdown();
 
     public void LoadMainMenu()
     {
+        Hide();
+        if (LoadingCamera.Singleton)
+            LoadingCamera.Singleton.Enable();
         StartCoroutine(NetworkShutdown(GoToMainMenu));
     }
 
     private void GoToMainMenu()
     {
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        LoadingScreen.Load("Menu");
     }
 
     public void QuitToDesktop()
     {
         StartCoroutine(NetworkShutdown(QuitApplication));
+    }
+
+    public void ReplayLevelButton()
+    {
+        if (NetworkManager.Singleton.IsHost)
+            GameStateManager.Singleton.ResetLevelToBeginning();
     }
 
     private void QuitApplication()
@@ -105,12 +133,12 @@ public class IngameEscMenu : MonoBehaviour
     public static void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        Instance.curserUnlocked = false;
+        Singleton.curserUnlocked = false;
     }
 
     public static void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
-        Instance.curserUnlocked = true;
+        Singleton.curserUnlocked = true;
     }
 }

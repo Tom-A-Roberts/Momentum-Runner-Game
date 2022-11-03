@@ -1,39 +1,105 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using Unity.Collections;
 using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEngine;
+using static GameStateManager;
+
 public class PlayerNetworking : NetworkBehaviour
 {
+    /// <summary>
+    /// All continuously updated player state data, specifically for this one player.
+    /// </summary>
     private NetworkVariable<PlayerNetworkData> _netState = new NetworkVariable<PlayerNetworkData>(writePerm: NetworkVariableWritePermission.Owner);
 
-    /// <summary>
-    /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
-    /// </summary>
-    public static Dictionary<ulong, GameObject> ConnectedPlayers;
+    private NetworkVariable<FixedString64Bytes> displayName = new NetworkVariable<FixedString64Bytes>(writePerm: NetworkVariableWritePermission.Owner);
 
-    private Vector3 _vel;
-    private float _rotVelX;
-    private float _rotVelY;
-    private float _rotVelZ;
+    public NetworkVariable<bool> _isDead = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> _isSpectating = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> _isRespawning = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Server);
 
-    public LevelLogicManager myLevelController;
+    [Header("Known Objects")]
+    public PlayerStateManager myPlayerStateController;
     public GameObject myCamera;
     public GameObject grappleGun;
     public GameObject shootingGun;
     public Rigidbody bodyRigidbody;
     public Rigidbody feetRigidbody;
-    public Transform multiplayerRepresentation;
+    public Collider MultiplayerCollider;
+    public Nameplate nameplate;
 
+    // These variables are set in OnNetworkSpawn
     private GunController myGunController;
     private GrappleGun myGrappleGun;
     private PlayerController myPlayerController;
-    //public AudioSource myAudioSource;
+
+    /// <summary>
+    /// Stats are ONLY tracked by the host
+    /// </summary>
+    public StatsTracker myStatsTracker;
+
+    /// <summary>
+    /// A maintained list of all player ID's in the game (the keys), along with their associated prefabs (the values).
+    /// </summary>
+    public static Dictionary<ulong, GameObject> ConnectedPlayers;
+    public static Dictionary<ulong, PlayerNetworking> ConnectedPlayerNetworkingScripts;
+
+    /// <summary>
+    /// Gets set to the local (IsOwner) PlayerNetworking instance
+    /// </summary>
+    public static PlayerNetworking localPlayer;
+
+    /// <summary>
+    /// Holds past player states. If IsOwner, then time is local time. If data is recieved from remote, then time is recieved from the remote owner.
+    /// </summary>
+    private List<KeyValuePair<float, PositionData>> positionHistory = new List<KeyValuePair<float, PositionData>>();
+
+    /// <summary>
+    /// Which ready up state this player is in. May not be accurate in all cases when the player
+    /// is not the owner
+    /// </summary>
+    public ReadyUpState PlayerReadyUpState => _playerReadyUpState;
+
+    /// <summary>
+    /// Which ready up state this player is in. May not be accurate in all cases when the player
+    /// is not the owner
+    /// </summary>
+    private ReadyUpState _playerReadyUpState = ReadyUpState.unready;
+
+    /// <summary>
+    /// My display name, as decided by the owner playerNetworking
+    /// </summary>
+    public string DisplayName => displayName.Value.ToSafeString();
+
+    private SettingsInterface settings;
+
+    /// <summary>
+    /// My display name, as decided by the owner playerNetworking
+    /// </summary>
+
+    /// <summary>
+    /// <para>unready and ready are what they say on the tin</para>
+    /// <para>waitingToReady and waitingToUnready are when you have shot and are waiting for
+    /// the server to confirm your new state.</para>
+    /// </summary>
+    public enum ReadyUpState
+    {
+        unready,
+        waitingToReady,
+        ready,
+        waitingToUnready
+    }
 
     /// <summary>
     /// How smoothed out a multiplayer player's movement should be. Higher = smoother
     /// </summary>
     [SerializeField] private float _cheapInterpolationTime = 0.05f;
 
+    void Awake()
+    {
+        settings = new SettingsInterface();
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -57,8 +123,19 @@ public class PlayerNetworking : NetworkBehaviour
                 HandlePositionData(serverTime);
             }
         }
+
+        if (NetworkManager.Singleton.IsHost && myStatsTracker != null && GameStateManager.Singleton)
+        {
+            myStatsTracker.Update(_netState.Value.PositionData.Velocity);
+        }
     }
 
+    /// <summary>
+    /// Using the local time, this function writes the local player's state along with the time stamp into a struct
+    /// and sends this over the network to the other clients. The state is added to a position history list, ordered by
+    /// timestamp. Local time is calculated by NetworkManager.LocalTime.TimeAsFloat
+    /// </summary>
+    /// <param name="localTime">Calculated by: NetworkManager.LocalTime.TimeAsFloat</param>
     private void UpdatePositionData(float localTime)
     {
         PositionData posData = new PositionData()
@@ -80,12 +157,15 @@ public class PlayerNetworking : NetworkBehaviour
         positionHistory.Add(new KeyValuePair<float, PositionData>(localTime, posData));
     }
 
-    private List<KeyValuePair<float, PositionData>> positionHistory = new List<KeyValuePair<float, PositionData>>();
-
+    /// <summary>
+    /// Reads the latest player state from the network variable, and updates the position history list with this state .
+    /// </summary>
+    /// <param name="serverTime">NetworkManager.ServerTime.TimeAsFloat</param>
     private void HandlePositionData(float serverTime)
     {
         PlayerNetworkData dataReceived = _netState.Value;
         float time = dataReceived.SendTime;
+
         PositionData positionData = dataReceived.PositionData;
 
         positionHistory.Add(new KeyValuePair<float, PositionData>(time, positionData));
@@ -94,9 +174,16 @@ public class PlayerNetworking : NetworkBehaviour
             InterpolatePosition(serverTime);
     }
 
-    private PositionData GetPositionDataAtTime(float localTime)
+    /// <summary>
+    /// Finds what position the player was likely to be in at a given point in time.
+    /// The function creates a new set of position data, interpolated from the existing data.
+    /// </summary>
+    /// <param name="localTime">The time at which we wish to observe the state of</param>
+    /// <param name="interpolationTime">How much we reverse the time, giving an allowance for lag and packet jitter</param>
+    /// <returns>INTERPOLATED position data</returns>
+    private PositionData GetPositionDataAtTime(float localTime, float interpolationTime)
     {
-        float timeToFind = localTime - _cheapInterpolationTime;
+        float timeToFind = localTime - interpolationTime;
 
         int foundDataIndex = positionHistory.FindLastIndex(value => value.Key < timeToFind);
 
@@ -109,7 +196,7 @@ public class PlayerNetworking : NetworkBehaviour
         float xRot;
         float yRot;
         float zRot;
-
+        // && foundDataIndex > -1
         if (foundDataIndex < positionHistory.Count - 1)
         {
             foundData = positionHistory[foundDataIndex].Value;
@@ -120,11 +207,10 @@ public class PlayerNetworking : NetworkBehaviour
             xRot = Mathf.LerpAngle(foundData.Rotation.x, foundData2.Rotation.x, interpRatio);
             yRot = Mathf.LerpAngle(foundData.Rotation.y, foundData2.Rotation.y, interpRatio);
             zRot = Mathf.LerpAngle(foundData.Rotation.z, foundData2.Rotation.z, interpRatio);
-
         }
         else
         {
-            Debug.LogWarning("Cannot Interp!");
+            //Debug.LogWarning("Cannot Interp!");
             foundData = positionHistory[positionHistory.Count - 1].Value;
             position = foundData.Position;
             velocity = foundData.Velocity;
@@ -143,9 +229,14 @@ public class PlayerNetworking : NetworkBehaviour
         return interpolatedData;
     }
 
+    /// <summary>
+    /// Finds the state of a player from back in time (a particular localTime) and SETS the player's state back
+    /// to the old state.
+    /// </summary>
+    /// <param name="localTime">The time to revert to, as defined by the owner who created the state</param>
     private void InterpolatePosition(float localTime)
     {
-        PositionData interpolatedPosition = GetPositionDataAtTime(localTime);
+        PositionData interpolatedPosition = GetPositionDataAtTime(localTime, _cheapInterpolationTime);
 
         Vector3 position = interpolatedPosition.Position;
         Vector3 velocity = interpolatedPosition.Velocity;
@@ -155,7 +246,7 @@ public class PlayerNetworking : NetworkBehaviour
 
         bodyRigidbody.position = position;
         
-        feetRigidbody.position = bodyRigidbody.position - myLevelController.bodyFeetOffset;
+        feetRigidbody.position = bodyRigidbody.position - myPlayerStateController.bodyFeetOffset;
 
         myCamera.transform.rotation = Quaternion.Euler(xRot, yRot, zRot);
         bodyRigidbody.rotation = Quaternion.Euler(0, myCamera.transform.eulerAngles.y, myCamera.transform.eulerAngles.z);
@@ -165,128 +256,192 @@ public class PlayerNetworking : NetworkBehaviour
         feetRigidbody.velocity = velocity;
     }
 
-    //public void LeverFlicked()
-    //{
-    //    LevelFlickRequestServerRPC();
-    //    AnimateLeverClientRPC();
-    //}
-
-    //[ServerRpc]
-    //public void LevelFlickRequestServerRPC()
-    //{
-    //    // Check the player position
-    //    AnimateLeverClientRPC();
-    //}
-
-    //[ClientRpc]
-    //public void AnimateLeverClientRPC()
-    //{
-    //    if(!IsOwner)
-    //    {
-    //        // Makes new route appear to user
-    //    }
-    //}
 
     #region SHOOTING
     public void ShootStart(Vector3 shootStartPosition, Vector3 shootDirection)
     {
         if (IsOwner)
-        {            
-            // who do we think we hit?
-            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
-            int hitID = CheckForPlayerHit(hitObj);
+        {
+            // animate the shot client side immediately
+            AnimateShot(shootStartPosition, shootDirection, 0f);
 
-            // OR: if I missed then no point checking
-            if (hitID == -1)
+            if (!IsHost)
             {
-                Debug.Log("I missed");
-                return;
+                myGunController.myGunState.Shoot();
             }
 
-            float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;
-            ShootServerRPC(shootTime, shootDirection, hitID);
+            float shootTime = NetworkManager.Singleton.LocalTime.TimeAsFloat;            
+            ShootServerRPC(shootTime, shootStartPosition, shootDirection);
         }
     }
 
     [ServerRpc]
-    public void ShootServerRPC(float shootTime, Vector3 shootDirection, int hitPlayerID)
+    public void ShootServerRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection)
     {
-        int hitID = hitPlayerID;
-        Vector3 shootStartPosition = bodyRigidbody.position;
+        int serverHitHash;
 
-        bool shootSuccess = true;
+        // OR: not 100% sure that we need rtt here
+        ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);            
+        float timeToCheck = shootTime - rtt / 1000f;
 
-        if (!IsOwnedByServer)
-        {
-            ulong rtt = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId);
-            Debug.Log("Player " + OwnerClientId.ToString() + " RTT: " + rtt);
-            float timeToCheck = shootTime - rtt / 1000f;
-            //Debug.Log(shootTime - NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId) / 1000f);
-            InterpolatePosition(shootTime);
+        // Reset player colliders then fire the shot serverside
+        RollbackPlayerColliders(timeToCheck, true);
 
-            shootStartPosition = GetPositionDataAtTime(timeToCheck).Position;
-            //Debug.Log("shoot pos: " + shootStartPosition);
+        GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
+        serverHitHash = GetHashOfHit(hitObj);
 
-            GameObject playerIThinkIHit;
-            ConnectedPlayers.TryGetValue((ulong)hitPlayerID, out playerIThinkIHit);
-            
-            // should probably rollback all players 
-            PlayerNetworking playerNetworkingToRollback;
-            if (playerIThinkIHit)
-            {
-                if (playerIThinkIHit.TryGetComponent(out playerNetworkingToRollback))
-                {
-                    playerNetworkingToRollback.InterpolatePosition(timeToCheck);
-                }
-            }
-            else
-            {
-                Debug.LogWarning("Trying to shoot at a player who does not exist! PlayerID: " + hitPlayerID);
-            }
+        ResetPlayerColliders();
 
-            GameObject hitObj = LocalShoot(shootStartPosition, shootDirection);
-            hitID = CheckForPlayerHit(hitObj);
+        //float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
 
-            shootSuccess = hitPlayerID == hitID;
-
-            if (hitPlayerID == hitID)            
-                Debug.Log("No discrepancy found - Hit registered");            
-            else
-                Debug.Log("Discrepancy found - Hit missed");
-        }
-
-        ShootClientRPC(shootStartPosition, shootDirection, shootSuccess);
+        ShootClientRPC(shootTime, shootStartPosition, shootDirection, serverHitHash);
     }
 
     [ClientRpc]
-    public void ShootClientRPC(Vector3 shootStartPosition, Vector3 shootDirection, bool success) // int playerHitID)
+    public void ShootClientRPC(float shootTime, Vector3 shootStartPosition, Vector3 shootDirection, int serverHitHash)
     {
+        float timeToWait = shootTime - NetworkManager.ServerTime.TimeAsFloat;
+
         if (!IsOwner)
-        {
-            LocalShoot(shootStartPosition, shootDirection);
+        {            
+            AnimateShot(shootStartPosition, shootDirection, timeToWait);
         }
 
-        if (success)
-            Debug.Log("Wahoo I hit what I wanted!");
+        if (timeToWait > 0)
+        {
+            StartCoroutine(SyncedShotResult(serverHitHash, timeToWait));
+        }
         else
-            Debug.Log("Noooo I didn't hit what I wanted");
-
-        //myLevelController.ProcessPotentialHit(playerHitID);
+        {
+            PerformShotResult(serverHitHash);
+        }
     }
 
-    public GameObject LocalShoot(Vector3 shootStartPosition, Vector3 shootDirection)
+    void AnimateShot(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
     {
-        GameObject hitObj = myGunController.TryShoot(shootStartPosition, shootDirection);
-        return hitObj;
+        // OR: fire instantly if client shooting
+        if (timeToWait > 0)
+        {
+            StartCoroutine(SyncedShotAnimation(shootStartPosition, shootDirection, timeToWait));
+        }
+        else
+        {
+            myGunController.DoShoot(shootStartPosition, shootDirection);
+        }
+    }
+
+    IEnumerator SyncedShotAnimation(Vector3 shootStartPosition, Vector3 shootDirection, float timeToWait)
+    {
+        if (timeToWait > 0)
+            yield return new WaitForSeconds(timeToWait);
+
+        myGunController.DoShoot(shootStartPosition, shootDirection);
+    }
+
+    IEnumerator SyncedShotResult(int hitHash, float timeToWait)
+    {
+        if (timeToWait > 0)
+            yield return new WaitForSeconds(timeToWait);
+
+        PerformShotResult(hitHash);
+    }
+
+    void PerformShotResult(int hitHash)
+    {
+        if (hitHash != -1)
+        {
+            NetworkObject hitNetworkObject = GetNetworkObject((ulong)hitHash);
+
+            if (hitNetworkObject != null)
+            {
+                GameObject hitGameObject = hitNetworkObject.gameObject;
+
+                // run ALL hit checks in here please
+                if (hitGameObject)
+                {
+                    // first check player hit
+                    PlayerNetworking shotPlayerNetworking = CheckForPlayerHit(hitGameObject);
+                    if (shotPlayerNetworking != null)
+                    {
+                        if (shotPlayerNetworking.myPlayerStateController.SlowdownShieldTimer > 0)
+                        {
+                            
+                        }
+                        else
+                        {
+                            if (IsOwner)
+                                myPlayerStateController.StartHitmarker();
+                        }
+
+                        shotPlayerNetworking.myPlayerStateController.ProcessHit();
+                        return;
+                    }
+
+                    if (IsOwner)
+                        myPlayerStateController.StartHitmarker();
+
+                    // then switch
+                    Target hitTarget = hitGameObject.transform.gameObject.GetComponent<Target>();
+                    if (hitTarget != null)
+                    {
+                        hitTarget.OnHitByLaser();
+                        return;
+                    }
+
+                    // finally ready up - only if owner
+                    if (IsOwner && GameStateManager.Singleton)
+                    {                        
+                        if (hitGameObject.transform.tag == "Readyup" && GameStateManager.Singleton.GameState == GameState.waitingToReadyUp)
+                        {
+                            ReadyUpStateChange();
+                            return;
+                        }
+
+                        
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>
     /// </summary>
     /// <param name="rayHitObject">The gameobject that was hit by the shoot raycast</param>
-    /// <returns>IF the ray hit a network player, returns OwnerClientID. ELSE, return -1</returns>
-    public int CheckForPlayerHit(GameObject rayHitObject)
+    /// <returns>IF the ray hit a network object, returns NetworkObjectID. ELSE, return -1</returns>
+    int GetHashOfHit(GameObject rayHitObject)
     {
-        int playerHitID = -1;
+        if (rayHitObject != null)
+        {
+            // first check whether the object we hit has a NetworkObject
+            NetworkObject hitNetworkObject;
+            if (rayHitObject.TryGetComponent<NetworkObject>(out hitNetworkObject))
+            {
+                return (int)hitNetworkObject.NetworkObjectId;
+            }
+            else
+            {
+                // if not then try the parent? (currently only necessary for players)
+                // searching in children would be an extremely bad idea
+                Transform prefabParent = rayHitObject.transform.root;
+                if (prefabParent != null)
+                {
+                    if (prefabParent.TryGetComponent<NetworkObject>(out hitNetworkObject))
+                    {
+                        return (int)hitNetworkObject.NetworkObjectId;
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="rayHitObject">The gameobject that was hit by the shoot raycast</param>
+    /// <returns>IF the ray hit a network player, returns its PlayerNetworking. ELSE, returns null</returns>
+    public PlayerNetworking CheckForPlayerHit(GameObject rayHitObject)
+    {
         if (rayHitObject != null)
         {
             Transform prefabParent = rayHitObject.transform.root;
@@ -295,12 +450,16 @@ public class PlayerNetworking : NetworkBehaviour
                 PlayerNetworking shotPlayerNetworkingScript;
                 if (prefabParent.TryGetComponent<PlayerNetworking>(out shotPlayerNetworkingScript))
                 {
-                    playerHitID = (int)shotPlayerNetworkingScript.OwnerClientId;
-
+                    return shotPlayerNetworkingScript;
+                }
+                else
+                {
+                    return null;
                 }
             }
         }
-        return playerHitID;
+        
+        return null;
     }
     #endregion
 
@@ -343,11 +502,275 @@ public class PlayerNetworking : NetworkBehaviour
     }
     #endregion
 
+    #region SpectatorMode
+    /// <summary>
+    /// Allow clients to turn themselves into spectators when they like.
+    /// No need to prevent cheaters here lol, let them do it
+    /// </summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void EnterSpectatorModeServerRPC()
+    {
+        _isSpectating.Value = true;
+    }
+    public void LeaveSpectatorMode()
+    {
+        _isSpectating.Value = false;
+    }
+
+    #endregion
+
+    #region ForceTeleporting
+    // Whenever the server wants to teleport a player, this is a useful command. Such as respawning etc
+    public void ServerTeleportPlayer(Vector3 teleportLocation)
+    {
+        TeleportPlayerClientRPC(teleportLocation);
+    }
+
+    [ClientRpc]
+    public void TeleportPlayerClientRPC(Vector3 teleportLocation)
+    {
+        myPlayerStateController.TeleportPlayer(teleportLocation);
+    }
+
+    #endregion
+
+    #region ReadyingUp
+
+
+    /// <summary>
+    /// When a client (the server, really) thinks everyone has readied up, they can prompt the server to do a check. Usually the server
+    /// itself does this. If the server agrees everyone is ready, then it calls the client RPC to say everyone is ready. At this point
+    /// it cannot be undone
+    /// </summary>
+    [ServerRpc(RequireOwnership =false)]
+    public void EveryoneHasReadiedUpServerRPC()
+    {
+        if (GameStateManager.Singleton && GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
+        {
+            GameStateManager.Singleton.ServerForceChangeGameState(GameState.readiedUp);
+        }
+    }
+
+    /// <summary>
+    /// Toggles the current ready up state, sending a request to change state to the server. In the meantime, the waiting effects are applied, such as the button
+    /// being half pressed.
+    /// </summary>
+    public void ReadyUpStateChange()
+    {
+        if (IsOwner && GameStateManager.Singleton)
+        {
+            if (_playerReadyUpState == ReadyUpState.ready)
+            {
+                _playerReadyUpState = ReadyUpState.waitingToUnready;
+                GameStateManager.Singleton.gameStateSwitcher.LocalStartUnreadyEffects();
+                UnReadyUpServerRPC();
+            }
+            else if (_playerReadyUpState == ReadyUpState.unready)
+            {
+                _playerReadyUpState = ReadyUpState.waitingToReady;
+                GameStateManager.Singleton.gameStateSwitcher.LocalStartReadyUpEffects();
+                ReadyUpServerRPC();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Activated when the client recieves a message from the server saying you are now fully readied up
+    /// </summary>
+    public void ServerReadyUp()
+    {
+        if (IsOwner)
+        {
+            _playerReadyUpState = ReadyUpState.ready;
+            GameStateManager.Singleton.gameStateSwitcher.LocalServerReadyUpEffects();
+        }
+        else
+        {
+            // Display unready state above myPlayerStateManager's head
+        }
+
+        // Track who's ready and who isn't:
+        if (!GameStateManager.Singleton.readiedPlayers.Contains(OwnerClientId))
+        {
+            GameStateManager.Singleton.readiedPlayers.Add(OwnerClientId);
+        }
+
+        // If everyone is ready and you are the host:
+        if (IsHost && GameStateManager.Singleton.readiedPlayers.Count == ConnectedPlayers.Count)
+        {
+            //Debug.Log("here");
+            EveryoneHasReadiedUpServerRPC();
+        }
+    }
+
+    /// <summary>
+    /// Activated when the client recieves a message from the server saying you are now fully unreadied
+    /// </summary>
+    public void ServerUnready()
+    {
+        if (IsOwner)
+        {
+            _playerReadyUpState = ReadyUpState.unready;
+            GameStateManager.Singleton.gameStateSwitcher.LocalServerUnreadyEffects();
+        }
+        else
+        {
+            // Display unready state above myPlayerStateManager's head
+        }
+
+        // Track who's ready and who isn't:
+        if (GameStateManager.Singleton.readiedPlayers.Contains(OwnerClientId))
+        {
+            GameStateManager.Singleton.readiedPlayers.Remove(OwnerClientId);
+        }
+    }
+
+    [ServerRpc]
+    public void ReadyUpServerRPC()
+    {
+        ReadyUpClientRPC();
+    }
+    [ServerRpc]
+    public void UnReadyUpServerRPC()
+    {
+        UnReadyUpClientRPC();
+    }
+    [ClientRpc]
+    public void ReadyUpClientRPC()
+    {
+        ServerReadyUp();
+    }
+    [ClientRpc]
+    public void UnReadyUpClientRPC()
+    {
+        ServerUnready();
+    }
+
+    #endregion
+
+    #region RollbackCode
+
+    // should maybe be in seperate manager that rolls back entire server state
+    /// <summary>
+    /// Rolls back all multiplayer colliders to be in a past game state
+    /// </summary>
+    /// <param name="time"></param> The time to rollback to 
+    /// <param name="ignoreMe"></param> Whether to disable the collider of the player calling this as well
+    void RollbackPlayerColliders(float time, bool ignoreMe)
+    {
+        // disable my own collider if requested
+        MultiplayerCollider.enabled = !ignoreMe;
+
+        foreach (ulong playerID in ConnectedPlayers.Keys)
+        {
+            GameObject playerObject;
+            if (ConnectedPlayers.TryGetValue(playerID, out playerObject))
+            {
+                PlayerNetworking playerNetworkingToRollback;
+                if (playerObject.TryGetComponent(out playerNetworkingToRollback))
+                {
+                    PositionData posData = playerNetworkingToRollback.GetPositionDataAtTime(time, _cheapInterpolationTime);
+
+                    playerNetworkingToRollback.MultiplayerCollider.transform.position = posData.Position;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("ConnectedPlayers contains players that don't exist!");
+            }
+        }
+    }
+
+    void ResetPlayerColliders()
+    {
+        MultiplayerCollider.enabled = true;
+
+        foreach (ulong playerID in ConnectedPlayers.Keys)
+        {
+            GameObject playerObject;
+            if (ConnectedPlayers.TryGetValue(playerID, out playerObject))
+            {
+                PlayerNetworking playerNetworkingToRollback;
+                if (playerObject.TryGetComponent(out playerNetworkingToRollback))
+                {
+                    playerNetworkingToRollback.MultiplayerCollider.transform.localPosition = Vector3.zero;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("ConnectedPlayers contains players that don't exist!");
+            }
+        }
+    }
+    #endregion
+
+    #region Winning/Losing Game
+
+    [ServerRpc]
+    public void SendLeaderboardDataServerRPC(LeaderboardData leaderboardData)
+    {
+        
+        SendLeaderboardDataClientRPC(leaderboardData);
+    }
+    [ClientRpc]
+    public void SendLeaderboardDataClientRPC(LeaderboardData leaderboardData)
+    {
+        if (GameStateManager.Singleton)
+            GameStateManager.Singleton.gameStateSwitcher.RecieveLeaderboardData(leaderboardData);
+    }
+
+    public void ResetPlayerServerside()
+    {
+        ResetPlayerClientRPC();
+    }
+
+    [ClientRpc]
+    public void ResetPlayerClientRPC()
+    {
+        ResetPlayerLocally();
+
+    }
+
+    /// <summary>
+    /// Resets them to the beginning of the map, and wipes their distance and speed stats
+    /// </summary>
+    public void ResetPlayerLocally()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            GameStateManager.Singleton.ServerForceChangeGameState(GameState.waitingToReadyUp);
+
+            myStatsTracker.ResetStats();
+            _isDead.Value = false;
+            _isRespawning.Value = false;
+            _isSpectating.Value = false;
+
+            //ServerTeleportPlayer(myPlayerStateController.bodySpawnPosition);
+        }
+
+        if (IsOwner)
+        {
+            myPlayerStateController.TeleportPlayer(myPlayerStateController.bodySpawnPosition);
+
+            if (_playerReadyUpState == ReadyUpState.ready)
+            {
+                ReadyUpStateChange();
+            }
+        }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Called by the player who joins, they modify the static list that persists across all playerNetworking instances locally.
+    /// If the static instance doesn't exist, it is created
+    /// </summary>
     private void PlayerConnect()
     {
         if (ConnectedPlayers == null || (IsOwner && IsHost))
         {
             ConnectedPlayers = new Dictionary<ulong, GameObject>();
+            ConnectedPlayerNetworkingScripts = new Dictionary<ulong, PlayerNetworking>();
         }
 
         if (ConnectedPlayers.ContainsKey(OwnerClientId))
@@ -356,18 +779,26 @@ public class PlayerNetworking : NetworkBehaviour
         }
 
         ConnectedPlayers[OwnerClientId] = gameObject;
-        Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        ConnectedPlayerNetworkingScripts[OwnerClientId] = gameObject.GetComponent<PlayerNetworking>();
+        Debug.Log("Player " + OwnerClientId.ToString() + " joined. There are now " + ConnectedPlayerNetworkingScripts.Keys.Count.ToString() + " players.");
     }
 
+    /// <summary>
+    /// Called by the player who disconnects, they modify the static list that persists across all playerNetworking instances locally.
+    /// </summary>
     private void PlayerDisconnect()
     {
         ConnectedPlayers.Remove(OwnerClientId);
-        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayers.Keys.Count.ToString() + " players.");
+        ConnectedPlayerNetworkingScripts.Remove(OwnerClientId);
+        Debug.Log("Player " + OwnerClientId.ToString() + " left. There are now " + ConnectedPlayerNetworkingScripts.Keys.Count.ToString() + " players.");
 
         if (IsOwner)
         {
+            // Re-enable the loading camera because this one will soon be destroyed:
+            if (LoadingCamera.Singleton)
+                LoadingCamera.Singleton.Enable();
             // OR: if I am disconnected then send my player to main menu
-            IngameEscMenu.Instance.LoadMainMenu();
+            IngameEscMenu.Singleton.LoadMainMenu();
         }
     }
 
@@ -375,18 +806,28 @@ public class PlayerNetworking : NetworkBehaviour
     {
         PlayerConnect();
 
+
+
         myGrappleGun = grappleGun.GetComponent<GrappleGun>();
         myGrappleGun.isGrappleOwner = IsOwner;
 
         myPlayerController = GetComponentInChildren<PlayerController>();
         myPlayerController.NetworkInitialize(IsOwner);
 
+        // OR: not sure it matters if this is always on?
+        MultiplayerCollider.enabled = true; //!IsOwner;
+
+        if (NetworkManager.Singleton.IsHost)
+            myStatsTracker = new StatsTracker(this, myPlayerStateController, bodyRigidbody);
+
+        displayName.OnValueChanged += ChangedDisplayName;
+
         // Check if this object has been spawned as an OTHER player (aka it's not controlled by the current client)
         if (!IsOwner)
         {
             //bodyRigidbody.isKinematic = true;
             //feetRigidbody.isKinematic = true;
-           
+            
             // Remove camera
             Destroy(myCamera.GetComponent<CameraController>());
             Destroy(myCamera.GetComponent<UnityEngine.Rendering.HighDefinition.HDAdditionalCameraData>());
@@ -397,27 +838,65 @@ public class PlayerNetworking : NetworkBehaviour
             bodyRigidbody.gameObject.layer = 6;
 
             // enable the multiplayer 3rd person representation of this prefab
-            for (int childID = 0; childID < multiplayerRepresentation.childCount; childID++)
-            {
-                multiplayerRepresentation.GetChild(childID).GetComponent<MeshRenderer>().enabled = true;
-            }
+
+            myPlayerStateController.ShowMultiplayerRepresentation();
+
             bodyRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
             feetRigidbody.gameObject.GetComponent<MeshRenderer>().enabled = false;
 
-            gameObject.name = "Player" + OwnerClientId.ToString() + " (Remote)";
+            if(localPlayer)
+                InitNameplate();
         }
         else
         {
-            //if (Camera.main != myCamera)
-            //{
-            //    GameObject spawnCam = Camera.main.gameObject;
-            //    Destroy(spawnCam);
-            //}
+            if (LoadingCamera.Singleton)
+                LoadingCamera.Singleton.Disable();
 
-            
+            if(GameStateManager.Singleton)
+                GameStateManager.Singleton.localPlayer = this;
+            localPlayer = this;
 
-            gameObject.name = "Player" + OwnerClientId.ToString() + " (Local)";
+            // Activate the game state manager initialization:
+            // Sadly has to be done here as the GameStateManager OnNetworkSpawn is unreliable
+            if (GameStateManager.Singleton)
+                GameStateManager.Singleton.OnLocalPlayerNetworkSpawn();
+
+            myPlayerStateController.HideMultiplayerRepresentation();
+
+            displayName.Value = GetMyDisplayName();
         }
+    }
+
+    private void ChangedDisplayName(FixedString64Bytes oldName, FixedString64Bytes newName)
+    {
+        if (!IsOwner)
+        {
+            gameObject.name = newName + " (Remote)";
+            nameplate.SetName(newName.ToSafeString());
+        }
+        else
+        {
+            gameObject.name = newName + " (Local)";
+        }
+    }
+
+    public void InitNameplate()
+    {
+        if (!IsOwner)
+        {
+            nameplate.Init(localPlayer.bodyRigidbody.transform, displayName.Value.ToSafeString());
+        }
+    }
+
+    public FixedString64Bytes GetMyDisplayName()
+    {
+        // If using steam, this is where we'd connect to the steam API
+
+        //string name = "Player " + OwnerClientId.ToString();
+        //MenuUIScript.UpdateDisplayName();
+        string name = settings.DisplayName;
+        FixedString64Bytes bytesName = new FixedString64Bytes(name);
+        return bytesName;
     }
 
     /// <summary>
@@ -436,6 +915,9 @@ public class PlayerNetworking : NetworkBehaviour
         Debug.Log(outStr);
     }
 
+    /// <summary>
+    /// Called whenever the object is destroyed, such as when a remote client disconnects, their prefab is destroyed.
+    /// </summary>
     public override void OnDestroy()
     {
         // OR: not a huge fan of disconnect being handled here
@@ -445,6 +927,9 @@ public class PlayerNetworking : NetworkBehaviour
         base.OnDestroy();
     }
 
+    /// <summary>
+    /// The continuous data that is synced across the network. A time key along with a state is syncronized
+    /// </summary>
     struct PlayerNetworkData : INetworkSerializable
     {
         private float _sendTime;
@@ -473,8 +958,14 @@ public class PlayerNetworking : NetworkBehaviour
     }
 }
 
+/// <summary>
+/// Represents a single tick of player state information, to be synced in PlayerNetworkData across the network
+/// </summary>
 struct PositionData : INetworkSerializable
 {
+    /// <summary>
+    /// The position of the body
+    /// </summary>
     private float _x, _y, _z;
 
     /// <summary>
@@ -497,6 +988,9 @@ struct PositionData : INetworkSerializable
         }
     }
 
+    /// <summary>
+    /// Also upload velocity to improve interpolation accuracy
+    /// </summary>
     internal Vector3 Velocity
     {
         get => new Vector3(_xVel, _yVel, _zVel);

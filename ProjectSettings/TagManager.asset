@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - TriggerDeath
+  - SpawnPoint
+  - Readyup
+  - Grappleable
   layers:
   - Default
   - TransparentFX
@@ -15,8 +18,8 @@ TagManager:
   - Terrain
   - Wall
   - FirstPersonRendering
-  - 
-  - 
+  - Feet
+  - HitBox
   - 
   - 
   - 

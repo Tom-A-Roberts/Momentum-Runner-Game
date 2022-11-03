@@ -27,7 +27,7 @@ public class CableProceduralSimple : MonoBehaviour
 	// How fast the cable will go back and forth per second.
 	[SerializeField] float swayFrequency = 1;
 
-	[SerializeField] bool swayEnabled = true;
+	[SerializeField] bool swayEnabled = false;
 
 	[SerializeField] bool isPlyonCable = true;
 
@@ -99,20 +99,21 @@ public class CableProceduralSimple : MonoBehaviour
 		}
 
 		UpdateEnds();
-	}
+        Draw();
+    }
 	
 
 
 	void Update () 
 	{
-        if (myEnd != endPointTransform.position || myStart != transform.position || myEndRot != endPointTransform.localRotation || myEndScale != endPointTransform.localScale)
-        {
+		if (myEnd != endPointTransform.position || myStart != transform.position || myEndRot != endPointTransform.localRotation || myEndScale != endPointTransform.localScale)
+		{
 			UpdateEnds();
-        }
-        else if (swayEnabled)
-        {
-			Draw();
 		}
+		//      else if (swayEnabled)
+		//      {
+		//	Draw();
+		//}
 
 	}
 

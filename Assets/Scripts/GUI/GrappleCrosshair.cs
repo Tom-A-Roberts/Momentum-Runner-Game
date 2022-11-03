@@ -6,6 +6,10 @@ using UnityEngine.UI;
 public class GrappleCrosshair : MonoBehaviour
 {
     public static GrappleCrosshair Instance { get; private set; }
+
+    [System.NonSerialized]
+    public bool spectatorMode = false;
+
     private Image myImage;
     private void Awake()
     {
@@ -24,7 +28,7 @@ public class GrappleCrosshair : MonoBehaviour
     }
     public void UpdateGrappleLocation(GrappleGun.GrappleablePointInfo pointInfo)
     {
-        if(pointInfo.targetFound && Camera.main)
+        if(pointInfo.targetFound && Camera.main && !spectatorMode)
         {
             Vector3 screenPos = Camera.main.WorldToScreenPoint(pointInfo.grapplePoint);
             this.gameObject.transform.position = screenPos;
@@ -37,4 +41,5 @@ public class GrappleCrosshair : MonoBehaviour
                 myImage.enabled = false;
         }
     }
+
 }

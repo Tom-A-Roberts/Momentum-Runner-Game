@@ -23,28 +23,38 @@ public class CameraController : NetworkBehaviour
 	[System.NonSerialized]
 	public float zRotation = 0;
 
-	private float originalFOV;
+    [System.NonSerialized]
+    public bool spectatorMode = false;
+
+
+
+    private float originalFOV;
 	private float targetFOV;
 	private float FOVchangeCurrentVelocity = 0.0f;
 	private Camera myCamera;
 	private PlayerController playerScript;
 	private Rigidbody playerRigidBody;
+
+
+
     private void Start()
     {
 		myCamera = GetComponent<Camera>();
 		playerScript = body.GetComponent<PlayerController>();
 		playerRigidBody = body.GetComponent<Rigidbody>();
-		originalFOV = myCamera.fieldOfView;
-		
-	}
 
-    // Code thanks to: https://gist.github.com/KarlRamstedt/407d50725c7b6abeaf43aee802fdd88e
-    public float Sensitivity
-	{
-		get { return sensitivity; }
-		set { sensitivity = value; }
-	}
-	[Range(0.1f, 9f)][SerializeField] float sensitivity = 2f;
+		SettingsInterface settings = new SettingsInterface();
+		float aspectRatio = (float)Screen.height / (float)Screen.width;
+        float verticalFOV = 2 * Mathf.Atan(Mathf.Tan((settings.fov.Value * Mathf.Deg2Rad) / 2) * aspectRatio) * Mathf.Rad2Deg;
+
+        originalFOV = verticalFOV;
+
+		Sensitivity = settings.sensitivity.Value * 2;
+
+    }
+
+	// Code thanks to: https://gist.github.com/KarlRamstedt/407d50725c7b6abeaf43aee802fdd88e
+	[Range(0.1f, 9f)][SerializeField] float Sensitivity = 2f;
 	[Tooltip("Limits vertical camera rotation. Prevents the flipping that happens when rotation goes above 90.")]
 	[Range(0f, 90f)][SerializeField] float yRotationLimit = 88f;
 
@@ -54,10 +64,13 @@ public class CameraController : NetworkBehaviour
 
 	void Update()
 	{
-        if (!IngameEscMenu.Instance.curserUnlocked)
+
+		bool inFinishedGameState = GameStateManager.Singleton && (GameStateManager.Singleton.GameState == GameState.winState || GameStateManager.Singleton.GameState == GameState.podium);
+
+        if (!IngameEscMenu.Singleton.curserUnlocked && !inFinishedGameState)
         {
-			rotation.x += Input.GetAxis(xAxis) * sensitivity;
-			rotation.y += Input.GetAxis(yAxis) * sensitivity;
+			rotation.x += Input.GetAxis(xAxis) * Sensitivity;
+			rotation.y += Input.GetAxis(yAxis) * Sensitivity;
 		}
 		rotation.y = Mathf.Clamp(rotation.y, -yRotationLimit, yRotationLimit);
 		var xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
@@ -99,8 +112,14 @@ public class CameraController : NetworkBehaviour
         {
 			targetFOV = originalFOV * MaxFOVMultiplier;
 		}
-		
-		myCamera.fieldOfView = Mathf.SmoothDamp(myCamera.fieldOfView, targetFOV,  ref FOVchangeCurrentVelocity, fovChangeSmoothing);
-	}
 
+		if (!spectatorMode)
+		{
+            myCamera.fieldOfView = Mathf.SmoothDamp(myCamera.fieldOfView, targetFOV, ref FOVchangeCurrentVelocity, fovChangeSmoothing);
+        }
+		else
+		{
+			myCamera.fieldOfView = originalFOV;
+        }
+	}
 }

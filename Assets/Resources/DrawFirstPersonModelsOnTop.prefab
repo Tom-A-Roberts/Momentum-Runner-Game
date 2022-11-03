@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &611969262137635123
 MonoBehaviour:
@@ -68,7 +68,7 @@ MonoBehaviour:
         m_Version: 0
         filterFoldout: 1
         rendererFoldout: 1
-        renderQueueType: 2
+        renderQueueType: 10
         layerMask:
           serializedVersion: 2
           m_Bits: 256

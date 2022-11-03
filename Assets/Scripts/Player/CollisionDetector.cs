@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CollisionDetector : MonoBehaviour
 {
-    public LevelLogicManager levelController;
+    public PlayerStateManager levelController;
     public float coyoteTime = 0.5f;
     private bool m_IsOnGround;
     private bool m_IsOnGroundCoyote;
@@ -78,9 +78,13 @@ public class CollisionDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider deathbox)
     {
-        if(deathbox.gameObject.tag == "TriggerDeath")
+        if (deathbox.gameObject.tag == "TriggerDeath")
         {
-            levelController.RespawnPlayer();
+            levelController.CheckForRespawn();
+        }
+        if (deathbox.gameObject.tag == "Finish")
+        {
+            levelController.HasCompletedSingleplayerLevel();
         }
 
     }

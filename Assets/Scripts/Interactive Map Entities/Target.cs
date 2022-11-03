@@ -5,13 +5,15 @@ using UnityEngine;
 
 
 
-public class Target : MonoBehaviour
+public class Target: MonoBehaviour, IShootInterface
 {
-    public GameObject Door;
+    public GameObject[] ObjectsToChange;
 
-    public void TargetHit()
+    public void OnHitByLaser()
     {
-        Door.SetActive(false);
+        foreach (GameObject gb in ObjectsToChange)
+        {
+            gb.SetActive(!gb.activeSelf);
+        }
     }
-
 }

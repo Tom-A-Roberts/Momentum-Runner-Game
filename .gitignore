@@ -6,6 +6,7 @@
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
+/[Rr]eleaseBuild/
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
@@ -81,3 +82,5 @@ Assets/TextMesh Pro/Examples & Extras/Resources/Fonts & Materials/Oswald Bold SD
 Assets/TextMesh Pro/Examples & Extras/Resources/Fonts & Materials/Electronic Highway Sign SDF.asset
 Assets/TextMesh Pro/Examples & Extras/Resources/Fonts & Materials/Bangers SDF.asset
 Assets/TextMesh Pro/Examples & Extras/Resources/Fonts & Materials/Anton SDF.asset
+Assets/TextMesh Pro/Examples & Extras/Resources/Fonts & Materials/Electronic Highway Sign SDF.asset
+Assets/Materials/Effects/Fog Wall/Fog_Plane_Shader_Scene.unitypackage.meta

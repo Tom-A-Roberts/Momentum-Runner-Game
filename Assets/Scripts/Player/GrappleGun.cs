@@ -40,6 +40,8 @@ public class GrappleGun : MonoBehaviour
     [Tooltip("(Visual Only) How fast the grapple gun looks at the grapple point")]
     public float LookAtSmoothSpeed = 0.05f;
 
+    [System.NonSerialized]
+    public bool spectatorMode = false;
 
     /// <summary>
     /// Is this GrappleGun owned by this clients player?
@@ -53,6 +55,7 @@ public class GrappleGun : MonoBehaviour
     
     private ConfigurableJoint ropeJoing;    
     private Rigidbody playerRigidbody;
+
     private GrappleCrosshair onScreenGrappleCrosshair;
 
     private Vector3 connectedPoint;
@@ -124,10 +127,11 @@ public class GrappleGun : MonoBehaviour
 
     private void ProcessGrappleInput(GrappleablePointInfo raypointInfo)
     {
+        bool inFinishedGameState = GameStateManager.Singleton && (GameStateManager.Singleton.GameState == GameState.winState || GameStateManager.Singleton.GameState == GameState.podium);
         // Check if grapple gun is being controlled by the owner. If yes, then process local player input
-        if (isGrappleOwner && !IngameEscMenu.Instance.curserUnlocked)
+        if (isGrappleOwner && !IngameEscMenu.Singleton.curserUnlocked && !inFinishedGameState)
         {
-            if (Input.GetButton("Grapple") && !grappleConnected && raypointInfo.targetFound)
+            if (Input.GetButton("Grapple") && !grappleConnected && raypointInfo.targetFound && !spectatorMode)
             {
                 ConnectGrapple(raypointInfo);
             }
@@ -135,6 +139,11 @@ public class GrappleGun : MonoBehaviour
             {
                 DisconnectGrapple();
             }
+        }
+        // If switched to spectator, disconnect the grapple
+        if((spectatorMode && grappleConnected))
+        {
+            DisconnectGrapple();
         }
     }
 
@@ -164,12 +173,16 @@ public class GrappleGun : MonoBehaviour
         const float initialSpherecastDeadzone = 2;
         if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out hit, MaxGrappleLength, LayerMask.GetMask("Terrain")))
         {
-            return new GrappleablePointInfo()
+            if (hit.transform.CompareTag("Grappleable"))
             {
-                targetFound = true,
-                grapplePoint = hit.point,
-                grappleDistance = hit.distance,
-            };
+                //Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
+                return new GrappleablePointInfo()
+                {
+                    targetFound = true,
+                    grapplePoint = hit.point,
+                    grappleDistance = hit.distance,
+                };
+            }
         }
         else 
         {
@@ -177,12 +190,16 @@ public class GrappleGun : MonoBehaviour
             float spherecastLength = MaxGrappleLength - (AimAssistRadius/1) - initialSpherecastDeadzone;
             if (Physics.SphereCast(spherecastStart, (AimAssistRadius/1), PlayerCamera.transform.forward, out hit, spherecastLength, LayerMask.GetMask("Terrain")))
             {
-                return new GrappleablePointInfo()
+                if (hit.transform.CompareTag("Grappleable"))
                 {
-                    targetFound = true,
-                    grapplePoint = hit.point,
-                    grappleDistance = Vector3.Distance(hit.point, PlayerCamera.transform.position),
-                };
+                    //Debug.DrawLine(PlayerCamera.transform.position, hit.point, Color.blue, Time.deltaTime);
+                    return new GrappleablePointInfo()
+                    {
+                        targetFound = true,
+                        grapplePoint = hit.point,
+                        grappleDistance = Vector3.Distance(hit.point, PlayerCamera.transform.position),
+                    };
+                }
             }
             //else
             //{
